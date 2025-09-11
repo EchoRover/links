@@ -1,174 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>My Link Tree</title>
-    <style>
-        body {
-
-            background: #ddefff;
-            font-family: Arial, sans-serif;
-         
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            background: #ddefff;
-
-            border-radius: 12px;
-        
-            width: 100%;
-
-            justify-content: center;
-            align-items: center;
-
-
-            text-align: center;
-        }
-
-        .links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-            /* centers horizontally */
-
-        }
-
-        .avatar {
-            width: 96px;
-            height: 96px;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-            object-fit: cover;
-        }
-
-        h1 {
-            margin: 0.5rem 0 1.5rem 0;
-            font-size: 1.5rem;
-            color: #222;
-        }
-
-        a {
-            display: block;
-            background: #2f67d0;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 0.75rem 1rem;
-            margin: 0.5rem 0;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        a:hover {
-            background: #2f67d0dc;
-            transform: scale(1.025)
-        }
-
-        .box {
-            background: #2e89de46;
-            color: #000000;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            max-width: 400px;
-            min-width: 16rem;
-        }
-
-      
-       .box2 {
-                background: #2e89de46;
-            color: #000000;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            max-width: 600px;
-            min-width: 12rem;
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: row;
-            justify-content: center; /* ✅ centers the links horizontally */
-                width: 100%;  
-
-    gap: 1rem;          
-          /* set same max width as .links container */
-    margin-left: auto;      /* center horizontally */
-    margin-right: auto;   
-        }
-    </style>
+    <title>CSE Year 2 Links</title>
+    <link rel="icon" type="image/png" href="hacker.png">   
+     <script>
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+  </script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+    <button class = "button" id="theme-toggle">◐</button>
     <div class="container">
         <img src="image.png" alt="Avatar" class="avatar">
-        <h1>BTECH CSE YEAR 2</h1>
-        <div class="box2">
+        <h1>BTECH Computer YEAR 2</h1>
+        
+        <div class="general"></div>
+        
+        <div class="links"></div>
 
-            <a href="https://iitdadierp.iitd.ac.in/student/login" target="_blank">ERP</a>
+    
 
-            <a href="https://teams.microsoft.com/" target="_blank">Teams</a>
-            <a href="https://outlook.office.com/">Outlook</a>
-            <a href="https://iida.blackboard.com/ultra/course">Blackboard</a>
-            <a href="https://abudhabi.iitd.ac.in/uploaded_files/B.Tech.%202nd%20year%20CSE%20Sem%201_2025-26.pdf">TimeTable</a>
+    
+        <script src="scripts.js"></script>
 
-        </div>
-
-        <div class="links">
-            <div class="box">
-                <h1>ACOL215 (DIGI)</h1>
-                <a href="https://kumarmadhukar.github.io/courses/digilog-ad-diwali25/index.html" target="_blank">Course
-                    Page</a>
-
-            </div>
-            <div class="box">
-
-                <h1>ACOL106 (DSA)</h1>
-                <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/" target="_blank">Course Page</a>
-                <a href="https://piazza.com/class/megt7ecep5i4wy" target="_blank">Piazza</a>
-                <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/homework.html"
-                    target="_blank">Homework</a>
-
-                <a href="https://www.gradescope.com/courses/1086727" target="_blank">Gradescope</a>
-                <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/slides.html"
-                    target="_blank">Lectures</a>
-
-            </div>
-            <div class="box">
-
-                <h1>AGRL112 (Intro CS)</h1>
-                <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/" target="_blank">Course Page</a>
-                <a href="https://piazza.com/class/megt7ecep5i4wy" target="_blank">Piazza</a>
-                <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/homework.html"
-                    target="_blank">Homework</a>
-
-                <a href="https://www.gradescope.com/courses/1098487" target="_blank">Gradescope</a>
-                <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/slides.html"
-                    target="_blank">Lectures</a>
-
-            </div>
-            <div class="box">
-
-                <h1>AMTL106 (Stoc & Prob)</h1>
-                <a href="https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/"
-                    target="_blank">Course Files</a>
-
-
-            </div>
-            <div class="box">
-
-                <h1>AENL100 (AI)</h1>
-                <a href="https://iida.blackboard.com/ultra/courses/_6_1/outline" target="_blank">Blackboard</a>
-
-
-            </div>
-        </div>
+    </div>
 </body>
 
+
+
 </html>
-</div>
