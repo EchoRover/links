@@ -33,7 +33,7 @@ const linksData = {
 
     "AMTL106 (Stoc & Prob)": {
 
-      "lectures": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Lecture%20Notes",
+      "Lectures": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Lecture%20Notes",
       "Problem Sets": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Problem%20Sets",
       "Problem Solutions": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Solution%20to%20Problem%20Sets",
       "Course Files": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/",
