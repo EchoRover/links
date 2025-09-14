@@ -13,25 +13,31 @@ const linksData = {
     },
 
     "ACOL106 (DSA)": {
-      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/",
       "Lectures": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/slides.html",
       "Homework": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/homework.html",
-      "Quiz":" https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/quiz.html",
+      "Quiz": " https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/quiz.html",
       "Gradescope": "https://www.gradescope.com/courses/1086727",
-      "Piazza": "https://piazza.com/class/megt7ecep5i4wy"
+      "Piazza": "https://piazza.com/class/megt7ecep5i4wy",
+      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/",
+
     },
 
     "AGRL112 (Intro CS)": {
-      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/",
       "Lectures": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/slides.html",
       "Homework": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/homework.html",
       "Gradescope": "https://www.gradescope.com/courses/1098487",
-      "Piazza": "https://piazza.com/class/megt7ecep5i4wy"
+      "Piazza": "https://piazza.com/class/megt7ecep5i4wy",
+      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/",
+
     },
 
     "AMTL106 (Stoc & Prob)": {
+
+      "lectures": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Lecture%20Notes",
+      "Problem Sets": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Problem%20Sets",
+      "Problem Solutions": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Solution%20to%20Problem%20Sets",
       "Course Files": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/",
-      "Blackboard":"https://iida.blackboard.com/ultra/courses/_44_1/outline"
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_44_1/outline",
     },
 
     "AENL100 (AI)": {
@@ -99,16 +105,16 @@ const toggleBtn = document.getElementById("theme-toggle");
 // Initialize theme from system preference
 const currentTheme = localStorage.getItem("theme");
 if (currentTheme) {
-    document.documentElement.setAttribute("data-theme", currentTheme);
+  document.documentElement.setAttribute("data-theme", currentTheme);
 }
 
 toggleBtn.addEventListener("click", () => {
-    const theme = document.documentElement.getAttribute("data-theme");
-    const newTheme = theme === "light" ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
+  const theme = document.documentElement.getAttribute("data-theme");
+  const newTheme = theme === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", newTheme);
+  localStorage.setItem("theme", newTheme);
 
-  
+
 });
 
 // Set initial icon
@@ -116,9 +122,9 @@ toggleBtn.addEventListener("click", () => {
 
 
 window.addEventListener("DOMContentLoaded", () => {
-  renderGeneralLinks(".general", linksData.general );   // general links
+  renderGeneralLinks(".general", linksData.general);   // general links
   renderLinks1(".links", linksData.courses);  // course links
-  
+
 });
 
 
