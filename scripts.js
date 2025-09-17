@@ -33,10 +33,12 @@ const linksData = {
 
     "AMTL106 (Stoc & Prob)": {
 
-      "Lectures": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Lecture%20Notes",
-      "Problem Sets": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Problem%20Sets",
-      "Problem Solutions": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/Solution%20to%20Problem%20Sets",
-      "Course Files": "https://owncloud.iitd.ac.in/nextcloud/index.php/s/nnFRzkpQYkG24D4?path=/",
+      "Lectures": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/Em6zEdGXyjhIu7zR8AelmXABQDu00UVwhmfGZTkL2qBayA?e=A1eyRL",
+      "Problem Sets": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EqJTUBdP5_JOl3DJZA1x9NoBLIqLDDyGMVASIxeLs_oTLA?e=XRO85C",
+      "Problem Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EgWkUBlK5q1FgNwNT9tr1f4BPtwbZ7d-nxpiiO12LKS0UQ?e=wF08QV",
+      "Quiz Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EhqyGydyYatAg34IGX0LQAIB5uMhU2-3dDeksiZWWRcNXg?e=opEGs0",
+
+      "Course Files": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EmCRWabo5RFMsKyJWGalJNEBN3vCCbt5q8lc2O5HuZ0sSg?e=vpTWOg",
       "Blackboard": "https://iida.blackboard.com/ultra/courses/_44_1/outline",
     },
 
