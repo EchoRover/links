@@ -33,12 +33,12 @@ const linksData = {
 
     "AMTL106 (Stoc & Prob)": {
 
-      "Lectures": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/Em6zEdGXyjhIu7zR8AelmXABTrrxgwJTEO8-izxjDqiJ-g?e=Uh1kMb",
-      "Problem Sets": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EqJTUBdP5_JOl3DJZA1x9NoBeapUtXShxvgO7bsJjfwBKA?e=llLCfm",
-      "Problem Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EgWkUBlK5q1FgNwNT9tr1f4B9cQHB7KZWay-v6D24dzlQg?e=agUWaU",
-      "Quiz Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EhqyGydyYatAg34IGX0LQAIBzpo7kRAs_EYYku9ooXNTDQ?e=0dAo85",
+      // "Lectures": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/Em6zEdGXyjhIu7zR8AelmXABTrrxgwJTEO8-izxjDqiJ-g?e=Uh1kMb",
+      // "Problem Sets": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EqJTUBdP5_JOl3DJZA1x9NoBeapUtXShxvgO7bsJjfwBKA?e=llLCfm",
+      // "Problem Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EgWkUBlK5q1FgNwNT9tr1f4B9cQHB7KZWay-v6D24dzlQg?e=agUWaU",
+      // "Quiz Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EhqyGydyYatAg34IGX0LQAIBzpo7kRAs_EYYku9ooXNTDQ?e=0dAo85",
 
-      "Course Files": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EmCRWabo5RFMsKyJWGalJNEBN3vCCbt5q8lc2O5HuZ0sSg?e=vpTWOg",
+      // "Course Files": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EmCRWabo5RFMsKyJWGalJNEBN3vCCbt5q8lc2O5HuZ0sSg?e=vpTWOg",
       "Blackboard": "https://iida.blackboard.com/ultra/courses/_44_1/outline",
     },
 
