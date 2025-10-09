@@ -88,21 +88,95 @@ function renderGeneralLinks(selector, data) {
   }
 }
 
-function renderUpdates(selector, updates) {
-  const container = document.querySelector(selector);
-  if (!container) return;
+// ====== Render Updates ======
 
+
+
+// ====== Updates Data ======
+const updatesData = [];
+
+// ====== Helper to Add Update ======
+function addUpdate(category, text, expiry) {
+  updatesData.push([category, text, expiry]);
+}
+
+function renderUpdates() {
   const now = new Date();
 
-  updates.forEach(update => {
-    const expiryDateTime = new Date(update.expiry);
-    if (now <= expiryDateTime) {
-      const p = document.createElement("p");
-      p.textContent = update.text;
-      container.appendChild(p);
-    }
+  // group updates by category
+  const grouped = {};
+  updatesData.forEach(([category, text, expiry]) => {
+    if (!grouped[category]) grouped[category] = [];
+    grouped[category].push([text, expiry]);
   });
+
+  // sort inside each category
+  for (const [category, items] of Object.entries(grouped)) {
+    items.sort((a, b) => new Date(a[1]) - new Date(b[1]));
+    const container = document.getElementById(category + "-box");
+    if (!container) continue;
+
+    items.forEach(([text, expiry]) => {
+      const parts = String(expiry).split('-').map(Number);
+      if (parts.length !== 3) return;
+      const [y, m, d] = parts;
+      const expiryExclusive = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
+      if (now < expiryExclusive) {
+        const p = document.createElement("p");
+        p.textContent = text;
+        container.appendChild(p);
+      }
+    });
+  }
 }
+function renderUpdates() {
+  const now = new Date();
+
+  // group updates by category
+  const grouped = {};
+  updatesData.forEach(([category, text, expiry]) => {
+    if (!grouped[category]) grouped[category] = [];
+    grouped[category].push([text, expiry]);
+  });
+
+  // sort and render
+  for (const [category, items] of Object.entries(grouped)) {
+    items.sort((a, b) => new Date(a[1]) - new Date(b[1]));
+    const container = document.getElementById(category + "-box");
+    if (!container) continue;
+
+ items.forEach(([text, expiry]) => {
+  const parts = String(expiry).split('-').map(Number);
+  if (parts.length !== 3) return;
+  const [y, m, d] = parts;
+  const expiryExclusive = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
+
+  if (now < expiryExclusive) {
+    const p = document.createElement("p");
+
+    // Try to split title and date using the last comma
+    const splitIndex = text.lastIndexOf(',');
+    if (splitIndex >= 0) {
+      const title = text.slice(0, splitIndex);
+      const date = text.slice(splitIndex + 1).trim();
+      p.classList.add("two-column");
+      p.innerHTML = `
+        <span class="title">${title}</span>
+        <span class="date">${date}</span>
+      `;
+    } else {
+      // No comma → center-align full text
+      p.classList.add("center-text");
+      p.textContent = text;
+    }
+
+    container.appendChild(p);
+  }
+});
+
+  }
+}
+
 const toggleBtn = document.getElementById("theme-toggle");
 
 // Initialize theme from system preference
@@ -122,11 +196,19 @@ toggleBtn.addEventListener("click", () => {
 
 // Set initial icon
 
+addUpdate("quizzes","There are exams next week!","2025-10-16");
+addUpdate("assignments","ACOL106: Programming assignment 4, 12/10/2025","2025-10-12");
+addUpdate("assignments","ACOL106: Programming assignment 5, 26/10/2025","2025-10-26");
+addUpdate("assignments","AGRL112: Assignment 6 (RMQ), 11/10/2025","2025-10-11");
+addUpdate("assignments","AGRL112: Assignment 7 (Systems), 25/10/2025","2025-10-25");
+
+
 
 
 window.addEventListener("DOMContentLoaded", () => {
   renderGeneralLinks(".general", linksData.general);   // general links
   renderLinks1(".links", linksData.courses);  // course links
+  renderUpdates();
 
 });
 
