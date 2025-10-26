@@ -203,6 +203,8 @@ addUpdate("assignments","AGRL112: Assignment 6 (RMQ), 11/10/2025","2025-10-11");
 addUpdate("assignments","AGRL112: Assignment 7 (Systems), 25/10/2025","2025-10-25");
 addUpdate("assignments","ACOL106: Comprehension Quiz 07, 14/10/2025","2025-10-14");
 addUpdate("assignments","ACOL215: 8bit display submission before diwali, 17/10/2025","2025-10-21");
+addUpdate("assignments","ACOL215: Assignment 1, 27/10/2025","2025-10-27");
+
 
 
 
