@@ -211,7 +211,7 @@ addUpdate("quizzes","ACOL106: Theory Quiz Regular, 20/11/2025","2025-11-20");
 addUpdate("quizzes","AMTL106: Theory Quiz Topic 14, 19/11/2025","2025-11-19");
 addUpdate("quizzes","AENL100: Quiz, 21/11/2025","2025-11-21");
 addUpdate("assignments","AENL100: Group AI Project, 12/12/2025","2025-12-12");
-addUpdate("assignments","AMTL106: Group Project (est date), 27/11/2025","2025-11-30");
+addUpdate("assignments","AMTL106: Group Project (est. date), 27/11/2025","2025-11-30");
 
 addUpdate("assignments","AGRL112: Robotics, 23/11/2025","2025-11-23");
 addUpdate("assignments","AGRL112: Error codes, 30/11/2025","2025-11-30");
