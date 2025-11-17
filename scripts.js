@@ -206,10 +206,10 @@ addUpdate("assignments","ACOL215: 8bit display submission before diwali, 17/10/2
 addUpdate("assignments","ACOL215: Assignment 1, 27/10/2025","2025-10-27");
 
 addUpdate("assignments","ACOL215: Lab Assignment, 20/11/2025","2025-11-20");
-addUpdate("Quizzes","ACOL215: Theory Quiz, 24/11/2025","2025-11-24");
-addUpdate("Quizzes","ACOL106: Theory Quiz, 20/11/2025","2025-11-20");
-addUpdate("Quizzes","AMTL106: Theory Quiz Topic 14, 19/11/2025","2025-11-19");
-addUpdate("Quizzes","AENL100: Quiz, 21/11/2025","2025-11-21");
+addUpdate("quizzes","ACOL215: Theory Quiz, 24/11/2025","2025-11-24");
+addUpdate("quizzes","ACOL106: Theory Quiz, 20/11/2025","2025-11-20");
+addUpdate("quizzes","AMTL106: Theory Quiz Topic 14, 19/11/2025","2025-11-19");
+addUpdate("quizzes","AENL100: Quiz, 21/11/2025","2025-11-21");
 
 addUpdate("assignments","ACOL215: Lab Assignment, 20/11/2025","2025-11-20");
 addUpdate("assignments","AENL100: Group AI Project, 12/12/2025","2025-12-12");
