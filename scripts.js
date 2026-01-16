@@ -1,55 +1,48 @@
+
 const linksData = {
   general: {
     "ERP": "https://iitdadierp.iitd.ac.in/student/login",
     "Teams": "https://teams.microsoft.com/",
     "Outlook": "https://outlook.office.com/",
     "Blackboard": "https://iida.blackboard.com/ultra/course",
-    "TimeTable": "https://abudhabi.iitd.ac.in/uploaded_files/B.Tech.%202nd%20year%20CSE%20Sem%201_2025-26.pdf",
-    "Website":"https://abudhabi.iitd.ac.in/"
+    "Website":"https://abudhabi.iitd.ac.in/",
+    "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf",
+    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/2025-20%20-%202nd%20year%20B.Tech%20CSE%20-%206th%20Jan.pdf",
+
   },
 
   courses: {
-    "ACOL215 (DIGI)": {
-      "Course Page": "https://kumarmadhukar.github.io/courses/digilog-ad-diwali25/index.html"
+    "ACOL216 (Comp Arch)": {
+      "Course Page": "",
+      "Piazza":""
     },
 
-    "ACOL106 (DSA)": {
-      "Lectures": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/slides.html",
-      "Homework": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/homework.html",
-      "Quiz": " https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/quiz.html",
-      "Gradescope": "https://www.gradescope.com/courses/1086727",
-      "Piazza": "https://piazza.com/class/megt7ecep5i4wy",
-      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/",
-
+     "ACOL226 (Prog Lang)": {
+      "Course Page": "",
+      "Piazza":""
     },
-
-    "AGRL112 (Intro CS)": {
-      "Lectures": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/slides.html",
-      "Homework": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/homework.html",
-      "Gradescope": "https://www.gradescope.com/courses/1098487",
-      "Piazza": "https://piazza.com/class/megt7ecep5i4wy",
-      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/",
-
+     "AAIL100 (Data Sci)": {
+      "Course Page": "",
+      "Piazza":""
     },
-
-    "AMTL106 (Stoc & Prob)": {
-
-      "Lectures": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Lecture%20Notes?csf=1&web=1&e=Ks8lhi",
-      "Problem Sets": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Problem%20Sets?csf=1&web=1&e=lKawnC",
-      "Problem Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Solution%20to%20Problem%20Sets?csf=1&web=1&e=TIGDUz",
-      "Quiz Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Exams/Quiz?csf=1&web=1&e=MximhB",
-
-      "Course Files": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EmCRWabo5RFMsKyJWGalJNEBEQ8tN5PLBAnV1RqlxuVCbA?e=OkG0g9",
-      "Blackboard": "https://iida.blackboard.com/ultra/courses/_44_1/outline",
+     "ACOP290 (Design Prac)": {
+      "Course Page": "",
+      "Piazza":""
     },
+     "AHUL213 (Macro Econ)": {
+      "Course Page": "",
+      "Piazza":""
+    },
+     "AHUL231 (Intro Lit)": {
+      "Course Page": "",
+      "Piazza":""
+    },
+    
 
-    "AENL100 (AI)": {
-      "Blackboard": "https://iida.blackboard.com/ultra/courses/_6_1/outline"
-    }
+
+ 
   }
 };
-
-
 
 
 function renderLinks1(thing, data) {
@@ -251,3 +244,55 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
+
+
+const linksDataOLD = {
+  general: {
+    "ERP": "https://iitdadierp.iitd.ac.in/student/login",
+    "Teams": "https://teams.microsoft.com/",
+    "Outlook": "https://outlook.office.com/",
+    "Blackboard": "https://iida.blackboard.com/ultra/course",
+    "TimeTable": "https://abudhabi.iitd.ac.in/uploaded_files/B.Tech.%202nd%20year%20CSE%20Sem%201_2025-26.pdf",
+    "Website":"https://abudhabi.iitd.ac.in/"
+  },
+
+  courses: {
+    "ACOL215 (DIGI)": {
+      "Course Page": "https://kumarmadhukar.github.io/courses/digilog-ad-diwali25/index.html"
+    },
+
+    "ACOL106 (DSA)": {
+      "Lectures": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/slides.html",
+      "Homework": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/homework.html",
+      "Quiz": " https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/quiz.html",
+      "Gradescope": "https://www.gradescope.com/courses/1086727",
+      "Piazza": "https://piazza.com/class/megt7ecep5i4wy",
+      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/",
+
+    },
+
+    "AGRL112 (Intro CS)": {
+      "Lectures": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/slides.html",
+      "Homework": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/homework.html",
+      "Gradescope": "https://www.gradescope.com/courses/1098487",
+      "Piazza": "https://piazza.com/class/megt7ecep5i4wy",
+      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/",
+
+    },
+
+    "AMTL106 (Stoc & Prob)": {
+
+      "Lectures": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Lecture%20Notes?csf=1&web=1&e=Ks8lhi",
+      "Problem Sets": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Problem%20Sets?csf=1&web=1&e=lKawnC",
+      "Problem Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Solution%20to%20Problem%20Sets?csf=1&web=1&e=TIGDUz",
+      "Quiz Solutions": "https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Exams/Quiz?csf=1&web=1&e=MximhB",
+
+      "Course Files": "https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EmCRWabo5RFMsKyJWGalJNEBEQ8tN5PLBAnV1RqlxuVCbA?e=OkG0g9",
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_44_1/outline",
+    },
+
+    "AENL100 (AI)": {
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_6_1/outline"
+    }
+  }
+};
