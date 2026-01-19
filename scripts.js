@@ -7,10 +7,10 @@ const linksData = {
     "Blackboard": "https://iida.blackboard.com/ultra/course",
     "Website":"https://abudhabi.iitd.ac.in/",
     "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf",
-    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/V2-B.Tech%20CSE%20-%20Semester%204.pdf",
+    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/B.Tech%20CSE%20-%20Semester%204%20-%20V3.pdf",
 
   },
-
+    
   courses: {
     "ACOL216 (Comp Arch)": {
       "Blackboard":"https://iida.blackboard.com/ultra/courses/_102_1/outline",
@@ -24,9 +24,12 @@ const linksData = {
       "Piazza":"https://piazza.com/class/mkl7p555i3l4c6#"
     },
      "AAIL100 (Data Sci)": {
-      "Blackboard":"https://iida.blackboard.com/ultra/courses/_105_1/outline",
+      "Lectures":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/slides.html",
+      "Quiz/Homework":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/quiz.html",
       "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/",
-      // "Piazza":""
+      "Gradescope":"https://www.gradescope.com/courses/1227694",
+      "Piazza":"https://piazza.com/class/mkeyrkxjpbxnh",
+      "Blackboard":"https://iida.blackboard.com/ultra/courses/_105_1/outline",
     },
      "ACOP290 (Design Prac)": {
       "Blackboard":"https://iida.blackboard.com/ultra/courses/_104_1/outline",
