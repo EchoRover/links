@@ -13,25 +13,29 @@ const linksData = {
 
   courses: {
     "ACOL216 (Comp Arch)": {
-      "Course Page": "",
-      "Piazza":""
+      "Blackboard":"https://iida.blackboard.com/ultra/courses/_102_1/outline",
+      // "Course Page": "",
+      // "Piazza":""
     },
 
      "ACOL226 (Prog Lang)": {
-      "Course Page": "",
-      "Piazza":""
+      // "Course Page": "",
+      "Blackboard":"https://iida.blackboard.com/ultra/courses/_103_1/outline",
+      "Piazza":"https://piazza.com/class/mkl7p555i3l4c6#"
     },
      "AAIL100 (Data Sci)": {
+      "Blackboard":"https://iida.blackboard.com/ultra/courses/_105_1/outline",
       "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/",
-      "Piazza":""
+      // "Piazza":""
     },
      "ACOP290 (Design Prac)": {
-      "Course Page": "",
-      "Piazza":""
+      "Blackboard":"https://iida.blackboard.com/ultra/courses/_104_1/outline",
+      // "Course Page": "",
+      // "Piazza":""
     },
      "AHUL213 (Macro Econ)": {
       "Course Page": "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",
-      "Blackboard":""
+      // "Blackboard":""
     },
      "AHUL231 (Intro Lit)": {
       "Course Page": "",
@@ -218,6 +222,11 @@ addUpdate("assignments","AGRL112: Robotics, 23/11/2025","2025-11-23");
 addUpdate("assignments","AGRL112: Error codes, 30/11/2025","2025-11-30");
 addUpdate("assignments","ACOL106: Programming Assignment 6, 23/11/2025","2025-11-23");
 addUpdate("assignments","ACOL106: Comprehension Quiz, 19/11/2025","2025-11-19");
+
+addUpdate("quizzes","ACOL226: Quiz 1, 11/02/2026","2026-2-11");
+addUpdate("quizzes","ACOL226: Quiz 2, 11/03/2026","2026-3-11");
+addUpdate("quizzes","ACOL226: Quiz 3, 06/05/2026","2026-5-6");
+
 
 
 
