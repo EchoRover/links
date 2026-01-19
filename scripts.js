@@ -7,7 +7,7 @@ const linksData = {
     "Blackboard": "https://iida.blackboard.com/ultra/course",
     "Website":"https://abudhabi.iitd.ac.in/",
     "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf",
-    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/2025-20%20-%202nd%20year%20B.Tech%20CSE%20-%206th%20Jan.pdf",
+    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/V2-B.Tech%20CSE%20-%20Semester%204.pdf",
 
   },
 
@@ -22,7 +22,7 @@ const linksData = {
       "Piazza":""
     },
      "AAIL100 (Data Sci)": {
-      "Course Page": "",
+      "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/",
       "Piazza":""
     },
      "ACOP290 (Design Prac)": {
@@ -30,8 +30,8 @@ const linksData = {
       "Piazza":""
     },
      "AHUL213 (Macro Econ)": {
-      "Course Page": "",
-      "Piazza":""
+      "Course Page": "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",
+      "Blackboard":""
     },
      "AHUL231 (Intro Lit)": {
       "Course Page": "",
