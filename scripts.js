@@ -13,13 +13,16 @@ const linksData = {
     
   courses: {
     "ACOL216 (Comp Arch)": {
+      "Lectures":"https://lcs2-iitd.github.io/ACOL316-2502/lectures/",
+      "Assignments":"https://lcs2-iitd.github.io/ACOL316-2502/assignments/",
+      "Materials":"https://lcs2-iitd.github.io/ACOL316-2502/materials/",
+      "Course Page":"http://lcs2.in/acol316",
       "Blackboard":"https://iida.blackboard.com/ultra/courses/_102_1/outline",
-      // "Course Page": "",
-      // "Piazza":""
+  
     },
 
      "ACOL226 (Prog Lang)": {
-      // "Course Page": "",
+
       "Blackboard":"https://iida.blackboard.com/ultra/courses/_103_1/outline",
       "Piazza":"https://piazza.com/class/mkl7p555i3l4c6#"
     },
@@ -33,12 +36,10 @@ const linksData = {
     },
      "ACOP290 (Design Prac)": {
       "Blackboard":"https://iida.blackboard.com/ultra/courses/_104_1/outline",
-      // "Course Page": "",
-      // "Piazza":""
     },
      "AHUL213 (Macro Econ)": {
       "Course Page": "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",
-      // "Blackboard":""
+
     },
      "AHUL231 (Intro Lit)": {
       "Course Page": "",
