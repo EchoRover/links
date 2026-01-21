@@ -13,10 +13,10 @@ const linksData = {
     
   courses: {
     "ACOL216 (Comp Arch)": {
-      "Lectures":"https://lcs2-iitd.github.io/ACOL316-2502/lectures/",
-      "Assignments":"https://lcs2-iitd.github.io/ACOL316-2502/assignments/",
-      "Materials":"https://lcs2-iitd.github.io/ACOL316-2502/materials/",
-      "Course Page":"http://lcs2.in/acol316",
+      "Lectures":"https://lcs2-iitd.github.io/ACOL216-2502/lectures/",
+      "Assignments":"https://lcs2-iitd.github.io/ACOL216-2502/assignments/",
+      "Materials":"https://lcs2-iitd.github.io/ACOL216-2502/materials/",
+      "Course Page":"http://lcs2.in/acol216",
       "Blackboard":"https://iida.blackboard.com/ultra/courses/_102_1/outline",
   
     },
