@@ -28,7 +28,9 @@ const linksData = {
     },
      "AAIL100 (Data Sci)": {
       "Lectures":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/slides.html",
+      "Labs":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/lab.html",
       "Quiz/Homework":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/quiz.html",
+
       "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/",
       "Gradescope":"https://www.gradescope.com/courses/1227694",
       "Piazza":"https://piazza.com/class/mkeyrkxjpbxnh",
