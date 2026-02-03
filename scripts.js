@@ -7,7 +7,7 @@ const linksData = {
     "Blackboard": "https://iida.blackboard.com/ultra/course",
     "Website":"https://abudhabi.iitd.ac.in/",
     "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf",
-    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/B.Tech%20CSE%20-%20Semester%204%20-%20V3.pdf",
+    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/B.Tech%20CSE%20-%20Semester%204%20-%20V4-2025-20.pdf",
 
   },
     
