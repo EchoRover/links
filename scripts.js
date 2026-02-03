@@ -230,6 +230,8 @@ addUpdate("assignments","ACOL106: Programming Assignment 6, 23/11/2025","2025-11
 addUpdate("assignments","ACOL106: Comprehension Quiz, 19/11/2025","2025-11-19");
 
 addUpdate("quizzes","ACOL226: Quiz 1, 11/02/2026","2026-2-11");
+addUpdate("quizzes","ACOL216: Quiz 1, 13/02/2026","2026-2-13");
+
 addUpdate("quizzes","ACOL226: Quiz 2, 11/03/2026","2026-3-11");
 addUpdate("quizzes","ACOL226: Quiz 3, 06/05/2026","2026-5-6");
 
