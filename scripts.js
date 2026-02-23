@@ -5,52 +5,54 @@ const linksData = {
     "Teams": "https://teams.microsoft.com/",
     "Outlook": "https://outlook.office.com/",
     "Blackboard": "https://iida.blackboard.com/ultra/course",
-    "Website":"https://abudhabi.iitd.ac.in/",
+    "Website": "https://abudhabi.iitd.ac.in/",
     "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf",
-    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/B.Tech%20CSE%20-%20Semester%204%20-%20V4-2025-20.pdf",
+    "TimeTable": "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/2025-20%20schedules%20-%20Ramadan%20-%20B.Tech%20CSE%20-%20Semester%204.pdf",
 
   },
-    
+
   courses: {
     "ACOL216 (Comp Arch)": {
-      "Lectures":"https://lcs2-iitd.github.io/ACOL216-2502/lectures/",
-      "Assignments":"https://lcs2-iitd.github.io/ACOL216-2502/assignments/",
-      "Materials":"https://lcs2-iitd.github.io/ACOL216-2502/materials/",
-      "Course Page":"http://lcs2.in/acol216",
-      "Blackboard":"https://iida.blackboard.com/ultra/courses/_102_1/outline",
-  
+      "Lectures": "https://lcs2-iitd.github.io/ACOL216-2502/lectures/",
+      "Tutorials": "https://lcs2-iitd.github.io/ACOL216-2502/tutorials/",
+      "Assignments": "https://lcs2-iitd.github.io/ACOL216-2502/assignments/",
+      "Materials": "https://lcs2-iitd.github.io/ACOL216-2502/materials/",
+      "Course Page": "http://lcs2.in/acol216",
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_102_1/outline",
+
     },
 
-     "ACOL226 (Prog Lang)": {
+    "ACOL226 (Prog Lang)": {
 
-      "Blackboard":"https://iida.blackboard.com/ultra/courses/_103_1/outline",
-      "Piazza":"https://piazza.com/class/mkl7p555i3l4c6#"
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_103_1/outline",
+      "Piazza": "https://piazza.com/class/mkl7p555i3l4c6#"
     },
-     "AAIL100 (Data Sci)": {
-      "Lectures":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/slides.html",
-      "Labs":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/lab.html",
-      "Quiz/Homework":"https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/quiz.html",
+    "AAIL100 (Data Sci)": {
+      "Lectures": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/slides.html",
+      "Labs": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/lab.html",
+      "Quiz/Homework": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/quiz.html",
 
       "Course Page": "https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/",
-      "Gradescope":"https://www.gradescope.com/courses/1227694",
-      "Piazza":"https://piazza.com/class/mkeyrkxjpbxnh",
-      "Blackboard":"https://iida.blackboard.com/ultra/courses/_105_1/outline",
+      "Gradescope": "https://www.gradescope.com/courses/1227694",
+      "Piazza": "https://piazza.com/class/mkeyrkxjpbxnh",
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_105_1/outline",
     },
-     "ACOP290 (Design Prac)": {
-      "Blackboard":"https://iida.blackboard.com/ultra/courses/_104_1/outline",
+    "ACOP290 (Design Prac)": {
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_104_1/outline",
     },
-     "AHUL213 (Macro Econ)": {
+    "AHUL213 (Macro Econ)": {
+      "Blackboard": "https://iida.blackboard.com/ultra/courses/_110_1/outline",
       "Course Page": "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",
 
     },
-     "AHUL231 (Intro Lit)": {
-      "Course Page": "",
-      "Piazza":""
-    },
-    
+    // "AHUL231 (Intro Lit)": {
+    //   "Course Page": "",
+    //   "Piazza": ""
+    // },
 
 
- 
+
+
   }
 };
 
@@ -148,34 +150,34 @@ function renderUpdates() {
     const container = document.getElementById(category + "-box");
     if (!container) continue;
 
- items.forEach(([text, expiry]) => {
-  const parts = String(expiry).split('-').map(Number);
-  if (parts.length !== 3) return;
-  const [y, m, d] = parts;
-  const expiryExclusive = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
+    items.forEach(([text, expiry]) => {
+      const parts = String(expiry).split('-').map(Number);
+      if (parts.length !== 3) return;
+      const [y, m, d] = parts;
+      const expiryExclusive = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
 
-  if (now < expiryExclusive) {
-    const p = document.createElement("p");
+      if (now < expiryExclusive) {
+        const p = document.createElement("p");
 
-    // Try to split title and date using the last comma
-    const splitIndex = text.lastIndexOf(',');
-    if (splitIndex >= 0) {
-      const title = text.slice(0, splitIndex);
-      const date = text.slice(splitIndex + 1).trim();
-      p.classList.add("two-column");
-      p.innerHTML = `
+        // Try to split title and date using the last comma
+        const splitIndex = text.lastIndexOf(',');
+        if (splitIndex >= 0) {
+          const title = text.slice(0, splitIndex);
+          const date = text.slice(splitIndex + 1).trim();
+          p.classList.add("two-column");
+          p.innerHTML = `
         <span class="title">${title}</span>
         <span class="date">${date}</span>
       `;
-    } else {
-      // No comma → center-align full text
-      p.classList.add("center-text");
-      p.textContent = text;
-    }
+        } else {
+          // No comma → center-align full text
+          p.classList.add("center-text");
+          p.textContent = text;
+        }
 
-    container.appendChild(p);
-  }
-});
+        container.appendChild(p);
+      }
+    });
 
   }
 }
@@ -199,41 +201,41 @@ toggleBtn.addEventListener("click", () => {
 
 // Set initial icon
 
-addUpdate("quizzes","There are exams next week!","2025-10-16");
-addUpdate("assignments","ACOL106: Programming assignment 4, 12/10/2025","2025-10-12");
-addUpdate("assignments","ACOL106: Programming assignment 5, 2/11/2025","2025-11-2");
-addUpdate("assignments","AGRL112: Assignment 6 (RMQ), 11/10/2025","2025-10-11");
-addUpdate("assignments","AGRL112: Assignment 7 (Systems), 25/10/2025","2025-10-25");
-addUpdate("assignments","ACOL106: Comprehension Quiz 07, 14/10/2025","2025-10-14");
-addUpdate("assignments","ACOL215: 8bit display submission before diwali, 17/10/2025","2025-10-21");
-addUpdate("assignments","ACOL215: Assignment 1, 27/10/2025","2025-10-27");
+addUpdate("quizzes", "There are exams next week!", "2025-10-16");
+addUpdate("assignments", "ACOL106: Programming assignment 4, 12/10/2025", "2025-10-12");
+addUpdate("assignments", "ACOL106: Programming assignment 5, 2/11/2025", "2025-11-2");
+addUpdate("assignments", "AGRL112: Assignment 6 (RMQ), 11/10/2025", "2025-10-11");
+addUpdate("assignments", "AGRL112: Assignment 7 (Systems), 25/10/2025", "2025-10-25");
+addUpdate("assignments", "ACOL106: Comprehension Quiz 07, 14/10/2025", "2025-10-14");
+addUpdate("assignments", "ACOL215: 8bit display submission before diwali, 17/10/2025", "2025-10-21");
+addUpdate("assignments", "ACOL215: Assignment 1, 27/10/2025", "2025-10-27");
 
-addUpdate("assignments","ACOL215: Lab Assignment, 20/11/2025","2025-11-20");
+addUpdate("assignments", "ACOL215: Lab Assignment, 20/11/2025", "2025-11-20");
 
-addUpdate("quizzes","ACOL215: Theory Quiz, 24/11/2025","2025-11-24");
+addUpdate("quizzes", "ACOL215: Theory Quiz, 24/11/2025", "2025-11-24");
 
-addUpdate("quizzes","ACOL215: Theory Quiz, 8/12/2025","2025-12-8");
+addUpdate("quizzes", "ACOL215: Theory Quiz, 8/12/2025", "2025-12-8");
 
-addUpdate("quizzes","ACOL106: Theory Quiz Regular, 20/11/2025","2025-11-20");
+addUpdate("quizzes", "ACOL106: Theory Quiz Regular, 20/11/2025", "2025-11-20");
 
-addUpdate("quizzes","AMTL106: Theory Quiz Topic 14, 19/11/2025","2025-11-19");
+addUpdate("quizzes", "AMTL106: Theory Quiz Topic 14, 19/11/2025", "2025-11-19");
 
-addUpdate("quizzes","AENL100: Quiz, 21/11/2025","2025-11-21");
+addUpdate("quizzes", "AENL100: Quiz, 21/11/2025", "2025-11-21");
 
 
-addUpdate("assignments","AENL100: Group AI Project, 12/12/2025","2025-12-12");
-addUpdate("assignments","AMTL106: Group Project (est. date), 27/11/2025","2025-11-30");
+addUpdate("assignments", "AENL100: Group AI Project, 12/12/2025", "2025-12-12");
+addUpdate("assignments", "AMTL106: Group Project (est. date), 27/11/2025", "2025-11-30");
 
-addUpdate("assignments","AGRL112: Robotics, 23/11/2025","2025-11-23");
-addUpdate("assignments","AGRL112: Error codes, 30/11/2025","2025-11-30");
-addUpdate("assignments","ACOL106: Programming Assignment 6, 23/11/2025","2025-11-23");
-addUpdate("assignments","ACOL106: Comprehension Quiz, 19/11/2025","2025-11-19");
+addUpdate("assignments", "AGRL112: Robotics, 23/11/2025", "2025-11-23");
+addUpdate("assignments", "AGRL112: Error codes, 30/11/2025", "2025-11-30");
+addUpdate("assignments", "ACOL106: Programming Assignment 6, 23/11/2025", "2025-11-23");
+addUpdate("assignments", "ACOL106: Comprehension Quiz, 19/11/2025", "2025-11-19");
 
-addUpdate("quizzes","ACOL226: Quiz 1, 11/02/2026","2026-2-11");
-addUpdate("quizzes","ACOL216: Quiz 1, 13/02/2026","2026-2-13");
+addUpdate("quizzes", "ACOL226: Quiz 1, 11/02/2026", "2026-2-11");
+addUpdate("quizzes", "ACOL216: Quiz 1, 13/02/2026", "2026-2-13");
 
-addUpdate("quizzes","ACOL226: Quiz 2, 11/03/2026","2026-3-11");
-addUpdate("quizzes","ACOL226: Quiz 3, 06/05/2026","2026-5-6");
+addUpdate("quizzes", "ACOL226: Quiz 2, 11/03/2026", "2026-3-11");
+addUpdate("quizzes", "ACOL226: Quiz 3, 06/05/2026", "2026-5-6");
 
 
 
@@ -270,7 +272,7 @@ const linksDataOLD = {
     "Outlook": "https://outlook.office.com/",
     "Blackboard": "https://iida.blackboard.com/ultra/course",
     "TimeTable": "https://abudhabi.iitd.ac.in/uploaded_files/B.Tech.%202nd%20year%20CSE%20Sem%201_2025-26.pdf",
-    "Website":"https://abudhabi.iitd.ac.in/"
+    "Website": "https://abudhabi.iitd.ac.in/"
   },
 
   courses: {
