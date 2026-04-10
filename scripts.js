@@ -43,6 +43,7 @@ const linksData = {
       Blackboard: "https://iida.blackboard.com/ultra/courses/_104_1/outline",
     },
     "AHUL213 (Macro Econ)": {
+      "Notes":"https://drive.google.com/drive/folders/1VYl6McAKfkJDZSQdlb_vN-aDjYnfkAPy",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_110_1/outline",
       "Course Page":
         "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",
