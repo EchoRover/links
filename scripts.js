@@ -16,6 +16,7 @@ const linksData = {
     "ACOL216 (Comp Arch)": {
       Lectures: "https://lcs2-iitd.github.io/ACOL216-2502/lectures/",
       Tutorials: "https://lcs2-iitd.github.io/ACOL216-2502/tutorials/",
+      "Daily Quiz":"https://lcs2-iitd.github.io/ACOL216-2502/quiz/",
       Assignments: "https://lcs2-iitd.github.io/ACOL216-2502/assignments/",
       Materials: "https://lcs2-iitd.github.io/ACOL216-2502/materials/",
       "Course Page": "http://lcs2.in/acol216",
@@ -23,6 +24,8 @@ const linksData = {
     },
 
     "ACOL226 (Prog Lang)": {
+      "Part 1 lectures":"https://piazza.com/iitdabudhabi.ac.ae/spring2026/acol226/resources",
+      "Part 2 lectures":"https://github.com/kumarmadhukar/kumarmadhukar.github.io/tree/master/courses/pl-holi26",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_103_1/outline",
       Piazza: "https://piazza.com/class/mkl7p555i3l4c6#",
     },
@@ -44,6 +47,7 @@ const linksData = {
     },
     "AHUL213 (Macro Econ)": {
       "Notes":"https://drive.google.com/drive/folders/1VYl6McAKfkJDZSQdlb_vN-aDjYnfkAPy",
+      "Topics for Minor": "./topics-ahul.html",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_110_1/outline",
       "Course Page":
         "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",

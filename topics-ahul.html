@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AHUL213 Topics for Minor</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --fg: #1f2937;
+        --card: #ffffff;
+        --accent: #0b57d0;
+        --muted: #6b7280;
+        --border: #dbe1ea;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.6rem;
+      }
+
+      .meta {
+        margin: 0 0 16px;
+        color: var(--muted);
+      }
+
+      .actions {
+        margin: 0 0 16px;
+      }
+
+      .download-btn {
+        display: inline-block;
+        text-decoration: none;
+        background: var(--accent);
+        color: #fff;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 600;
+      }
+
+      .download-btn:hover {
+        filter: brightness(0.95);
+      }
+
+      .sheet-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .sheet-tabs button {
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--fg);
+        border-radius: 999px;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .sheet-tabs button.active {
+        border-color: var(--accent);
+        color: #fff;
+        background: var(--accent);
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        overflow: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      td,
+      th {
+        border: 1px solid #d1d5db;
+        padding: 8px;
+        font-size: 0.92rem;
+      }
+
+      .error {
+        color: #b91c1c;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>AHUL213 (Macro Econ): Topics for Minor</h1>
+      <p class="meta">Web preview of all sheets in Schedule_AHUL_213_JanMay2026.xls</p>
+      <div class="actions">
+        <a class="download-btn" href="./Schedule_AHUL_213_JanMay2026.xls" download>
+          Download Excel Sheet
+        </a>
+      </div>
+      <div id="tabs" class="sheet-tabs"></div>
+      <div id="viewer" class="card">Loading workbook...</div>
+    </div>
+
+    <script>
+      const workbookUrl = "./Schedule_AHUL_213_JanMay2026.xls";
+      const tabsEl = document.getElementById("tabs");
+      const viewerEl = document.getElementById("viewer");
+      let workbook;
+
+      function renderSheet(sheetName) {
+        const sheet = workbook.Sheets[sheetName];
+        if (!sheet) return;
+
+        const html = XLSX.utils.sheet_to_html(sheet, { id: "sheet-table" });
+        viewerEl.innerHTML = html;
+
+        for (const btn of tabsEl.querySelectorAll("button")) {
+          btn.classList.toggle("active", btn.dataset.sheet === sheetName);
+        }
+      }
+
+      function renderTabs() {
+        tabsEl.innerHTML = "";
+        const normalize = (name) =>
+          String(name)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim();
+
+        const defaultSheet =
+          workbook.SheetNames.find((name) => {
+            const n = normalize(name);
+            return n.includes("minor") && n.includes("exam");
+          }) ||
+          workbook.SheetNames.find((name) => normalize(name).includes("minor")) ||
+          workbook.SheetNames.find((name) => normalize(name).includes("exam")) ||
+          workbook.SheetNames[0];
+
+        workbook.SheetNames.forEach((name) => {
+          const btn = document.createElement("button");
+          btn.textContent = name;
+          btn.dataset.sheet = name;
+          btn.addEventListener("click", () => renderSheet(name));
+          tabsEl.appendChild(btn);
+        });
+
+        renderSheet(defaultSheet);
+      }
+
+      async function init() {
+        try {
+          const res = await fetch(workbookUrl);
+          if (!res.ok) {
+            throw new Error("Could not load workbook file.");
+          }
+
+          const data = await res.arrayBuffer();
+          workbook = XLSX.read(data, { type: "array" });
+          renderTabs();
+        } catch (err) {
+          viewerEl.innerHTML =
+            '<p class="error">Failed to open workbook in browser. If you are opening this directly from file system, serve the folder with a local server (for example: python3 -m http.server).</p>';
+          console.error(err);
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>
