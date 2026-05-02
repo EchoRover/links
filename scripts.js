@@ -9,14 +9,13 @@ const linksData = {
       "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf",
     TimeTable:
       "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/B.Tech%20CSE%20-%20Semester%204%20-%20V4-2025-20.pdf",
-      
   },
 
   courses: {
     "ACOL216 (Comp Arch)": {
       Lectures: "https://lcs2-iitd.github.io/ACOL216-2502/lectures/",
       Tutorials: "https://lcs2-iitd.github.io/ACOL216-2502/tutorials/",
-      "Daily Quiz":"https://lcs2-iitd.github.io/ACOL216-2502/quiz/",
+      "Daily Quiz": "https://lcs2-iitd.github.io/ACOL216-2502/quiz/",
       Assignments: "https://lcs2-iitd.github.io/ACOL216-2502/assignments/",
       Materials: "https://lcs2-iitd.github.io/ACOL216-2502/materials/",
       "Course Page": "http://lcs2.in/acol216",
@@ -24,8 +23,10 @@ const linksData = {
     },
 
     "ACOL226 (Prog Lang)": {
-      "Part 1 lectures":"https://piazza.com/iitdabudhabi.ac.ae/spring2026/acol226/resources",
-      "Part 2 lectures":"https://github.com/kumarmadhukar/kumarmadhukar.github.io/tree/master/courses/pl-holi26",
+      "Part 1 lectures":
+        "https://piazza.com/iitdabudhabi.ac.ae/spring2026/acol226/resources",
+      "Part 2 lectures":
+        "https://github.com/kumarmadhukar/kumarmadhukar.github.io/tree/master/courses/pl-holi26",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_103_1/outline",
       Piazza: "https://piazza.com/class/mkl7p555i3l4c6#",
     },
@@ -46,7 +47,8 @@ const linksData = {
       Blackboard: "https://iida.blackboard.com/ultra/courses/_104_1/outline",
     },
     "AHUL213 (Macro Econ)": {
-      "Notes":"https://drive.google.com/drive/folders/1VYl6McAKfkJDZSQdlb_vN-aDjYnfkAPy",
+      Notes:
+        "https://drive.google.com/drive/folders/1VYl6McAKfkJDZSQdlb_vN-aDjYnfkAPy",
       "Topics for Minor": "./topics-ahul.html",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_110_1/outline",
       "Course Page":
@@ -267,7 +269,7 @@ addUpdate("quizzes", "ACOL226: Quiz 1, 11/02/2026", "2026-2-11");
 addUpdate("quizzes", "ACOL216: Quiz 1, 13/02/2026", "2026-2-13");
 
 addUpdate("quizzes", "ACOL226: Quiz 2, 11/03/2026", "2026-3-11");
-addUpdate("quizzes", "ACOL226: Quiz 3, 06/05/2026", "2026-5-6");
+// addUpdate("quizzes", "ACOL226: Quiz 3, 06/05/2026", "2026-5-6");
 
 window.addEventListener("DOMContentLoaded", () => {
   renderGeneralLinks(".general", linksData.general); // general links
@@ -335,4 +337,3 @@ const linksDataOLD = {
     },
   },
 };
-
