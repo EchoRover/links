@@ -275,6 +275,9 @@ addUpdate("assignments", "AHUL213: Term Paper, 15/05/2026", "2026-5-15");
 addUpdate("assignments", "ACOP290: Part 2 dev complete, 25/05/2026", "2026-5-25");
 addUpdate("assignments", "ACOP290: Part 2 demo, 26/05/2026", "2026-5-26");
 
+addUpdate("quizzes", "AAIL100: Quiz (MLR Theory + Lab-9), 12/05/2026", "2026-5-12");
+addUpdate("quizzes", "ACOL216: Quiz 3 (Pipelining), 15/05/2026", "2026-5-15");
+
 window.addEventListener("DOMContentLoaded", () => {
   renderGeneralLinks(".general", linksData.general); // general links
   renderLinks1(".links", linksData.courses); // course links
