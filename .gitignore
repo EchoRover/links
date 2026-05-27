@@ -1,0 +1,9 @@
+# macOS Finder metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor / OS junk
+*.swp
+*.swo
+Thumbs.db
