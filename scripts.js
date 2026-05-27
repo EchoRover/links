@@ -1,4 +1,75 @@
+// ============================================================
+// SEM 5 (Year 3 Sem 1) — Aug 2026 onward · ACTIVE
+// URLs added as courses come online.
+// ============================================================
 const linksData = {
+  general: {
+    ERP: "https://iitdadierp.iitd.ac.in/student/login",
+    Teams: "https://teams.microsoft.com/",
+    Outlook: "https://outlook.office.com/",
+    Blackboard: "https://iida.blackboard.com/ultra/course",
+    Website: "https://abudhabi.iitd.ac.in/",
+    "Acd Cal": "",   // TODO: AY2026-2027 Sem 1 calendar PDF
+    TimeTable: "",   // TODO: Sem 5 timetable PDF
+  },
+
+  // Dummy links per course — placeholder URLs ("#"). Replace as real URLs land.
+  // Varied counts on purpose so the row layout looks like a real sem.
+  courses: {
+    "ACOL333 (AI)": {
+      Lectures: "#",
+      Tutorials: "#",
+      Labs: "#",
+      Assignments: "#",
+      Quiz: "#",
+      Piazza: "#",
+      Gradescope: "#",
+      "Course Page": "#",
+      Blackboard: "https://iida.blackboard.com/ultra/course",
+    },
+    "ACOL334 (Comp Networks)": {
+      Lectures: "#",
+      Labs: "#",
+      Assignments: "#",
+      Piazza: "#",
+      "Course Page": "#",
+      Blackboard: "https://iida.blackboard.com/ultra/course",
+    },
+    "ACOL351 (Algos)": {
+      Lectures: "#",
+      Tutorials: "#",
+      Assignments: "#",
+      Quiz: "#",
+      Piazza: "#",
+      "Course Page": "#",
+      Blackboard: "https://iida.blackboard.com/ultra/course",
+    },
+    "AGRL130 (Entrepren)": {
+      Slides: "#",
+      Readings: "#",
+      "Course Page": "#",
+      Blackboard: "https://iida.blackboard.com/ultra/course",
+    },
+    "AHUL256 (Crit Think)": {
+      Readings: "#",
+      Notes: "#",
+      "Course Page": "#",
+      Blackboard: "https://iida.blackboard.com/ultra/course",
+    },
+    "AHUL261 (Psych)": {
+      Lectures: "#",
+      Readings: "#",
+      Assignments: "#",
+      "Course Page": "#",
+      Blackboard: "https://iida.blackboard.com/ultra/course",
+    },
+  },
+};
+
+// ============================================================
+// SEM 4 (Year 2 Sem 2) — Jan-May 2026 · PRESERVED
+// ============================================================
+const linksDataSem4 = {
   general: {
     ERP: "https://iitdadierp.iitd.ac.in/student/login",
     Teams: "https://teams.microsoft.com/",
@@ -49,7 +120,7 @@ const linksData = {
     "AHUL213 (Macro Econ)": {
       Notes:
         "https://drive.google.com/drive/folders/1VYl6McAKfkJDZSQdlb_vN-aDjYnfkAPy",
-      "Topics for Minor": "./topics-ahul.html",
+      "Topics for Minor": "./extras/topics-ahul.html",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_110_1/outline",
       "Course Page":
         "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",
@@ -61,39 +132,98 @@ const linksData = {
   },
 };
 
+// Per-course metadata. Each course gets editorial treatment:
+// title (short display), subtitle (descriptive tagline), dept, credits, LTP.
+const COURSE_META = {
+  ACOL333: {
+    title: "Artificial Intelligence",
+    subtitle: "A Study Of Inference, Search & Learning",
+    dept: "COMP. SCI.",
+    credits: 4, ltp: "3-0-2",
+  },
+  ACOL334: {
+    title: "Computer Networks",
+    subtitle: "Protocols, Routing & The Modern Internet",
+    dept: "COMP. SCI.",
+    credits: 4, ltp: "3-0-2",
+  },
+  ACOL351: {
+    title: "Algorithms",
+    subtitle: "Design, Analysis & The Cost Of Computation",
+    dept: "COMP. SCI.",
+    credits: 4, ltp: "3-1-0",
+  },
+  AGRL130: {
+    title: "Innovation, Entrepreneurship & Sustainability",
+    subtitle: "Innovation, Ventures & Sustainable Practice",
+    dept: "GEN. ELEC.",
+    credits: 3, ltp: "3-0-0",
+  },
+  AHUL256: {
+    title: "Critical Thinking",
+    subtitle: "Arguments, Reasoning & Sound Inference",
+    dept: "HUMANITIES",
+    credits: 4, ltp: "3-1-0",
+  },
+  AHUL261: {
+    title: "Psychology",
+    subtitle: "Cognition, Behavior & The Mind",
+    dept: "HUMANITIES",
+    credits: 4, ltp: "3-1-0",
+  },
+};
+
 function renderLinks1(thing, data) {
   const container = document.querySelector(thing);
+  if (!container) return;
 
   for (const [course, resources] of Object.entries(data)) {
-    const box = document.createElement("div");
+    const match = course.match(/^(\S+)(?:\s*\((.+)\))?$/);
+    const code = match ? match[1] : course;
+    const prefix = code.slice(0, 4).toUpperCase();
+    const meta = COURSE_META[code] || {};
+    const title = meta.title || (match && match[2]) || course;
+    const subtitle = meta.subtitle || "";
+    const dept = meta.dept || "";
+
+    const box = document.createElement("article");
     box.className = "box";
+    box.dataset.prefix = prefix;
 
-    const title = document.createElement("h1");
-    title.textContent = course;
-    box.appendChild(title);
+    const h1 = document.createElement("h1");
+    h1.className = "course-h1-sr";
+    h1.textContent = `${code} — ${title}`;
+    box.appendChild(h1);
 
-    for (const [name, url] of Object.entries(resources)) {
+    // Editorial course header — code chip, dept label, drop-cap title, subtitle
+    const firstLetter = title.charAt(0);
+    const restOfTitle = title.slice(1);
+    const header = document.createElement("div");
+    header.className = "course-header";
+    header.innerHTML = `
+      <div class="course-top">
+        <span class="course-chip">${code}</span>
+        <span class="course-meta-inline">
+          ${meta.ltp ? `<span class="course-ltp">${meta.ltp}</span>` : ""}
+          ${meta.credits ? `<span class="course-credits">${meta.credits}</span>` : ""}
+        </span>
+      </div>
+      <h2 class="course-name"><span class="course-firstletter">${firstLetter}</span>${restOfTitle}</h2>
+    `;
+    box.appendChild(header);
+
+    const linksGrid = document.createElement("div");
+    linksGrid.className = "course-links";
+    for (const [n, url] of Object.entries(resources)) {
       const link = document.createElement("a");
       link.href = url;
       link.target = "_blank";
-      link.textContent = name;
-      box.appendChild(link);
+      link.innerHTML = `<span class="link-bullet"></span><span class="link-label">${n}</span><svg class="link-arrow" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      linksGrid.appendChild(link);
     }
+    box.appendChild(linksGrid);
 
     container.appendChild(box);
-  }
-}
-// For general links in .box2
-function renderGeneralLinks(selector, data) {
-  const container = document.querySelector(selector);
-  if (!container) return;
-
-  for (const [name, url] of Object.entries(data)) {
-    const link = document.createElement("a");
-    link.href = url;
-    link.target = "_blank";
-    link.textContent = name;
-    container.appendChild(link);
   }
 }
 
@@ -107,17 +237,20 @@ function addUpdate(category, text, expiry) {
   updatesData.push([category, text, expiry]);
 }
 
+// Rich update rendering: each item gets a date box (day-of-week · DD MMM)
+// + course code + event text. Falls back to the old two-column format
+// when the text doesn't follow "CODE: event, DD/MM/YYYY".
 function renderUpdates() {
   const now = new Date();
+  const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  // group updates by category
   const grouped = {};
   updatesData.forEach(([category, text, expiry]) => {
     if (!grouped[category]) grouped[category] = [];
     grouped[category].push([text, expiry]);
   });
 
-  // sort inside each category
   for (const [category, items] of Object.entries(grouped)) {
     items.sort((a, b) => new Date(a[1]) - new Date(b[1]));
     const container = document.getElementById(category + "-box");
@@ -128,57 +261,47 @@ function renderUpdates() {
       if (parts.length !== 3) return;
       const [y, m, d] = parts;
       const expiryExclusive = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
-      if (now < expiryExclusive) {
-        const p = document.createElement("p");
-        p.textContent = text;
-        container.appendChild(p);
-      }
-    });
-  }
-}
-function renderUpdates() {
-  const now = new Date();
+      if (now >= expiryExclusive) return;
 
-  // group updates by category
-  const grouped = {};
-  updatesData.forEach(([category, text, expiry]) => {
-    if (!grouped[category]) grouped[category] = [];
-    grouped[category].push([text, expiry]);
-  });
+      const dateObj = new Date(y, m - 1, d);
+      const dow = DOW[dateObj.getDay()];
+      const mon = MON[dateObj.getMonth()];
 
-  // sort and render
-  for (const [category, items] of Object.entries(grouped)) {
-    items.sort((a, b) => new Date(a[1]) - new Date(b[1]));
-    const container = document.getElementById(category + "-box");
-    if (!container) continue;
+      // Parse "CODE: event, DD/MM/YYYY" → { code, event }
+      const lastComma = text.lastIndexOf(",");
+      const head = lastComma >= 0 ? text.slice(0, lastComma) : text;
+      const colon = head.indexOf(":");
+      const code = colon >= 0 ? head.slice(0, colon).trim() : "";
+      const event = colon >= 0 ? head.slice(colon + 1).trim() : head.trim();
 
-    items.forEach(([text, expiry]) => {
-      const parts = String(expiry).split("-").map(Number);
-      if (parts.length !== 3) return;
-      const [y, m, d] = parts;
-      const expiryExclusive = new Date(y, m - 1, d + 1, 0, 0, 0, 0);
+      const row = document.createElement("a");
+      row.className = "upd-row";
+      row.href = "#";
 
-      if (now < expiryExclusive) {
-        const p = document.createElement("p");
-
-        // Try to split title and date using the last comma
-        const splitIndex = text.lastIndexOf(",");
-        if (splitIndex >= 0) {
-          const title = text.slice(0, splitIndex);
-          const date = text.slice(splitIndex + 1).trim();
-          p.classList.add("two-column");
-          p.innerHTML = `
-        <span class="title">${title}</span>
-        <span class="date">${date}</span>
+      const dateBox = document.createElement("div");
+      dateBox.className = "upd-date";
+      dateBox.innerHTML = `
+        <span class="upd-dow">${dow}</span>
+        <span class="upd-day">${String(d).padStart(2, "0")}</span>
+        <span class="upd-mon">${mon}</span>
       `;
-        } else {
-          // No comma → center-align full text
-          p.classList.add("center-text");
-          p.textContent = text;
-        }
+      row.appendChild(dateBox);
 
-        container.appendChild(p);
+      const body = document.createElement("div");
+      body.className = "upd-body";
+      if (code) {
+        const codeEl = document.createElement("span");
+        codeEl.className = "upd-code";
+        codeEl.textContent = code;
+        body.appendChild(codeEl);
       }
+      const eventEl = document.createElement("span");
+      eventEl.className = "upd-event";
+      eventEl.textContent = event;
+      body.appendChild(eventEl);
+      row.appendChild(body);
+
+      container.appendChild(row);
     });
   }
 }
@@ -279,13 +402,19 @@ addUpdate("assignments", "ACOP290: Part 2 demo, 26/05/2026", "2026-5-26");
 addUpdate("quizzes", "AAIL100: Quiz (MLR Theory + Lab-9), 12/05/2026", "2026-5-12");
 addUpdate("quizzes", "ACOL216: Quiz 3 (Pipelining), 15/05/2026", "2026-5-15");
 
+// ============================================================
+// SEM 5 (Year 3 Sem 1) — real entries go here as they drop
+// ============================================================
+
 window.addEventListener("DOMContentLoaded", () => {
-  renderGeneralLinks(".general", linksData.general); // general links
-  renderLinks1(".links", linksData.courses); // course links
+  renderLinks1("#course-grid", linksData.courses);
   renderUpdates();
 });
 
-const linksDataOLD = {
+// ============================================================
+// SEM 3 (Year 2 Sem 1) — Aug-Nov 2025 · PRESERVED
+// ============================================================
+const linksDataSem3 = {
   general: {
     ERP: "https://iitdadierp.iitd.ac.in/student/login",
     Teams: "https://teams.microsoft.com/",

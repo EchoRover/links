@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Archive — CSE Year 2 Links</title>
+    <link rel="icon" type="image/png" href="../assets/hacker.png">
+    <script>
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const stored = localStorage.getItem("theme");
+        document.documentElement.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .archive-banner {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 1rem auto 0;
+            padding: 0.5rem;
+            width: fit-content;
+        }
+
+        .archive-banner .text-img {
+            max-height: 100px;
+            height: auto;
+        }
+
+        .archive-banner .circle-img {
+            max-height: 100px;
+            height: 100%;
+            width: auto;
+        }
+
+        [data-theme="dark"] .archive-banner .text-img {
+            filter: invert(100%);
+        }
+
+        @media (max-width: 500px) {
+            .archive-banner {
+                flex-direction: column-reverse;
+            }
+        }
+
+        .archive-note {
+            max-width: 38rem;
+            margin: 1rem auto 2rem;
+            padding: 0.75rem 1rem;
+            background: var(--background-200);
+            color: var(--text-800);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            text-align: center;
+        }
+
+        .archive-note em {
+            color: var(--text-600);
+        }
+
+        .era {
+            margin: 0 auto 3rem;
+            padding: 1.5rem 1rem 2rem;
+            max-width: 62rem;
+            background: var(--background-50);
+            border-radius: 16px;
+            border: 2px solid var(--primary-300);
+        }
+
+        .era-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 62rem;
+            margin: 0 auto;
+            color: var(--text-500);
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .era-divider::before,
+        .era-divider::after {
+            content: "";
+            flex: 1;
+            height: 2px;
+            background: var(--primary-300);
+            margin: 0 1rem;
+        }
+
+        .era-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--primary-300);
+            max-width: 90%;
+        }
+
+        .era-header .era-eyebrow {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: var(--accent-500);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .era-header h2 {
+            margin: 0;
+            font-size: 1.9rem;
+            color: var(--text-900);
+            font-weight: 800;
+        }
+
+        .era-header .era-subtitle {
+            font-size: 1rem;
+            color: var(--text-700);
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }
+
+        .era-header .era-dates {
+            font-size: 0.85rem;
+            color: var(--text-600);
+            margin-top: 0.5rem;
+            letter-spacing: 0.05em;
+            font-style: italic;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--background-200);
+            border: none;
+            color: var(--text-900);
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s, color 0.3s, transform 0.2s;
+        }
+
+        .back-button:hover {
+            background: var(--background-300);
+            transform: scale(1.04);
+        }
+
+        a.dead-hint {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <a class="back-button" href="../">← Back</a>
+    <button class="button" id="theme-toggle">◐</button>
+
+    <div class="container">
+
+        <div class="archive-banner">
+            <img src="../assets/text.png" class="text-img" alt="Text logo">
+            <img src="../assets/circle.png" class="circle-img" alt="Circle logo">
+        </div>
+
+        <h1>Year 2 Archive</h1>
+
+        <div class="archive-note">
+            A treasury of every link this site has carried.
+            <em>Some are now dead — kept as-is, on purpose.</em>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- ERA: Year 2 Semester 1 (Sem 3) — Aug-Nov 2025  -->
+        <!-- ============================================== -->
+        <section class="era">
+            <div class="era-header">
+                <div class="era-eyebrow">Era 1</div>
+                <h2>Year 2 · Semester 1</h2>
+                <div class="era-subtitle">3rd semester of B.Tech CSE</div>
+                <div class="era-dates">August – November 2025</div>
+            </div>
+
+            <div class="general">
+                <a href="https://iitdadierp.iitd.ac.in/student/login" target="_blank">ERP</a>
+                <a href="https://teams.microsoft.com/" target="_blank">Teams</a>
+                <a href="https://outlook.office.com/" target="_blank">Outlook</a>
+                <a href="https://iida.blackboard.com/ultra/course" target="_blank">Blackboard</a>
+                <a href="https://abudhabi.iitd.ac.in/uploaded_files/B.Tech.%202nd%20year%20CSE%20Sem%201_2025-26.pdf" target="_blank">TimeTable</a>
+                <a href="https://abudhabi.iitd.ac.in/" target="_blank">Website</a>
+            </div>
+
+            <div class="links">
+                <div class="box">
+                    <h1>ACOL215 (DIGI)</h1>
+                    <a href="https://kumarmadhukar.github.io/courses/digilog-ad-diwali25/index.html" target="_blank">Course Page</a>
+                </div>
+
+                <div class="box">
+                    <h1>ACOL106 (DSA)</h1>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/slides.html" target="_blank">Lectures</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/homework.html" target="_blank">Homework</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/quiz.html" target="_blank">Quiz</a>
+                    <a href="https://www.gradescope.com/courses/1086727" target="_blank">Gradescope</a>
+                    <a href="https://piazza.com/class/megt7ecep5i4wy" target="_blank">Piazza</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/ACOL106/" target="_blank">Course Page</a>
+                </div>
+
+                <div class="box">
+                    <h1>AGRL112 (Intro CS)</h1>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/slides.html" target="_blank">Lectures</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/homework.html" target="_blank">Homework</a>
+                    <a href="https://www.gradescope.com/courses/1098487" target="_blank">Gradescope</a>
+                    <a href="https://piazza.com/class/megt7ecep5i4wy" target="_blank">Piazza</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2025/AGRL112/" target="_blank">Course Page</a>
+                </div>
+
+                <div class="box">
+                    <h1>AMTL106 (Stoc &amp; Prob)</h1>
+                    <a href="https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Lecture%20Notes?csf=1&web=1&e=Ks8lhi" target="_blank">Lectures</a>
+                    <a href="https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Problem%20Sets?csf=1&web=1&e=lKawnC" target="_blank">Problem Sets</a>
+                    <a href="https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Solution%20to%20Problem%20Sets?csf=1&web=1&e=TIGDUz" target="_blank">Problem Solutions</a>
+                    <a href="https://iitdabudhabi-my.sharepoint.com/:f:/r/personal/sirahul_iitdabudhabi_ac_ae/Documents/AMTL106/Exams/Quiz?csf=1&web=1&e=MximhB" target="_blank">Quiz Solutions</a>
+                    <a href="https://iitdabudhabi-my.sharepoint.com/:f:/g/personal/sirahul_iitdabudhabi_ac_ae/EmCRWabo5RFMsKyJWGalJNEBEQ8tN5PLBAnV1RqlxuVCbA?e=OkG0g9" target="_blank">Course Files</a>
+                    <a href="https://iida.blackboard.com/ultra/courses/_44_1/outline" target="_blank">Blackboard</a>
+                </div>
+
+                <div class="box">
+                    <h1>AENL100 (AI)</h1>
+                    <a href="https://iida.blackboard.com/ultra/courses/_6_1/outline" target="_blank">Blackboard</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="era-divider">· · ·</div>
+
+        <!-- ============================================== -->
+        <!-- ERA: Year 2 Semester 2 (Sem 4) — Jan-May 2026  -->
+        <!-- ============================================== -->
+        <section class="era">
+            <div class="era-header">
+                <div class="era-eyebrow">Era 2</div>
+                <h2>Year 2 · Semester 2</h2>
+                <div class="era-subtitle">4th semester of B.Tech CSE</div>
+                <div class="era-dates">January – May 2026</div>
+            </div>
+
+            <div class="general">
+                <a href="https://iitdadierp.iitd.ac.in/student/login" target="_blank">ERP</a>
+                <a href="https://teams.microsoft.com/" target="_blank">Teams</a>
+                <a href="https://outlook.office.com/" target="_blank">Outlook</a>
+                <a href="https://iida.blackboard.com/ultra/course" target="_blank">Blackboard</a>
+                <a href="https://abudhabi.iitd.ac.in/" target="_blank">Website</a>
+                <a href="https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf" target="_blank">Acd Cal</a>
+                <a href="https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/B.Tech%20CSE%20-%20Semester%204%20-%20V4-2025-20.pdf" target="_blank">TimeTable</a>
+            </div>
+
+            <div class="links">
+                <div class="box">
+                    <h1>ACOL216 (Comp Arch)</h1>
+                    <a href="https://lcs2-iitd.github.io/ACOL216-2502/lectures/" target="_blank">Lectures</a>
+                    <a href="https://lcs2-iitd.github.io/ACOL216-2502/tutorials/" target="_blank">Tutorials</a>
+                    <a href="https://lcs2-iitd.github.io/ACOL216-2502/quiz/" target="_blank">Daily Quiz</a>
+                    <a href="https://lcs2-iitd.github.io/ACOL216-2502/assignments/" target="_blank">Assignments</a>
+                    <a href="https://lcs2-iitd.github.io/ACOL216-2502/materials/" target="_blank">Materials</a>
+                    <a href="http://lcs2.in/acol216" target="_blank">Course Page</a>
+                    <a href="https://iida.blackboard.com/ultra/courses/_102_1/outline" target="_blank">Blackboard</a>
+                </div>
+
+                <div class="box">
+                    <h1>ACOL226 (Prog Lang)</h1>
+                    <a href="https://piazza.com/iitdabudhabi.ac.ae/spring2026/acol226/resources" target="_blank">Part 1 lectures</a>
+                    <a href="https://github.com/kumarmadhukar/kumarmadhukar.github.io/tree/master/courses/pl-holi26" target="_blank">Part 2 lectures</a>
+                    <a href="https://iida.blackboard.com/ultra/courses/_103_1/outline" target="_blank">Blackboard</a>
+                    <a href="https://piazza.com/class/mkl7p555i3l4c6#" target="_blank">Piazza</a>
+                </div>
+
+                <div class="box">
+                    <h1>AAIL100 (Data Sci)</h1>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/slides.html" target="_blank">Lectures</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/lab.html" target="_blank">Labs</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/quiz.html" target="_blank">Quiz/Homework</a>
+                    <a href="https://www.cse.iitd.ac.in/%7Erjaiswal/Teaching/2026/AAIL100/" target="_blank">Course Page</a>
+                    <a href="https://www.gradescope.com/courses/1227694" target="_blank">Gradescope</a>
+                    <a href="https://piazza.com/class/mkeyrkxjpbxnh" target="_blank">Piazza</a>
+                    <a href="https://iida.blackboard.com/ultra/courses/_105_1/outline" target="_blank">Blackboard</a>
+                </div>
+
+                <div class="box">
+                    <h1>ACOP290 (Design Prac)</h1>
+                    <a href="https://iida.blackboard.com/ultra/courses/_104_1/outline" target="_blank">Blackboard</a>
+                </div>
+
+                <div class="box">
+                    <h1>AHUL213 (Macro Econ)</h1>
+                    <a href="https://drive.google.com/drive/folders/1VYl6McAKfkJDZSQdlb_vN-aDjYnfkAPy" target="_blank">Notes</a>
+                    <a href="../extras/topics-ahul.html" target="_blank">Topics for Minor</a>
+                    <a href="https://iida.blackboard.com/ultra/courses/_110_1/outline" target="_blank">Blackboard</a>
+                    <a href="https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/" target="_blank">Course Page</a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById("theme-toggle");
+        toggleBtn.addEventListener("click", () => {
+            const theme = document.documentElement.getAttribute("data-theme");
+            const newTheme = theme === "light" ? "dark" : "light";
+            document.documentElement.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+        });
+    </script>
+</body>
+
+</html>

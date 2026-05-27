@@ -1,45 +1,499 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>CSE Year 2 Links</title>
-    <link rel="icon" type="image/png" href="hacker.png">   
-     <script>
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-  </script>
+    <title>CSE · YR 3 · IITD-AD</title>
+    <link rel="icon" type="image/png" href="assets/hacker.png">
+    <script>
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const stored = localStorage.getItem("theme");
+        document.documentElement.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&family=Familjen+Grotesk:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <button class = "button" id="theme-toggle">◐</button>
-    <div class="container">
-    
- <div class="image">
-    <img src="text.png" class="text-img" alt="Text Image">
-    <img src="circle.png" class="circle-img" alt="Circle Image">
-</div>
-        <h1>BTECH Computer YEAR 2</h1>
-        
-        <div class="general"></div>
-        
-        <div class="links"></div>
-         <div class="updates">
-          <h1>Updates</h1>
-          <div class="box" id="assignments-box"><h2>Assignments/Homework</h2></div>
-          <div class="box" id="quizzes-box"><h2>Quizzes</h2></div>
-        </div>
-    
+    <!-- DEEP LAYER 2 — furthest back, heavily blurred -->
+    <svg class="circuit circuit-deep" viewBox="0 0 1600 1200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+            <path id="dp1" d="M 0 180 L 200 180 L 200 60 L 520 60 L 520 220 L 900 220 L 900 100 L 1260 100 L 1260 320 L 1600 320" />
+            <path id="dp2" d="M 0 540 L 180 540 L 180 720 L 460 720 L 460 600 L 820 600 L 820 820 L 1180 820 L 1180 660 L 1600 660" />
+            <path id="dp3" d="M 0 980 L 340 980 L 340 1080 L 700 1080 L 700 920 L 1080 920 L 1080 1100 L 1400 1100 L 1400 960 L 1600 960" />
+            <path id="dp4" d="M 140 0 L 140 220 L 320 220 L 320 480 L 180 480 L 180 760 L 340 760 L 340 1200" />
+            <path id="dp5" d="M 1480 0 L 1480 200 L 1320 200 L 1320 440 L 1480 440 L 1480 700 L 1340 700 L 1340 1200" />
+        </defs>
+        <g class="circuit-traces"><use href="#dp1"/><use href="#dp2"/><use href="#dp3"/><use href="#dp4"/><use href="#dp5"/></g>
+        <g class="circuit-pulses">
+            <use href="#dp1" class="zip" style="animation-duration: 32s"/>
+            <use href="#dp2" class="zip" style="animation-duration: 36s; animation-delay: -12s"/>
+            <use href="#dp3" class="zip" style="animation-duration: 34s; animation-delay: -22s"/>
+        </g>
+    </svg>
 
-    
-        <script src="scripts.js"></script>
+    <!-- DEEP LAYER 1 — middle depth, lightly blurred -->
+    <svg class="circuit circuit-mid" viewBox="0 0 1600 1200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+            <path id="mp1" d="M 0 120 L 280 120 L 280 240 L 600 240 L 600 140 L 980 140 L 980 320 L 1320 320 L 1320 180 L 1600 180" />
+            <path id="mp2" d="M 0 420 L 220 420 L 220 560 L 480 560 L 480 420 L 760 420 L 760 600 L 1100 600 L 1100 480 L 1600 480" />
+            <path id="mp3" d="M 0 820 L 240 820 L 240 980 L 580 980 L 580 860 L 940 860 L 940 1020 L 1300 1020 L 1300 840 L 1600 840" />
+            <path id="mp4" d="M 380 0 L 380 200 L 540 200 L 540 480 L 700 480 L 700 760 L 540 760 L 540 1200" />
+            <path id="mp5" d="M 1100 0 L 1100 280 L 940 280 L 940 540 L 1100 540 L 1100 820 L 940 820 L 940 1200" />
+        </defs>
+        <g class="circuit-vias">
+            <circle cx="280" cy="120" r="3"/><circle cx="280" cy="240" r="3"/>
+            <circle cx="600" cy="240" r="3"/><circle cx="600" cy="140" r="3"/>
+            <circle cx="980" cy="140" r="3"/><circle cx="980" cy="320" r="3"/>
+            <circle cx="220" cy="420" r="3"/><circle cx="220" cy="560" r="3"/>
+            <circle cx="480" cy="560" r="3"/><circle cx="480" cy="420" r="3"/>
+            <circle cx="760" cy="420" r="3"/><circle cx="760" cy="600" r="3"/>
+            <circle cx="240" cy="820" r="3"/><circle cx="240" cy="980" r="3"/>
+            <circle cx="580" cy="980" r="3"/><circle cx="580" cy="860" r="3"/>
+        </g>
+        <g class="circuit-traces"><use href="#mp1"/><use href="#mp2"/><use href="#mp3"/><use href="#mp4"/><use href="#mp5"/></g>
+        <g class="circuit-pulses">
+            <use href="#mp1" class="zip" style="animation-duration: 22s"/>
+            <use href="#mp2" class="zip" style="animation-duration: 26s; animation-delay: -10s"/>
+            <use href="#mp3" class="zip" style="animation-duration: 24s; animation-delay: -14s"/>
+            <use href="#mp4" class="zip" style="animation-duration: 28s; animation-delay: -8s"/>
+        </g>
+    </svg>
 
-    </div>
+    <!-- TOP CIRCUIT BOARD — sharpest layer with the interactive dots -->
+    <svg class="circuit circuit-top" viewBox="0 0 1600 1200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+            <path id="cb1" d="M 60 80 L 380 80 L 380 200 L 720 200 L 720 80 L 1080 80 L 1080 260 L 1540 260" />
+            <path id="cb2" d="M 60 340 L 240 340 L 240 480 L 540 480 L 540 380 L 880 380 L 880 540 L 1540 540" />
+            <path id="cb3" d="M 60 700 L 320 700 L 320 600 L 700 600 L 700 740 L 1100 740 L 1100 620 L 1540 620" />
+            <path id="cb4" d="M 60 920 L 460 920 L 460 1040 L 860 1040 L 860 880 L 1240 880 L 1240 1040 L 1540 1040" />
+            <path id="cb5" d="M 220 60 L 220 320 L 380 320 L 380 580 L 540 580 L 540 860 L 700 860 L 700 1180" />
+            <path id="cb6" d="M 1380 60 L 1380 280 L 1220 280 L 1220 520 L 1380 520 L 1380 780 L 1240 780 L 1240 1180" />
+        </defs>
+        <g class="circuit-vias">
+            <circle cx="380" cy="80" r="3"/><circle cx="380" cy="200" r="3"/>
+            <circle cx="720" cy="200" r="3"/><circle cx="720" cy="80" r="3"/>
+            <circle cx="1080" cy="80" r="3"/><circle cx="1080" cy="260" r="3"/>
+            <circle cx="240" cy="340" r="3"/><circle cx="240" cy="480" r="3"/>
+            <circle cx="540" cy="480" r="3"/><circle cx="540" cy="380" r="3"/>
+            <circle cx="880" cy="380" r="3"/><circle cx="880" cy="540" r="3"/>
+            <circle cx="320" cy="700" r="3"/><circle cx="320" cy="600" r="3"/>
+            <circle cx="700" cy="600" r="3"/><circle cx="700" cy="740" r="3"/>
+            <circle cx="1100" cy="740" r="3"/><circle cx="1100" cy="620" r="3"/>
+            <circle cx="460" cy="920" r="3"/><circle cx="460" cy="1040" r="3"/>
+            <circle cx="860" cy="1040" r="3"/><circle cx="860" cy="880" r="3"/>
+            <circle cx="1240" cy="880" r="3"/><circle cx="1240" cy="1040" r="3"/>
+            <circle cx="220" cy="320" r="3"/><circle cx="380" cy="320" r="3"/>
+            <circle cx="380" cy="580" r="3"/><circle cx="540" cy="580" r="3"/>
+            <circle cx="540" cy="860" r="3"/><circle cx="700" cy="860" r="3"/>
+            <circle cx="1380" cy="280" r="3"/><circle cx="1220" cy="280" r="3"/>
+            <circle cx="1220" cy="520" r="3"/><circle cx="1380" cy="520" r="3"/>
+            <circle cx="1380" cy="780" r="3"/><circle cx="1240" cy="780" r="3"/>
+        </g>
+        <g class="circuit-traces">
+            <use href="#cb1"/><use href="#cb2"/><use href="#cb3"/>
+            <use href="#cb4"/><use href="#cb5"/><use href="#cb6"/>
+        </g>
+        <g class="circuit-pulses">
+            <use href="#cb1" class="zip" style="animation-duration: 14s"/>
+            <use href="#cb2" class="zip" style="animation-duration: 18s; animation-delay: -6s"/>
+            <use href="#cb3" class="zip" style="animation-duration: 16s; animation-delay: -3s"/>
+            <use href="#cb4" class="zip" style="animation-duration: 20s; animation-delay: -8s"/>
+            <use href="#cb5" class="zip" style="animation-duration: 22s; animation-delay: -5s"/>
+            <use href="#cb6" class="zip" style="animation-duration: 19s; animation-delay: -10s"/>
+        </g>
+    </svg>
+
+    <!-- Interactive dot particles tethered to circuit paths, cursor-reactive -->
+    <canvas class="dots" id="dots" aria-hidden="true"></canvas>
+
+    <!-- Translucent cover that dims the circuit/dots beneath the content -->
+    <div class="cover" aria-hidden="true"></div>
+
+    <!-- Hide button — appears only at the bottom of the page -->
+    <button type="button" class="play-toggle" id="play-toggle" aria-label="Hide content" aria-pressed="false">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="2.4" fill="currentColor"/>
+            <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.55"/>
+        </svg>
+        <span class="play-toggle-label">hide</span>
+    </button>
+
+    <main class="page" id="page">
+
+        <!-- TOP BAR — uni logo + brand name left · utilities right -->
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <img src="assets/text.png" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="assets/circle.png" class="circle-img" alt="">
+                </div>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">sem v · 2026—27</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="https://linkeen.vercel.app" target="_blank" class="pill pill-linkeen" id="pill-linkeen">
+                    <span class="pill-name">linkEEN</span>
+                    <svg class="pill-out" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 10 L10 4 M5 4 L10 4 L10 9" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="pill-quote pill-quote-top" aria-hidden="true">you and I are polar opposite</span>
+                    <span class="pill-quote pill-quote-bot" aria-hidden="true">if your laptop dies, blame them</span>
+                </a>
+                <a class="archive-link" href="archive/" title="Year 2 Archive"><img src="assets/box.png" alt="Archive"></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <!-- HERO ROW: logo + title + subtitle LEFT · quick links RIGHT -->
+        <section class="herobar">
+            <div class="hero-block">
+                <span class="hero-btech">B.Tech</span>
+                <div class="hero-text">
+                    <h1 class="hero-title">
+                        <span class="hero-title-main">Computer Science</span>
+                        <span class="hero-title-yr">/ Year <em>3</em></span>
+                    </h1>
+                </div>
+            </div>
+            <div class="hero-quick">
+                <a href="https://iitdadierp.iitd.ac.in/student/login" target="_blank" class="pill">
+                    <span class="pill-name">ERP</span>
+                </a>
+                <a href="https://teams.microsoft.com/" target="_blank" class="pill">
+                    <span class="pill-name">Teams</span>
+                </a>
+                <a href="https://outlook.office.com/" target="_blank" class="pill">
+                    <span class="pill-name">Outlook</span>
+                </a>
+                <a href="https://iida.blackboard.com/ultra/course" target="_blank" class="pill">
+                    <span class="pill-name">Blackboard</span>
+                </a>
+                <a href="#" target="_blank" class="pill" data-todo="sem5 timetable PDF">
+                    <span class="pill-name">Timetable</span>
+                </a>
+                <button type="button" class="pill pill-more" id="more-toggle" aria-expanded="false" aria-label="More links">
+                    <svg viewBox="0 0 14 14" class="pill-more-icon" aria-hidden="true">
+                        <path d="M5 3 L10 7 L5 11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <section class="quick-secondary" id="quick-secondary" aria-hidden="true">
+            <a href="#" target="_blank" class="pill" data-todo="mess menu PDF">
+                <span class="pill-name">Mess</span>
+            </a>
+            <a href="https://abudhabi.iitd.ac.in/" target="_blank" class="pill">
+                <span class="pill-name">Website</span>
+            </a>
+            <a href="#" target="_blank" class="pill" data-todo="sem5 academic calendar PDF">
+                <span class="pill-name">Acd Cal</span>
+            </a>
+        </section>
+
+        <!-- COURSES — 2-column grid, compact -->
+        <section id="course-grid" class="course-list"></section>
+
+        <!-- UPDATES — no big heading, just the two columns -->
+        <section class="updates-grid">
+            <div class="updates-col">
+                <h3 class="updates-col-title">Assignments</h3>
+                <div id="assignments-box" class="updates-list"></div>
+            </div>
+            <div class="updates-col">
+                <h3 class="updates-col-title">Quizzes</h3>
+                <div id="quizzes-box" class="updates-list"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // HIDE-MODE toggle — only revealed when scrolled to the bottom
+        (function () {
+            const btn = document.getElementById('play-toggle');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const on = document.body.classList.toggle('play-mode');
+                btn.setAttribute('aria-pressed', String(on));
+                const label = btn.querySelector('.play-toggle-label');
+                if (label) label.textContent = on ? 'show' : 'hide';
+            });
+
+            // Show button only when near the page bottom (within 80px)
+            function check() {
+                const nearBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 80);
+                btn.classList.toggle('visible', nearBottom || document.body.classList.contains('play-mode'));
+            }
+            window.addEventListener('scroll', check, { passive: true });
+            window.addEventListener('resize', check);
+            check();
+        })();
+
+        // INTERACTIVE DOTS — tethered to circuit paths, react to cursor.
+        // Move along path → snap toward cursor if near → rope breaks if pulled
+        // too far → drift free → re-attach to nearest path point after a beat.
+        (function () {
+            const canvas = document.getElementById('dots');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const svg = document.querySelector('.circuit-top');
+            const paths = ['#cb1','#cb2','#cb3','#cb4','#cb5','#cb6']
+                .map(id => svg && svg.querySelector(id))
+                .filter(Boolean);
+            if (!paths.length) return;
+
+            const pathLengths = paths.map(p => p.getTotalLength());
+            const PULL = 90;      // cursor influence radius (modest)
+            const TETHER = 140;   // rope-break distance (hard to break)
+            const FREE_MAX = 60;  // frames before re-attaching to a path
+            const DOT_COUNT = 18;
+
+            let dpr = 1, W = 0, H = 0;
+            const mouse = { x: -1e4, y: -1e4, active: false };
+            const dots = [];
+
+            function fit() {
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = W * dpr;
+                canvas.height = H * dpr;
+                canvas.style.width = W + 'px';
+                canvas.style.height = H + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            // Map a point from SVG viewBox space to screen coords
+            function pointAtT(pathIdx, t) {
+                const p = paths[pathIdx];
+                const len = pathLengths[pathIdx];
+                const svgPt = p.getPointAtLength(t * len);
+                const m = p.getScreenCTM();
+                if (!m) return { x: svgPt.x, y: svgPt.y };
+                return { x: svgPt.x * m.a + m.e, y: svgPt.y * m.d + m.f };
+            }
+
+            function spawn() {
+                dots.length = 0;
+                for (let i = 0; i < DOT_COUNT; i++) {
+                    const pi = i % paths.length;
+                    const t = Math.random();
+                    const p = pointAtT(pi, t);
+                    dots.push({
+                        pi, t,
+                        x: p.x, y: p.y,
+                        vx: 0, vy: 0,
+                        speed: 0.0006 + Math.random() * 0.0006,
+                        dir: Math.random() < 0.5 ? 1 : -1,
+                        tethered: true,
+                        free: 0,
+                        size: 2.8 + Math.random() * 1.5,
+                    });
+                }
+            }
+
+            function rgbFromVar(name, fallback) {
+                const v = getComputedStyle(document.documentElement)
+                    .getPropertyValue(name).trim();
+                return v || fallback;
+            }
+
+            function step() {
+                ctx.clearRect(0, 0, W, H);
+                const tetherColor = rgbFromVar('--coral', '#3B5C9C');
+                const freeColor = tetherColor;
+                const ropeColor = 'rgba(120, 130, 170, 0.20)';
+
+                for (const d of dots) {
+                    if (d.tethered) {
+                        // step along path
+                        d.t += d.speed * d.dir;
+                        if (d.t > 1) d.t -= 1;
+                        if (d.t < 0) d.t += 1;
+                        const tgt = pointAtT(d.pi, d.t);
+
+                        // strong attraction to path target — dots stick to path
+                        let ax = (tgt.x - d.x) * 0.32;
+                        let ay = (tgt.y - d.y) * 0.32;
+
+                        // light cursor attraction
+                        if (mouse.active) {
+                            const dx = mouse.x - d.x, dy = mouse.y - d.y;
+                            const dm = Math.sqrt(dx * dx + dy * dy);
+                            if (dm < PULL && dm > 0.1) {
+                                const f = (1 - dm / PULL) * 0.5;
+                                ax += (dx / dm) * f * 2.5;
+                                ay += (dy / dm) * f * 2.5;
+                            }
+                        }
+
+                        d.vx = (d.vx + ax) * 0.74;
+                        d.vy = (d.vy + ay) * 0.74;
+                        d.x += d.vx;
+                        d.y += d.vy;
+
+                        const stretch = Math.hypot(d.x - tgt.x, d.y - tgt.y);
+                        // rope breaks
+                        if (stretch > TETHER) {
+                            d.tethered = false;
+                            d.free = 0;
+                            // give a small kick in the cursor direction
+                            if (mouse.active) {
+                                const dx = d.x - mouse.x, dy = d.y - mouse.y;
+                                const dm = Math.hypot(dx, dy) || 1;
+                                d.vx = (dx / dm) * 6;
+                                d.vy = (dy / dm) * 6;
+                            }
+                        }
+                    } else {
+                        // free drift with momentum
+                        d.vx *= 0.985;
+                        d.vy *= 0.985;
+                        d.x += d.vx;
+                        d.y += d.vy;
+                        d.free++;
+                        // wrap around viewport edges
+                        if (d.x < -30) d.x = W + 30;
+                        if (d.x > W + 30) d.x = -30;
+                        if (d.y < -30) d.y = H + 30;
+                        if (d.y > H + 30) d.y = -30;
+
+                        if (d.free > FREE_MAX) {
+                            // find nearest path point and re-attach
+                            let best = { pi: 0, t: 0, dist: Infinity };
+                            for (let i = 0; i < paths.length; i++) {
+                                for (let s = 0; s <= 1; s += 0.04) {
+                                    const pt = pointAtT(i, s);
+                                    const dx = pt.x - d.x, dy = pt.y - d.y;
+                                    const dd = dx * dx + dy * dy;
+                                    if (dd < best.dist) {
+                                        best = { pi: i, t: s, dist: dd };
+                                    }
+                                }
+                            }
+                            d.pi = best.pi;
+                            d.t = best.t;
+                            d.tethered = true;
+                            d.dir = Math.random() < 0.5 ? 1 : -1;
+                        }
+                    }
+
+                    // draw the dot with a soft halo so it shows above the wires
+                    ctx.globalAlpha = d.tethered ? 0.25 : 0.4;
+                    ctx.fillStyle = d.tethered ? tetherColor : freeColor;
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.size * 2.2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = d.tethered ? 0.95 : 1;
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+                requestAnimationFrame(step);
+            }
+
+            window.addEventListener('pointermove', (e) => {
+                mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+            }, { passive: true });
+            window.addEventListener('pointerleave', () => { mouse.active = false; });
+            window.addEventListener('resize', () => { fit(); spawn(); });
+
+            // Wait for SVG paths to lay out before spawning
+            requestAnimationFrame(() => {
+                fit();
+                spawn();
+                requestAnimationFrame(step);
+            });
+        })();
+
+        // Cursor → CSS vars (ambient glow follows you)
+        (function () {
+            const root = document.documentElement;
+            let raf = 0, tx = 50, ty = 30, cx = tx, cy = ty;
+            root.style.setProperty('--mx', cx + '%');
+            root.style.setProperty('--my', cy + '%');
+            const tick = () => {
+                cx += (tx - cx) * 0.12;
+                cy += (ty - cy) * 0.12;
+                root.style.setProperty('--mx', cx + '%');
+                root.style.setProperty('--my', cy + '%');
+                if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) raf = requestAnimationFrame(tick);
+                else raf = 0;
+            };
+            window.addEventListener('pointermove', (e) => {
+                tx = (e.clientX / window.innerWidth) * 100;
+                ty = (e.clientY / window.innerHeight) * 100;
+                if (!raf) raf = requestAnimationFrame(tick);
+            }, { passive: true });
+        })();
+
+        // Theme toggle
+        (function () {
+            const btn = document.getElementById('theme-toggle');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const cur = document.documentElement.getAttribute('data-theme');
+                const next = cur === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+            });
+        })();
+
+        // More-toggle — expand/collapse the secondary quick links
+        (function () {
+            const btn = document.getElementById('more-toggle');
+            const sec = document.getElementById('quick-secondary');
+            if (!btn || !sec) return;
+            btn.addEventListener('click', () => {
+                const expanded = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', String(!expanded));
+                sec.setAttribute('aria-hidden', String(expanded));
+                sec.classList.toggle('open');
+                const label = btn.querySelector('.util-more-label');
+                if (label) label.textContent = expanded ? '+ more' : '× hide';
+            });
+        })();
+
+        // LINKEEN pill — tap-toggle the popup on touch devices
+        (function () {
+            const el = document.getElementById('pill-linkeen');
+            if (!el) return;
+            const isTouch = window.matchMedia('(hover: none)').matches;
+            if (!isTouch) return;
+            el.addEventListener('click', (e) => {
+                if (!el.classList.contains('show-popup')) {
+                    e.preventDefault();
+                    el.classList.add('show-popup');
+                    setTimeout(() => el.classList.remove('show-popup'), 3000);
+                }
+            });
+        })();
+
+        // Equalize ALL course box heights (tallest sets the height for everyone).
+        (function () {
+            function equalize() {
+                const boxes = Array.from(document.querySelectorAll('.course-list .box'));
+                if (!boxes.length) return;
+                boxes.forEach(b => { b.style.height = 'auto'; });
+                requestAnimationFrame(() => {
+                    const maxH = Math.max(...boxes.map(b => b.offsetHeight));
+                    boxes.forEach(b => { b.style.height = maxH + 'px'; });
+                });
+            }
+            window.addEventListener('load', equalize);
+            window.addEventListener('resize', () => {
+                clearTimeout(window._eqT);
+                window._eqT = setTimeout(equalize, 120);
+            });
+        })();
+    </script>
+    <script src="scripts.js"></script>
 </body>
-
-
 
 </html>
