@@ -9,51 +9,53 @@
 }
 
 :root[data-theme="light"] {
-    --bg: #E2E8F5;              /* pale blue */
-    --bg-card: #EEF2FA;
-    --bg-elevated: #C7D2FE;
-    --fg: #0F172A;              /* slate-900 */
-    --fg-soft: #334155;
-    --fg-faint: #64748B;
-    --rule: rgba(15, 23, 42, 0.16);
-    --rule-faint: rgba(15, 23, 42, 0.08);
+    /* Editorial light mode — warm cream background, deep ink text,
+       rich saturated accents that pop. Distinct from dark in tone, not just luminance. */
+    --bg: #F2EBDB;              /* warm cream paper */
+    --bg-card: #FFFEFB;          /* off-white card */
+    --bg-elevated: #EAE0C8;
+    --fg: #0E1726;              /* deep ink */
+    --fg-soft: #3B4659;
+    --fg-faint: #6B7689;
+    --rule: rgba(14, 23, 38, 0.20);
+    --rule-faint: rgba(14, 23, 38, 0.09);
 
-    /* main accent — softer blue */
-    --coral: #3B5C9C;
-    --coral-bright: #547BBE;
-    --coral-glow: rgba(59, 92, 156, 0.28);
-    --coral-soft: #DDE4F3;
+    /* main accent — rich royal blue, vivid on cream */
+    --coral: #1E40AF;
+    --coral-bright: #2563EB;
+    --coral-glow: rgba(30, 64, 175, 0.28);
+    --coral-soft: #E2E8FB;
 
-    /* secondary — muted teal-cyan */
-    --cyan: #2A7E8D;
-    --cyan-bright: #3D9AAB;
-    --cyan-glow: rgba(42, 126, 141, 0.26);
-    --cyan-soft: #D5E8EC;
+    /* secondary — deep teal */
+    --cyan: #0F766E;
+    --cyan-bright: #14B8A6;
+    --cyan-glow: rgba(15, 118, 110, 0.26);
+    --cyan-soft: #D6F0EC;
 
-    /* indigo — softer */
-    --indigo: #4A4B8F;
-    --indigo-bright: #6566AE;
-    --indigo-glow: rgba(74, 75, 143, 0.26);
-    --indigo-soft: #DCDDEC;
+    /* indigo — vivid violet */
+    --indigo: #6D28D9;
+    --indigo-bright: #8B5CF6;
+    --indigo-glow: rgba(109, 40, 217, 0.28);
+    --indigo-soft: #E9DEFB;
 
-    /* deep — navy */
-    --deep: #1E293B;
-    --deep-bright: #334155;
-    --deep-glow: rgba(30, 41, 59, 0.32);
+    /* deep navy */
+    --deep: #0E1726;
+    --deep-bright: #3B4659;
+    --deep-glow: rgba(14, 23, 38, 0.32);
 
-    /* sparse violet accent (just a touch) */
+    /* violet accent */
     --sky: #7C3AED;
     --sky-glow: rgba(124, 58, 237, 0.32);
 
     /* red — used for live indicator, AGRL category, LINKEEN border */
-    --red: #DC2626;
-    --red-bright: #EF4444;
-    --red-glow: rgba(220, 38, 38, 0.34);
-    --red-soft: #FEE2E2;
+    --red: #B91C1C;
+    --red-bright: #DC2626;
+    --red-glow: rgba(185, 28, 28, 0.32);
+    --red-soft: #FAD8D8;
 
-    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-    --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.10);
-    --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.16);
+    --shadow-sm: 0 1px 2px rgba(14, 23, 38, 0.08);
+    --shadow-md: 0 6px 18px rgba(14, 23, 38, 0.12);
+    --shadow-lg: 0 24px 60px rgba(14, 23, 38, 0.18);
 }
 
 :root[data-theme="dark"] {
@@ -112,8 +114,10 @@ body {
     overflow-x: hidden;
     min-height: 100vh;
     position: relative;
-    transition: background 0.4s, color 0.4s;
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
+
+/* Body bg is driven by --bg variable; no hardcoded overrides needed. */
 
 /* Circuit board layers — top-down PCB illusion via blur + depth */
 .circuit {
@@ -123,14 +127,10 @@ body {
     height: 100%;
     pointer-events: none;
 }
-.circuit-deep {
-    z-index: 0;
-    filter: blur(3px);
-}
-.circuit-mid {
-    z-index: 0;
-    filter: blur(1.2px);
-}
+/* Depth-illusion done via opacity + stroke-width per layer (NO filter:blur,
+   which forces full-viewport rasterization every animation frame). */
+.circuit-deep,
+.circuit-mid,
 .circuit-top {
     z-index: 0;
 }
@@ -155,18 +155,19 @@ body {
     opacity: 0.75;
 }
 
-.circuit-deep .circuit-pulses use { stroke: var(--indigo-bright); opacity: 0.6;  stroke-width: 2.2; filter: drop-shadow(0 0 5px var(--indigo-glow)); }
-.circuit-mid  .circuit-pulses use { stroke: var(--cyan-bright);   opacity: 0.75; stroke-width: 2.4; filter: drop-shadow(0 0 5px var(--cyan-glow)); }
+/* Pulses — NO drop-shadow filters (they re-rasterize every frame on
+   animated strokes). Brightness comes from bright stroke colors + opacity. */
+.circuit-deep .circuit-pulses use { stroke: var(--indigo-bright); opacity: 0.55; stroke-width: 2.6; }
+.circuit-mid  .circuit-pulses use { stroke: var(--cyan-bright);   opacity: 0.7;  stroke-width: 2.6; }
 .circuit-top  .circuit-pulses use { stroke-width: 2.6; }
 .circuit-pulses use {
     fill: none;
     stroke: var(--coral-bright);
-    stroke-width: 1.4;
+    stroke-width: 2;
     stroke-linecap: round;
     stroke-dasharray: 22 9999;
     stroke-dashoffset: 0;
-    opacity: 0.7;
-    filter: drop-shadow(0 0 3px var(--coral-glow));
+    opacity: 0.85;
     animation-name: zip;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
@@ -193,11 +194,11 @@ body {
     z-index: 2;
     pointer-events: none;
     background: var(--bg);
-    opacity: 0.65;
-    transition: opacity 0.5s ease;
+    opacity: 0.55;
+    transition: opacity 0.5s ease, background 0.4s ease;
 }
 [data-theme="dark"] .cover {
-    opacity: 0.55;
+    opacity: 0.5;
 }
 body.play-mode .cover {
     opacity: 0;
@@ -362,9 +363,20 @@ a:focus-visible, button:focus-visible {
     right: 0;
     bottom: -0.18em;
     height: 3px;
-    background: var(--coral);
+    background: linear-gradient(90deg,
+        var(--coral) 0%,
+        var(--cyan) 25%,
+        var(--indigo) 50%,
+        var(--red) 75%,
+        var(--coral) 100%);
+    background-size: 300% 100%;
     border-radius: 2px;
-    opacity: 0.4;
+    opacity: 0.85;
+    animation: brand-underline-slide 6s linear infinite;
+}
+@keyframes brand-underline-slide {
+    from { background-position: 0% 0; }
+    to   { background-position: 300% 0; }
 }
 
 .brand-meta {
@@ -402,27 +414,30 @@ a:focus-visible, button:focus-visible {
     box-shadow: 0 0 0 1px var(--coral), 0 12px 28px var(--coral-glow);
 }
 
-/* + more pill — narrow chevron button, low horizontal footprint */
+/* + more pill — chevron button (visible, clearly clickable) */
 .pill-more {
-    background: transparent;
-    border: 1px dashed var(--fg-faint);
-    color: var(--fg-soft);
+    background: var(--bg-card);
+    border: 1.5px dashed var(--coral);
+    color: var(--coral);
     cursor: pointer;
     padding: 0;
-    width: 1.8rem;
-    min-width: 0;
-    align-self: stretch;
+    width: 2.4rem;
+    min-width: 2.4rem;
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-family: inherit;
     flex-shrink: 0;
 }
+/* CSS-drawn right-pointing triangle — perfectly centered, no font needed */
 .pill-more-icon {
-    width: 14px;
-    height: 14px;
-    display: block;
-    color: currentColor;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 8px;
+    border-color: transparent transparent transparent currentColor;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .pill-more[aria-expanded="true"] .pill-more-icon {
@@ -667,14 +682,19 @@ a:focus-visible, button:focus-visible {
     max-height: 0;
     overflow: hidden;
     opacity: 0;
-    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease, padding 0.4s ease;
+    visibility: hidden;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease, padding 0.4s ease, visibility 0s linear 0.4s;
 }
 .quick-secondary.open {
     max-height: 16rem;
     opacity: 1;
+    visibility: visible;
     margin-bottom: clamp(1rem, 2vw, 1.5rem);
     padding-bottom: clamp(0.85rem, 2vw, 1.25rem);
     border-bottom: 1px solid var(--rule);
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease, padding 0.4s ease, visibility 0s linear 0s;
 }
 .pill {
     display: inline-flex; align-items: center;
@@ -868,13 +888,16 @@ a:focus-visible, button:focus-visible {
     font-weight: 800;
     line-height: 1;
 }
-.course-list .box[data-prefix="ACOL"] .course-firstletter,
+/* Letter gets color only (no background — it's inline on the title) */
+.course-list .box[data-prefix="ACOL"] .course-firstletter { color: var(--coral); }
+.course-list .box[data-prefix="AGRL"] .course-firstletter { color: var(--red); }
+.course-list .box[data-prefix="AHUL"] .course-firstletter { color: var(--indigo); }
+
+/* Chip + credits circle get the soft-tinted background pill */
 .course-list .box[data-prefix="ACOL"] .course-chip,
 .course-list .box[data-prefix="ACOL"] .course-credits { color: var(--coral); border-color: var(--coral); background: var(--coral-soft); }
-.course-list .box[data-prefix="AGRL"] .course-firstletter,
 .course-list .box[data-prefix="AGRL"] .course-chip,
 .course-list .box[data-prefix="AGRL"] .course-credits { color: var(--red); border-color: var(--red); background: var(--red-soft); }
-.course-list .box[data-prefix="AHUL"] .course-firstletter,
 .course-list .box[data-prefix="AHUL"] .course-chip,
 .course-list .box[data-prefix="AHUL"] .course-credits { color: var(--indigo); border-color: var(--indigo); background: var(--indigo-soft); }
 

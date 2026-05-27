@@ -6,11 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Archive — CSE Year 2 Links</title>
     <link rel="icon" type="image/png" href="../assets/hacker.png">
-    <script>
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const stored = localStorage.getItem("theme");
-        document.documentElement.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
-    </script>
+    <script src="../theme-init.js"></script>
     <link rel="stylesheet" href="styles.css">
     <style>
         .archive-banner {
@@ -310,15 +306,7 @@
 
     </div>
 
-    <script>
-        const toggleBtn = document.getElementById("theme-toggle");
-        toggleBtn.addEventListener("click", () => {
-            const theme = document.documentElement.getAttribute("data-theme");
-            const newTheme = theme === "light" ? "dark" : "light";
-            document.documentElement.setAttribute("data-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-        });
-    </script>
+    <script src="archive.js"></script>
 </body>
 
 </html>
