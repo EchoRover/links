@@ -9,7 +9,7 @@ const linksData = {
     Outlook: "https://outlook.office.com/",
     Blackboard: "https://iida.blackboard.com/ultra/course",
     Website: "https://abudhabi.iitd.ac.in/",
-    "Acd Cal": "",   // TODO: AY2026-2027 Sem 1 calendar PDF
+    "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-2026-27Sem2.pdf",
     TimeTable: "",   // TODO: Sem 5 timetable PDF
   },
 
