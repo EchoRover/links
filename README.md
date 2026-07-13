@@ -38,10 +38,10 @@ links/
 ├── styles.css          # theme tokens + all layout
 ├── README.md
 ├── assets/
-│   ├── circle.png      # red IIT mark
-│   ├── text.png        # IITDAD text logo (inverts in dark mode)
-│   ├── hacker.png      # favicon
-│   └── box.png         # archive icon (inverts in dark mode)
+│   ├── circle.webp      # red IIT mark
+│   ├── text.webp        # IITDAD text logo (inverts in dark mode)
+│   ├── hacker.webp      # favicon
+│   └── box.webp         # archive icon (inverts in dark mode)
 ├── archive/            # frozen Year 2 archive, self-contained
 │   ├── index.html
 │   └── styles.css
