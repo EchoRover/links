@@ -48,7 +48,7 @@
 
         .bus-sub {
             margin: 0.35rem 0 0;
-            color: var(--fg-faint);
+            color: var(--fg-soft);
             font-size: 0.9rem;
         }
 
@@ -58,7 +58,7 @@
             gap: 0.5rem;
             font-family: var(--font-mono);
             font-size: 0.8rem;
-            color: var(--fg-faint);
+            color: var(--fg-soft);
         }
 
         .bus-now #clock {
@@ -122,11 +122,11 @@
         }
 
         .route-arrow {
-            color: var(--fg-faint);
+            color: var(--fg-soft);
         }
 
         .route-loop {
-            color: var(--fg-faint);
+            color: var(--fg-soft);
             font-style: italic;
         }
 
@@ -163,7 +163,7 @@
         .next-from {
             font-family: var(--font-mono);
             font-size: 0.72rem;
-            color: var(--fg-faint);
+            color: var(--fg-soft);
         }
 
         .next-lead {
@@ -218,7 +218,7 @@
         .next-veh {
             font-family: var(--font-mono);
             font-size: 0.75rem;
-            color: var(--fg-faint);
+            color: var(--fg-soft);
         }
 
         .next-then {
@@ -241,11 +241,11 @@
         }
 
         .then-eta {
-            color: var(--fg-faint);
+            color: var(--fg-soft);
         }
 
         .then-veh {
-            color: var(--fg-faint);
+            color: var(--fg-soft);
             font-size: 0.7rem;
         }
 
@@ -301,144 +301,171 @@
             color: var(--coral);
         }
 
-        /* ---------- schedule tables ---------- */
+        /* ---------- schedule grid ----------
+           Was a 4-column table. Three of those columns repeated
+           themselves on all 144 rows — the route string is identical
+           per direction, the vehicle is a fixed 7-trip cycle — and that
+           repetition is what shoved the time off the side of a phone.
+           Route is now stated once in the header, the vehicle cycle
+           once as a rule, and the times get the full width grouped by
+           hour. No horizontal scroll anywhere. */
         .sched-wrap {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-            gap: clamp(1rem, 2.5vw, 1.75rem);
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+            gap: clamp(1.25rem, 3vw, 2rem);
         }
 
         .sched-head {
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--rule);
         }
 
         .sched-h2 {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: 700;
             margin: 0;
+            color: var(--fg);
         }
 
         .sched-route {
             margin: 0.2rem 0 0;
             font-family: var(--font-mono);
-            font-size: 0.72rem;
-            color: var(--fg-faint);
+            font-size: 0.75rem;
+            color: var(--fg-soft);
         }
 
-        .sched-block {
-            margin-bottom: 1.25rem;
+        .shift {
+            margin-bottom: 1.5rem;
         }
 
-        .sched-title {
+        .shift-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .shift-title {
             font-family: var(--font-mono);
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--fg-faint);
-            margin: 0 0 0.4rem;
+            color: var(--fg);
+            font-weight: 600;
+            margin: 0;
         }
 
-        .sched-scroll {
-            overflow-x: auto;
+        .shift-span {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--fg-soft);
+        }
+
+        .grid {
             border: 1px solid var(--rule);
             border-radius: 12px;
             background: var(--bg-card);
+            overflow: hidden;
         }
 
-        table.sched {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-        }
-
-        table.sched th {
-            text-align: left;
-            font-family: var(--font-mono);
-            font-size: 0.64rem;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            color: var(--fg-faint);
-            font-weight: 500;
-            padding: 0.6rem 0.7rem;
-            border-bottom: 1px solid var(--rule);
-            white-space: nowrap;
-        }
-
-        table.sched td {
-            padding: 0.45rem 0.7rem;
+        .hrow {
+            display: grid;
+            grid-template-columns: 3.6rem 1fr;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.6rem;
             border-bottom: 1px solid var(--rule-faint);
-            white-space: nowrap;
         }
 
-        table.sched tr:last-child td {
+        .hrow:last-child {
             border-bottom: none;
         }
 
-        .c-no {
-            color: var(--fg-faint);
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            width: 2.5rem;
-        }
-
-        .c-time {
-            font-family: var(--font-mono);
-            font-weight: 600;
-            color: var(--fg);
-        }
-
-        .c-route {
-            color: var(--fg-soft);
-            font-size: 0.75rem;
-        }
-
-        .c-veh {
-            color: var(--fg-faint);
+        .hlabel {
             font-family: var(--font-mono);
             font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--fg-soft);
             text-align: right;
+            letter-spacing: 0.02em;
         }
 
-        /* past trips fade back; the next one is the hero of the table */
-        tr.past td {
-            opacity: 0.38;
+        .mins {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
         }
 
-        tr.next td {
-            background: var(--coral-soft);
+        /* Upcoming departure: full-contrast text on a bordered chip.
+           Past: no chrome, but the text stays at --fg-soft (9.4:1 light,
+           7.0:1 dark) instead of the old opacity:.38, which crushed
+           everything to under 2:1 and was the low-contrast complaint. */
+        .min {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 600;
+            line-height: 1;
+            color: var(--fg);
+            background: var(--bg-elevated);
+            border: 1px solid var(--rule);
+            border-radius: 7px;
+            padding: 0.34rem 0.4rem;
+            min-width: 2.1rem;
+            text-align: center;
+            cursor: default;
         }
 
-        tr.next .c-time {
-            color: var(--coral);
+        .min.past {
+            color: var(--fg-soft);
+            background: transparent;
+            border-color: transparent;
+            font-weight: 400;
         }
 
-        tr.next .c-time::after {
-            content: " ←  next";
-            font-size: 0.62rem;
-            font-weight: 500;
-            letter-spacing: 0.06em;
-            color: var(--coral);
+        .min.next {
+            background: var(--coral);
+            border-color: var(--coral);
+            color: var(--bg-card);
+            font-weight: 700;
+            box-shadow: 0 0 0 3px var(--coral-glow);
+        }
+
+        .shift-night .grid {
+            border-style: dashed;
+        }
+
+        /* the vehicle rota, stated once instead of 144 times */
+        .rota {
+            margin: 0.5rem 0 0;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            line-height: 1.6;
+            color: var(--fg-soft);
+        }
+
+        .rota b {
+            color: var(--fg);
+            font-weight: 600;
         }
 
         /* tap-confirmation for "jump to next departure" */
         .flash {
-            animation: flashRow 1.1s ease-out 1;
+            animation: flashChip 1.1s ease-out 1;
         }
 
-        @keyframes flashRow {
+        @keyframes flashChip {
 
             0%,
             100% {
-                background: transparent;
+                box-shadow: 0 0 0 3px var(--coral-glow);
             }
 
-            25% {
-                background: var(--coral-glow);
+            30% {
+                box-shadow: 0 0 0 9px var(--coral-glow);
             }
-        }
-
-        .sched-night .sched-scroll {
-            border-style: dashed;
         }
 
         /* ---------- footnote ---------- */
@@ -447,7 +474,7 @@
             padding-top: 1rem;
             border-top: 1px solid var(--rule);
             font-size: 0.78rem;
-            color: var(--fg-faint);
+            color: var(--fg-soft);
             max-width: 46rem;
             line-height: 1.6;
         }
@@ -534,16 +561,23 @@
             <button type="button" class="link-btn" id="jump-next">jump to next departure</button>
         </div>
 
-        <!-- FULL TABLES -->
+        <!-- FULL SCHEDULE -->
         <div class="sched-wrap" id="sched-wrap"></div>
+
+        <p class="rota">
+            Vehicles run a fixed cycle, so it is a rule rather than a column:
+            <b>Coaster 1 → Coaster 2 → Coaster 3 → Bus 1 → Bus 2 → Bus 3 → Coaster 4</b>,
+            then repeat from trip 1. Night shift alternates <b>two vans</b>.
+            The card above names the vehicle on the next bus; hover a time for the rest.
+        </p>
 
         <p class="bus-note">
             <strong>Source:</strong> the printed shift poster, transcribed 19 Aug 2026. Countdowns use your
             device clock, so they only line up if your phone is on Gulf time.
             <strong>Known gaps:</strong> the poster shows no weekday/weekend or holiday variation, so this page
             shows the same times every day — check the physical board before relying on it for a weekend trip.
-            Trips 16 and 17 on the Campus → Dorms leg are both printed as 10:00 AM; that is reproduced as printed,
-            not corrected.
+            Trips 16 and 17 on the Campus → Dorms leg are both printed as 10:00 AM; they share one 10:00 chip
+            here (one departure, two vehicles) rather than being silently renumbered.
         </p>
     </main>
 
