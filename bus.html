@@ -249,13 +249,49 @@
             font-size: 0.7rem;
         }
 
-        /* ---------- controls ---------- */
+        /* ---------- controls ----------
+           On a phone this bar is the context: which direction you are
+           reading and the road it takes. It sticks to the top so that
+           scrolling 58 rows of times can never leave you wondering which
+           way round you are looking at. On desktop both directions are
+           on screen with their own headings, so it stays put. */
         .bus-controls {
+            margin-bottom: 1rem;
+        }
+
+        .ctl-row {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
+        }
+
+        .road {
+            display: none;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--fg-soft);
+        }
+
+        .road .from {
+            background: var(--coral);
+            color: var(--bg-card);
+            font-weight: 700;
+            padding: 0.15rem 0.4rem;
+            border-radius: 5px;
+        }
+
+        .road .via {
+            color: var(--fg);
+            font-weight: 600;
+        }
+
+        .road .arw {
+            opacity: 0.55;
         }
 
         .seg {
@@ -509,6 +545,35 @@
             body[data-dir="toDorms"] [data-dir="toCampus"] {
                 display: none;
             }
+
+            /* full-bleed so nothing scrolls through the side padding */
+            .bus-controls {
+                position: sticky;
+                top: 0;
+                z-index: 30;
+                margin-left: calc(-1 * clamp(1.1rem, 4vw, 2.5rem));
+                margin-right: calc(-1 * clamp(1.1rem, 4vw, 2.5rem));
+                padding: 0.55rem clamp(1.1rem, 4vw, 2.5rem) 0.5rem;
+                background: var(--bg);
+                border-bottom: 1px solid var(--rule);
+            }
+
+            .road {
+                display: flex;
+            }
+
+            .seg {
+                flex: 1;
+            }
+
+            .seg button {
+                flex: 1;
+            }
+
+            /* the sticky bar already shows the road — don't print it twice */
+            .sched-route {
+                display: none;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -569,12 +634,15 @@
         <!-- LIVE — next departures per direction -->
         <div class="next-wrap" id="next-wrap"></div>
 
-        <div class="bus-controls">
-            <div class="seg">
-                <button type="button" data-show="toCampus" class="on">To Campus</button>
-                <button type="button" data-show="toDorms">To Dorms</button>
+        <div class="bus-controls" id="bus-controls">
+            <div class="ctl-row">
+                <div class="seg">
+                    <button type="button" data-show="toCampus" class="on">To Campus</button>
+                    <button type="button" data-show="toDorms">To Dorms</button>
+                </div>
+                <button type="button" class="link-btn" id="jump-next">jump to next</button>
             </div>
-            <button type="button" class="link-btn" id="jump-next">jump to next departure</button>
+            <div class="road" id="road" aria-live="polite"></div>
         </div>
 
         <!-- FULL TABLES -->
