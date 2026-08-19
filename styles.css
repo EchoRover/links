@@ -1120,6 +1120,34 @@ a:focus-visible, button:focus-visible {
     .updates-grid { grid-template-columns: 1fr; }
 }
 
+/* TOPBAR on phones. The brand lockup runs ~500px wide — a 145px
+   institute wordmark, the linkCS name, and the meta line — against a
+   ~355px content box, and every child is flex-shrink:0 in a row that
+   never wraps. So the utils (theme toggle, archive, Home) ended up
+   painted on top of the wordmark. Drop the institute logo on mobile;
+   the linkCS name carries the identity on its own, and losing it buys
+   back ~190px. flex-wrap is the backstop: on a very narrow phone the
+   buttons take their own line instead of overlapping anything. */
+@media (max-width: 720px) {
+    .topbar {
+        flex-wrap: wrap;
+        row-gap: 0.55rem;
+        padding-bottom: 0.9rem;
+    }
+    .brand { gap: 0.45rem; min-width: 0; }
+    .brand-logo { display: none; }
+    .brand-part-link { font-size: 1.9rem; }
+    .brand-part-cs { font-size: 2rem; }
+    .topbar-utils { margin-left: auto; flex-shrink: 0; }
+    .topbar-utils .pill { padding: 0.5rem 0.8rem; min-height: 38px; }
+    .topbar-utils .pill-name { font-size: 0.85rem; }
+}
+
+/* below this the meta line is what tips the row into wrapping */
+@media (max-width: 540px) {
+    .brand-meta { display: none; }
+}
+
 @media (max-width: 480px) {
     body { font-size: 15px; }
     .button, .archive-link { top: 0.75rem; height: 2.4rem; width: 2.4rem; }
