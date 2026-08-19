@@ -8,9 +8,11 @@ const linksData = {
     Teams: "https://teams.microsoft.com/",
     Outlook: "https://outlook.office.com/",
     Blackboard: "https://iida.blackboard.com/ultra/course",
-    Website: "https://abudhabi.iitd.ac.in/",
-    "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-2026-27Sem2.pdf",
-    TimeTable: "",   // TODO: Sem 5 timetable PDF
+    Website: "https://iitdabudhabi.ac.ae/",
+    Faculty: "https://iitdabudhabi.ac.ae/faculty",
+    Bus: "bus.html",
+    "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-2026-27Sem1.pdf",
+    TimeTable: "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/2026/Year%203%20%20Semester%205%20%20B.%20TECH%20Computer%20Science%20and%20Engineering.pdf",
   },
 
   // Dummy links per course — placeholder URLs ("#"). Replace as real URLs land.
