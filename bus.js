@@ -283,6 +283,19 @@ function renderAll() {
     tick(true);
 }
 
+// The route line in the sticky bar. On a phone this is the only thing
+// telling you which way round you are reading, so it has to track the
+// toggle exactly and stay on screen while the table scrolls under it.
+function setRoad(dirId) {
+    const el = document.getElementById("road");
+    if (!el) return;
+    const dir = SCHEDULE[dirId];
+    if (!dir) return;
+    const [from, ...rest] = dir.stops;
+    el.innerHTML = `<span class="from">${from}</span>` +
+        rest.map((s) => `<span class="arw">→</span><span class="via">${s}</span>`).join("");
+}
+
 // Mobile direction switcher — on narrow screens only one column shows.
 function bindDirToggle() {
     const btns = document.querySelectorAll("[data-show]");
@@ -290,8 +303,10 @@ function bindDirToggle() {
         btn.addEventListener("click", () => {
             btns.forEach((b) => b.classList.toggle("on", b === btn));
             document.body.dataset.dir = btn.dataset.show;
+            setRoad(btn.dataset.show);
         });
     });
+    setRoad(document.body.dataset.dir || "toCampus");
 }
 
 // Jump to the next departure.
