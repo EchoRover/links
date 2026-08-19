@@ -130,6 +130,44 @@ function untilLabel(mins, now) {
 }
 
 // ---------- rendering ----------
+//
+// The schedule is NOT a table. A table of 144 rows spent three of its
+// four columns repeating itself: the route string is identical on every
+// row of a given direction, and the vehicle is a fixed 7-trip cycle. On
+// a phone that repetition is what pushed the real content — the time —
+// off the side of the screen.
+//
+// So: state the route once in the header, state the vehicle cycle once
+// as a rule, and give the times the whole width, grouped by hour the way
+// a printed timetable does. 12 hour-rows instead of 58 table rows.
+
+// 7 -> "7 AM", 13 -> "1 PM", 24 -> "12 AM"
+function hourLabel(h) {
+    const hh = h % 24;
+    const suffix = hh < 12 ? "AM" : "PM";
+    let d = hh % 12;
+    if (d === 0) d = 12;
+    return `${d} ${suffix}`;
+}
+
+// Collapse trips that share a departure time into one chip. The poster
+// prints two trips at 10:00 AM on the Campus leg; that is one departure
+// moment with two vehicles, not two rows the reader must reconcile.
+function groupByHour(rows) {
+    const hours = [];
+    for (const t of rows) {
+        const h = Math.floor(t.mins / 60);
+        let bucket = hours[hours.length - 1];
+        if (!bucket || bucket.h !== h) {
+            bucket = { h, slots: [] };
+            hours.push(bucket);
+        }
+        const last = bucket.slots[bucket.slots.length - 1];
+        if (last && last.mins === t.mins) last.trips.push(t);
+        else bucket.slots.push({ mins: t.mins, time: t.time, trips: [t] });
+    }
+    return hours;
+}
 
 function renderNext(dir, data, now) {
     // Upcoming = everything still ahead today. If nothing is left,
@@ -169,42 +207,36 @@ function renderNext(dir, data, now) {
     </article>`;
 }
 
-function renderTable(dir, rows, now, title, isNight) {
-    // The next departure gets marked so it can be highlighted + scrolled to.
-    const nextMins = (() => {
-        const up = rows.find((t) => t.mins >= now);
-        return up ? up.mins : null;
-    })();
+function renderGrid(dir, rows, now, title, isNight) {
+    if (!rows.length) return "";
+
+    const upcoming = rows.find((t) => t.mins >= now);
+    const nextMins = upcoming ? upcoming.mins : null;
+    const span = `${to12h(rows[0].time)} – ${to12h(rows[rows.length - 1].time)}`;
+
+    const hours = groupByHour(rows).map((g) => `
+        <div class="hrow">
+            <span class="hlabel">${hourLabel(g.h)}</span>
+            <div class="mins">
+                ${g.slots.map((s) => {
+                    const past = s.mins < now;
+                    const isNext = s.mins === nextMins;
+                    const cls = ["min", past ? "past" : "", isNext ? "next" : ""]
+                        .filter(Boolean).join(" ");
+                    const vehicles = s.trips.map((t) => t.vehicle).join(", ");
+                    const label = `${to12h(s.time)} — ${vehicles}`;
+                    return `<span class="${cls}" title="${label}" aria-label="${label}">${s.time.slice(3)}</span>`;
+                }).join("")}
+            </div>
+        </div>`).join("");
 
     return `
-    <div class="sched-block${isNight ? " sched-night" : ""}">
-        <h3 class="sched-title">${title}</h3>
-        <div class="sched-scroll">
-            <table class="sched">
-                <thead>
-                    <tr>
-                        <th class="c-no">#</th>
-                        <th class="c-time">Departs ${dir.from}</th>
-                        <th class="c-route">Route</th>
-                        <th class="c-veh">Vehicle</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows.map((t) => {
-                        const past = t.mins < now;
-                        const isNext = t.mins === nextMins;
-                        const cls = [past ? "past" : "", isNext ? "next" : ""].filter(Boolean).join(" ");
-                        return `
-                        <tr class="${cls}"${isNext ? ' id="next-' + dir.id + (isNight ? "-n" : "") + '"' : ""}>
-                            <td class="c-no">${t.no}</td>
-                            <td class="c-time">${to12h(t.time)}</td>
-                            <td class="c-route">${dir.stops.join(" → ")}</td>
-                            <td class="c-veh">${t.vehicle}</td>
-                        </tr>`;
-                    }).join("")}
-                </tbody>
-            </table>
+    <div class="shift${isNight ? " shift-night" : ""}">
+        <div class="shift-head">
+            <h3 class="shift-title">${title}</h3>
+            <span class="shift-span">${rows.length} trips · ${span}</span>
         </div>
+        <div class="grid">${hours}</div>
     </div>`;
 }
 
@@ -212,7 +244,7 @@ function renderTable(dir, rows, now, title, isNight) {
 let elNext, elSched, elClock;
 
 // Which trip is "next" in each direction. When this string changes,
-// a bus has actually departed and the tables need rebuilding.
+// a bus has actually departed and the grid needs rebuilding.
 function nextKey(now) {
     return [SCHEDULE.toCampus, SCHEDULE.toDorms]
         .map((d) => {
@@ -238,10 +270,10 @@ function renderTables(now) {
             <section class="sched-col" data-dir="${d.id}">
                 <header class="sched-head">
                     <h2 class="sched-h2">${d.label}</h2>
-                    <p class="sched-route">${d.stops.join("  \u2192  ")}</p>
+                    <p class="sched-route">${d.stops.join("  →  ")}</p>
                 </header>
-                ${renderTable(d, data.day, now, "Day shift", false)}
-                ${renderTable(d, data.night, now, "Night shift", true)}
+                ${renderGrid(d, data.day, now, "Day shift", false)}
+                ${renderGrid(d, data.night, now, "Night shift", true)}
             </section>`;
         })
         .join("");
@@ -255,8 +287,8 @@ function renderClock() {
 
 // ---------- the tick ----------
 // Everything on this page is a function of the current minute, so the
-// tick is cheap: bail out unless the minute actually rolled over.
-// The 144-row tables only get rebuilt when a bus genuinely departs.
+// tick is cheap: bail out unless the minute actually rolled over. The
+// grid only gets rebuilt when a bus genuinely departs.
 
 let lastMinute = null;
 let lastNextKey = null;
@@ -272,7 +304,7 @@ function tick(force) {
     const key = nextKey(now);
     if (force || key !== lastNextKey) {
         lastNextKey = key;
-        renderTables(now);         // expensive, only when a bus has gone
+        renderTables(now);         // only when a bus has gone
     }
 }
 
@@ -296,24 +328,20 @@ function bindDirToggle() {
 
 // Jump to the next departure.
 //
-// Two traps here, both of which bit on mobile:
-//  1. On narrow screens one direction is display:none. querySelector
-//     returns the FIRST tr.next in DOM order, which is always the
-//     "To Campus" one — so with "To Dorms" showing, the button aimed at
-//     a hidden row and scrollIntoView silently no-op'd. Pick the first
-//     row that is actually rendered (offsetParent is null when hidden).
-//  2. .sched-scroll sets overflow-x:auto, which makes the computed
-//     overflow-y auto too, so it counts as a scroll container and
-//     scrollIntoView walks into it. Do the page-scroll math directly
-//     instead of asking the browser to guess which box to move.
+// On narrow screens one direction is display:none. querySelector returns
+// the FIRST match in DOM order, which is always the "To Campus" one — so
+// with "To Dorms" showing, the button aimed at a hidden element and did
+// nothing. Pick the first one actually rendered (offsetParent is null
+// when hidden), and do the page-scroll math directly rather than letting
+// scrollIntoView guess which of the nested scroll boxes to move.
 function scrollToNext() {
     const visible = (el) => el && el.offsetParent !== null;
 
-    const rows = Array.from(document.querySelectorAll(".sched tr.next"));
-    let target = rows.find(visible);
+    const chips = Array.from(document.querySelectorAll(".min.next"));
+    let target = chips.find(visible);
 
-    // After the last bus every row is "past", so there is no tr.next at
-    // all — fall back to the top of whichever direction is on screen.
+    // After the last bus nothing is "next" — fall back to the top of
+    // whichever direction is on screen.
     if (!target) {
         target = Array.from(document.querySelectorAll(".sched-col")).find(visible);
     }
@@ -325,7 +353,7 @@ function scrollToNext() {
 
     window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
 
-    // Confirm the tap did something, even if the row was already on screen.
+    // Confirm the tap did something, even if it was already on screen.
     target.classList.remove("flash");
     void target.offsetWidth;          // restart the animation
     target.classList.add("flash");
@@ -353,6 +381,7 @@ window.addEventListener("pageshow", () => tick(true));   // incl. bfcache restor
 window.addEventListener("focus", () => tick(true));
 window.addEventListener("online", () => tick(true));
 
+// Theme toggle (same contract as the main page — one handler, no duplicates).
 const toggleBtn = document.getElementById("theme-toggle");
 if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
