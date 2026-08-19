@@ -301,171 +301,158 @@
             color: var(--coral);
         }
 
-        /* ---------- schedule grid ----------
-           Was a 4-column table. Three of those columns repeated
-           themselves on all 144 rows — the route string is identical
-           per direction, the vehicle is a fixed 7-trip cycle — and that
-           repetition is what shoved the time off the side of a phone.
-           Route is now stated once in the header, the vehicle cycle
-           once as a rule, and the times get the full width grouped by
-           hour. No horizontal scroll anywhere. */
+        /* ---------- schedule tables ---------- */
         .sched-wrap {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-            gap: clamp(1.25rem, 3vw, 2rem);
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+            gap: clamp(1rem, 2.5vw, 1.75rem);
         }
 
         .sched-head {
-            margin-bottom: 0.85rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--rule);
+            margin-bottom: 0.75rem;
         }
 
         .sched-h2 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             margin: 0;
-            color: var(--fg);
         }
 
         .sched-route {
-            margin: 0.2rem 0 0;
+            margin: 0.25rem 0 0;
             font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--fg-soft);
-        }
-
-        .shift {
-            margin-bottom: 1.5rem;
-        }
-
-        .shift-head {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 0.5rem;
-        }
-
-        .shift-title {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--fg);
+            font-size: 0.74rem;
             font-weight: 600;
-            margin: 0;
+            color: var(--fg);
         }
 
-        .shift-span {
+        .sched-block {
+            margin-bottom: 1.25rem;
+        }
+
+        .sched-title {
             font-family: var(--font-mono);
             font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             color: var(--fg-soft);
+            margin: 0 0 0.4rem;
         }
 
-        .grid {
+        .sched-scroll {
+            overflow-x: auto;
             border: 1px solid var(--rule);
             border-radius: 12px;
             background: var(--bg-card);
-            overflow: hidden;
         }
 
-        .hrow {
-            display: grid;
-            grid-template-columns: 3.6rem 1fr;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.6rem;
+        table.sched {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        table.sched th {
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--fg-soft);
+            font-weight: 600;
+            padding: 0.6rem 0.55rem;
+            border-bottom: 1px solid var(--rule);
+            white-space: nowrap;
+        }
+
+        table.sched td {
+            padding: 0.45rem 0.55rem;
             border-bottom: 1px solid var(--rule-faint);
+            white-space: nowrap;
         }
 
-        .hrow:last-child {
+        table.sched tr:last-child td {
             border-bottom: none;
         }
 
-        .hlabel {
+        .c-no {
+            color: var(--fg-soft);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            width: 2.4rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .c-time {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--fg);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .c-route {
+            color: var(--fg-soft);
+            font-size: 0.75rem;
+        }
+
+        .c-veh {
+            color: var(--fg-soft);
             font-family: var(--font-mono);
             font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--fg-soft);
             text-align: right;
-            letter-spacing: 0.02em;
         }
 
-        .mins {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.3rem;
-        }
-
-        /* Upcoming departure: full-contrast text on a bordered chip.
-           Past: no chrome, but the text stays at --fg-soft (9.4:1 light,
-           7.0:1 dark) instead of the old opacity:.38, which crushed
-           everything to under 2:1 and was the low-contrast complaint. */
-        .min {
-            font-family: var(--font-mono);
-            font-size: 0.82rem;
-            font-weight: 600;
-            line-height: 1;
-            color: var(--fg);
-            background: var(--bg-elevated);
-            border: 1px solid var(--rule);
-            border-radius: 7px;
-            padding: 0.34rem 0.4rem;
-            min-width: 2.1rem;
-            text-align: center;
-            cursor: default;
-        }
-
-        .min.past {
+        /* Past trips step back by weight and colour, NOT by opacity.
+           The old opacity:.38 dropped this text to under 2:1 against the
+           card, which is what read as "contrast is too low". --fg-soft
+           is 9.4:1 on light and 7.0:1 on dark. */
+        tr.past .c-time {
             color: var(--fg-soft);
-            background: transparent;
-            border-color: transparent;
             font-weight: 400;
         }
 
-        .min.next {
-            background: var(--coral);
-            border-color: var(--coral);
-            color: var(--bg-card);
-            font-weight: 700;
-            box-shadow: 0 0 0 3px var(--coral-glow);
-        }
-
-        .shift-night .grid {
-            border-style: dashed;
-        }
-
-        /* the vehicle rota, stated once instead of 144 times */
-        .rota {
-            margin: 0.5rem 0 0;
-            font-family: var(--font-mono);
-            font-size: 0.68rem;
-            line-height: 1.6;
+        tr.past .c-no,
+        tr.past .c-route,
+        tr.past .c-veh {
             color: var(--fg-soft);
         }
 
-        .rota b {
-            color: var(--fg);
-            font-weight: 600;
+        tr.next td {
+            background: var(--coral-soft);
+        }
+
+        tr.next .c-time {
+            color: var(--coral);
+        }
+
+        tr.next .c-time::after {
+            content: " ←  next";
+            font-size: 0.62rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            color: var(--coral);
         }
 
         /* tap-confirmation for "jump to next departure" */
         .flash {
-            animation: flashChip 1.1s ease-out 1;
+            animation: flashRow 1.1s ease-out 1;
         }
 
-        @keyframes flashChip {
+        @keyframes flashRow {
 
             0%,
             100% {
-                box-shadow: 0 0 0 3px var(--coral-glow);
+                background: transparent;
             }
 
-            30% {
-                box-shadow: 0 0 0 9px var(--coral-glow);
+            25% {
+                background: var(--coral-glow);
             }
+        }
+
+        .sched-night .sched-scroll {
+            border-style: dashed;
         }
 
         /* ---------- footnote ---------- */
@@ -481,6 +468,35 @@
 
         .bus-note strong {
             color: var(--fg-soft);
+        }
+
+        /* ---------- narrow screens: the table ----------
+           The four columns need ~376px; a 390px phone gives the table
+           ~355px, so it scrolled sideways and the vehicle fell off the
+           edge. The Route cell is 166px of that and is byte-identical on
+           every one of the 144 rows — and it is already printed once,
+           in full, under the direction heading. Dropping the repeat gets
+           the table to ~210px and everything fits from 320px up. */
+        @media (max-width: 560px) {
+
+            table.sched th.c-route,
+            table.sched td.c-route {
+                display: none;
+            }
+
+            table.sched {
+                font-size: 0.8rem;
+            }
+
+            table.sched th,
+            table.sched td {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .sched-route {
+                font-size: 0.72rem;
+            }
         }
 
         /* ---------- narrow screens: one direction at a time ---------- */
@@ -561,23 +577,16 @@
             <button type="button" class="link-btn" id="jump-next">jump to next departure</button>
         </div>
 
-        <!-- FULL SCHEDULE -->
+        <!-- FULL TABLES -->
         <div class="sched-wrap" id="sched-wrap"></div>
-
-        <p class="rota">
-            Vehicles run a fixed cycle, so it is a rule rather than a column:
-            <b>Coaster 1 → Coaster 2 → Coaster 3 → Bus 1 → Bus 2 → Bus 3 → Coaster 4</b>,
-            then repeat from trip 1. Night shift alternates <b>two vans</b>.
-            The card above names the vehicle on the next bus; hover a time for the rest.
-        </p>
 
         <p class="bus-note">
             <strong>Source:</strong> the printed shift poster, transcribed 19 Aug 2026. Countdowns use your
             device clock, so they only line up if your phone is on Gulf time.
             <strong>Known gaps:</strong> the poster shows no weekday/weekend or holiday variation, so this page
             shows the same times every day — check the physical board before relying on it for a weekend trip.
-            Trips 16 and 17 on the Campus → Dorms leg are both printed as 10:00 AM; they share one 10:00 chip
-            here (one departure, two vehicles) rather than being silently renumbered.
+            Trips 16 and 17 on the Campus → Dorms leg are both printed as 10:00 AM; that is reproduced as printed,
+            not corrected.
         </p>
     </main>
 
