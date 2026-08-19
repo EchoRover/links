@@ -67,6 +67,30 @@
             color: var(--fg);
         }
 
+        /* the dot pulses so it reads as live, not as a frozen snapshot */
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--red-bright);
+            align-self: center;
+            animation: livePulse 2.4s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 var(--red-glow);
+            }
+
+            50% {
+                opacity: 0.55;
+                box-shadow: 0 0 0 4px transparent;
+            }
+        }
+
         /* ---------- route strip ---------- */
         .route-strip {
             display: flex;
@@ -431,6 +455,10 @@
             html {
                 scroll-behavior: auto;
             }
+
+            .live-dot {
+                animation: none;
+            }
         }
     </style>
 </head>
@@ -462,6 +490,7 @@
                 <p class="bus-sub">KCA 1&amp;2 · KCA 3 · Campus — one clockwise loop, both directions.</p>
             </div>
             <div class="bus-now">
+                <span class="live-dot" aria-hidden="true"></span>
                 <span>now</span><span id="clock">—</span>
             </div>
         </section>

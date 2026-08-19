@@ -208,39 +208,79 @@ function renderTable(dir, rows, now, title, isNight) {
     </div>`;
 }
 
-function renderAll() {
-    const now = nowMinutes();
+// Cached DOM handles — looked up once, not on every tick.
+let elNext, elSched, elClock;
 
-    const nextWrap = document.getElementById("next-wrap");
-    const schedWrap = document.getElementById("sched-wrap");
-    if (!nextWrap || !schedWrap) return;
+// Which trip is "next" in each direction. When this string changes,
+// a bus has actually departed and the tables need rebuilding.
+function nextKey(now) {
+    return [SCHEDULE.toCampus, SCHEDULE.toDorms]
+        .map((d) => {
+            const up = trips(d).all.find((t) => t.mins >= now);
+            return up ? up.time : "end";
+        })
+        .join("|");
+}
 
-    const dirs = [SCHEDULE.toCampus, SCHEDULE.toDorms];
-
-    nextWrap.innerHTML = dirs
+function renderNextCards(now) {
+    if (!elNext) return;
+    elNext.innerHTML = [SCHEDULE.toCampus, SCHEDULE.toDorms]
         .map((d) => renderNext(d, trips(d), now))
         .join("");
+}
 
-    schedWrap.innerHTML = dirs
+function renderTables(now) {
+    if (!elSched) return;
+    elSched.innerHTML = [SCHEDULE.toCampus, SCHEDULE.toDorms]
         .map((d) => {
             const data = trips(d);
             return `
             <section class="sched-col" data-dir="${d.id}">
                 <header class="sched-head">
                     <h2 class="sched-h2">${d.label}</h2>
-                    <p class="sched-route">${d.stops.join("  →  ")}</p>
+                    <p class="sched-route">${d.stops.join("  \u2192  ")}</p>
                 </header>
                 ${renderTable(d, data.day, now, "Day shift", false)}
                 ${renderTable(d, data.night, now, "Night shift", true)}
             </section>`;
         })
         .join("");
+}
 
-    const clock = document.getElementById("clock");
-    if (clock) {
-        const d = new Date();
-        clock.textContent = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+function renderClock() {
+    if (!elClock) return;
+    elClock.textContent = new Date()
+        .toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+// ---------- the tick ----------
+// Everything on this page is a function of the current minute, so the
+// tick is cheap: bail out unless the minute actually rolled over.
+// The 144-row tables only get rebuilt when a bus genuinely departs.
+
+let lastMinute = null;
+let lastNextKey = null;
+
+function tick(force) {
+    const now = nowMinutes();
+    if (!force && now === lastMinute) return;
+    lastMinute = now;
+
+    renderClock();
+    renderNextCards(now);          // cheap, always — this is the countdown
+
+    const key = nextKey(now);
+    if (force || key !== lastNextKey) {
+        lastNextKey = key;
+        renderTables(now);         // expensive, only when a bus has gone
     }
+}
+
+function renderAll() {
+    elNext = document.getElementById("next-wrap");
+    elSched = document.getElementById("sched-wrap");
+    elClock = document.getElementById("clock");
+    tick(true);
 }
 
 // Mobile direction switcher — on narrow screens only one column shows.
@@ -248,9 +288,8 @@ function bindDirToggle() {
     const btns = document.querySelectorAll("[data-show]");
     btns.forEach((btn) => {
         btn.addEventListener("click", () => {
-            const want = btn.dataset.show;
             btns.forEach((b) => b.classList.toggle("on", b === btn));
-            document.body.dataset.dir = want;
+            document.body.dataset.dir = btn.dataset.show;
         });
     });
 }
@@ -260,14 +299,28 @@ function scrollToNext() {
     if (target) target.scrollIntoView({ block: "center", behavior: "smooth" });
 }
 
+// ---------- keeping the page honest ----------
+// A timer alone is not enough. Phones throttle or freeze timers on a
+// backgrounded tab, and a page restored from the back/forward cache is
+// resurrected frozen in time — so an untouched tab can happily show a
+// "3 min" that went stale forty minutes ago. That is the one failure
+// this page cannot have. So: tick on a timer AND re-tick, forced, on
+// every event that means the page just came back in front of a human.
+
 renderAll();
 bindDirToggle();
 document.getElementById("jump-next")?.addEventListener("click", scrollToNext);
 
-// Re-render every 30s so the countdown and the "next" highlight stay honest.
-setInterval(renderAll, 30000);
+// Cheap: returns immediately unless the wall-clock minute rolled over.
+setInterval(tick, 1000);
 
-// Theme toggle (same contract as the main page — one handler, no duplicates).
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) tick(true);
+});
+window.addEventListener("pageshow", () => tick(true));   // incl. bfcache restore
+window.addEventListener("focus", () => tick(true));
+window.addEventListener("online", () => tick(true));
+
 const toggleBtn = document.getElementById("theme-toggle");
 if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
