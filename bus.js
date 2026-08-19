@@ -294,9 +294,41 @@ function bindDirToggle() {
     });
 }
 
+// Jump to the next departure.
+//
+// Two traps here, both of which bit on mobile:
+//  1. On narrow screens one direction is display:none. querySelector
+//     returns the FIRST tr.next in DOM order, which is always the
+//     "To Campus" one — so with "To Dorms" showing, the button aimed at
+//     a hidden row and scrollIntoView silently no-op'd. Pick the first
+//     row that is actually rendered (offsetParent is null when hidden).
+//  2. .sched-scroll sets overflow-x:auto, which makes the computed
+//     overflow-y auto too, so it counts as a scroll container and
+//     scrollIntoView walks into it. Do the page-scroll math directly
+//     instead of asking the browser to guess which box to move.
 function scrollToNext() {
-    const target = document.querySelector(".sched tr.next");
-    if (target) target.scrollIntoView({ block: "center", behavior: "smooth" });
+    const visible = (el) => el && el.offsetParent !== null;
+
+    const rows = Array.from(document.querySelectorAll(".sched tr.next"));
+    let target = rows.find(visible);
+
+    // After the last bus every row is "past", so there is no tr.next at
+    // all — fall back to the top of whichever direction is on screen.
+    if (!target) {
+        target = Array.from(document.querySelectorAll(".sched-col")).find(visible);
+    }
+    if (!target) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const rect = target.getBoundingClientRect();
+    const y = rect.top + window.pageYOffset - window.innerHeight / 2 + rect.height / 2;
+
+    window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
+
+    // Confirm the tap did something, even if the row was already on screen.
+    target.classList.remove("flash");
+    void target.offsetWidth;          // restart the animation
+    target.classList.add("flash");
 }
 
 // ---------- keeping the page honest ----------
