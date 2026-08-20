@@ -29,7 +29,7 @@ const linksData = {
       "Course Page": "#",
       Blackboard: "https://iida.blackboard.com/ultra/course",
     },
-    "ACOL334 (Comp Networks)": {
+    "ACOL331 (Operating Systems)": {
       Lectures: "#",
       Labs: "#",
       Assignments: "#",
