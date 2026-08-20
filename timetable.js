@@ -93,19 +93,26 @@ function ymd(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-// "M4-1-017" / "M4.0.019" -> building, floor, room number.
-// The middle digit is the floor. The room number is printed EXACTLY as
-// the PDF has it — Evan thinks 017 is "classroom 7" but wasn't certain,
-// and guessing wrong sends someone to the wrong door.
+// Room codes -> what people actually call the room. Only four rooms
+// appear in the whole Sem 5 timetable, so this is an explicit table
+// rather than a rule — the codes do not decode arithmetically.
+//
+// M4-1-017 = "classroom 7" is Evan's, confirmed off the door. The other
+// three are the code's last group with the leading zero dropped and are
+// NOT confirmed — if a door disagrees, fix it here, one line.
+const ROOMS = {
+    "M4-1-017": { bldg: "M4", floor: "1st floor", no: "7" },
+    "M4-0-011": { bldg: "M4", floor: "ground floor", no: "11" },
+    "M3-0-022": { bldg: "M3", floor: "ground floor", no: "22" },
+    "M4.0.019": { bldg: "M4", floor: "ground floor", no: "19" },
+};
+
 function whereIs(code) {
+    const r = ROOMS[code];
+    if (r) return { raw: code, no: r.no, sub: `${r.bldg} · ${r.floor}` };
     const m = String(code || "").match(/^([A-Za-z]\d+)[.\-](\d)[.\-](\d+)$/);
-    if (!m) return { raw: code || "", text: code || "" };
-    const [, bldg, fl, num] = m;
-    const floor = fl === "0" ? "ground floor"
-        : fl === "1" ? "1st floor"
-            : fl === "2" ? "2nd floor"
-                : fl === "3" ? "3rd floor" : fl + "th floor";
-    return { raw: code, text: `${bldg.toUpperCase()} · ${floor} · rm ${num}` };
+    if (!m) return { raw: code || "", no: code || "?", sub: "" };
+    return { raw: code, no: String(Number(m[3])), sub: `${m[1].toUpperCase()} · floor ${m[2]}` };
 }
 
 function left(mins) {
@@ -137,10 +144,11 @@ function nextDayWithClass(after) {
     return null;
 }
 
+const KIND = { lab: "Lab", tut: "Tutorial", "": "Lecture" };
+
 function label(x) {
     const c = COURSES[x.code];
-    const suffix = x.kind === "lab" ? " lab" : x.kind === "tut" ? " tutorial" : "";
-    return { code: x.code, name: (c ? c.name : x.code) + suffix };
+    return { code: x.code, name: c ? c.name : x.code, kind: KIND[x.kind] || "Lecture" };
 }
 
 // ---------- render ----------
@@ -153,16 +161,23 @@ function renderTimetable() {
     const today = ymd(now);
     const mins = now.getHours() * 60 + now.getMinutes();
 
-    // course code -> where -> when. Group badge only when it differs.
+    // Left is what and when; right is the big room number, because that
+    // is the bit you are actually looking for while walking there.
     const slot = (tag, x, timeText, on) => {
         const L = label(x);
         const w = whereIs(x.room);
         return `
         <div class="tt-slot${on ? " tt-on" : ""}">
-            <span class="tt-tag">${tag}${x.grp ? `<b class="tt-g">G${x.grp}</b>` : ""}</span>
-            <span class="tt-code">${L.code}<em>${L.name}</em></span>
-            <span class="tt-where" title="${w.raw}">${w.text}</span>
-            <span class="tt-time">${timeText}</span>
+            <div class="tt-main">
+                <span class="tt-tag">${tag}<b class="tt-kind tt-k-${x.kind || "lec"}">${L.kind}</b>${x.grp ? `<b class="tt-g">G${x.grp}</b>` : ""}</span>
+                <span class="tt-code">${L.code}<em>${L.name}</em></span>
+                <span class="tt-time">${timeText}</span>
+            </div>
+            <div class="tt-room" title="${w.raw}">
+                <span class="tt-room-lab">${L.kind === "Lab" ? "lab" : "classroom"}</span>
+                <span class="tt-room-no">${w.no}</span>
+                <span class="tt-room-sub">${w.sub}</span>
+            </div>
         </div>`;
     };
 
