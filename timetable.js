@@ -101,10 +101,10 @@ function ymd(d) {
 // three are the code's last group with the leading zero dropped and are
 // NOT confirmed — if a door disagrees, fix it here, one line.
 const ROOMS = {
-    "M4-1-017": { bldg: "M4", floor: "1st floor", no: "7" },
-    "M4-0-011": { bldg: "M4", floor: "ground floor", no: "11" },
-    "M3-0-022": { bldg: "M3", floor: "ground floor", no: "22" },
-    "M4.0.019": { bldg: "M4", floor: "ground floor", no: "19" },
+    "M4-1-017": { bldg: "M4", floor: "1F", no: "7" },
+    "M4-0-011": { bldg: "M4", floor: "G", no: "11" },
+    "M3-0-022": { bldg: "M3", floor: "G", no: "22" },
+    "M4.0.019": { bldg: "M4", floor: "G", no: "19" },
 };
 
 function whereIs(code) {
@@ -112,7 +112,7 @@ function whereIs(code) {
     if (r) return { raw: code, no: r.no, sub: `${r.bldg} · ${r.floor}` };
     const m = String(code || "").match(/^([A-Za-z]\d+)[.\-](\d)[.\-](\d+)$/);
     if (!m) return { raw: code || "", no: code || "?", sub: "" };
-    return { raw: code, no: String(Number(m[3])), sub: `${m[1].toUpperCase()} · floor ${m[2]}` };
+    return { raw: code, no: String(Number(m[3])), sub: `${m[1].toUpperCase()} · ${m[2] === "0" ? "G" : m[2] + "F"}` };
 }
 
 function left(mins) {
@@ -120,6 +120,14 @@ function left(mins) {
     if (mins < 60) return `${mins} min`;
     const h = Math.floor(mins / 60), m = mins % 60;
     return m ? `${h}h ${m}m` : `${h}h`;
+}
+
+// Same shape as the room plate: one big number plus a quiet unit, so
+// the two plates read as a pair rather than two different ideas.
+function countPlate(mins, verb) {
+    if (mins < 60) return { lab: verb, no: String(Math.max(0, mins)), sub: "min" };
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return { lab: verb, no: String(h), sub: m ? `h ${m}m` : (h === 1 ? "hour" : "hours") };
 }
 
 // Everything on a given weekday — both groups, in time order.
@@ -161,23 +169,28 @@ function renderTimetable() {
     const today = ymd(now);
     const mins = now.getHours() * 60 + now.getMinutes();
 
-    // Left is what and when; right is the big room number, because that
-    // is the bit you are actually looking for while walking there.
-    const slot = (tag, x, timeText, on) => {
+    // Two plates of the same shape bracket the course: how long you
+    // have on the left, which room on the right. Both are a single big
+    // number because both are read at a glance, mid-walk.
+    const plate = (kind, p) => `
+        <div class="tt-plate tt-p-${kind}">
+            <span class="tt-p-lab">${p.lab}</span>
+            <span class="tt-p-no">${p.no}</span>
+            <span class="tt-p-sub">${p.sub}</span>
+        </div>`;
+
+    const slot = (tagText, x, timePlate, on) => {
         const L = label(x);
         const w = whereIs(x.room);
         return `
         <div class="tt-slot${on ? " tt-on" : ""}">
+            ${plate("time", timePlate)}
             <div class="tt-main">
-                <span class="tt-tag">${tag}<b class="tt-kind tt-k-${x.kind || "lec"}">${L.kind}</b>${x.grp ? `<b class="tt-g">G${x.grp}</b>` : ""}</span>
+                <span class="tt-tag">${tagText}<b class="tt-kind tt-k-${x.kind || "lec"}">${L.kind}</b>${x.grp ? `<b class="tt-g">G${x.grp}</b>` : ""}</span>
                 <span class="tt-code">${L.code}<em>${L.name}</em></span>
-                <span class="tt-time">${timeText}</span>
+                <span class="tt-clock">${t12(x.s)} – ${t12(x.e)}</span>
             </div>
-            <div class="tt-room" title="${w.raw}">
-                <span class="tt-room-lab">${L.kind === "Lab" ? "lab" : "classroom"}</span>
-                <span class="tt-room-no">${w.no}</span>
-                <span class="tt-room-sub">${w.sub}</span>
-            </div>
+            ${plate("room", { lab: L.kind === "Lab" ? "lab" : "room", no: w.no, sub: w.sub })}
         </div>`;
     };
 
@@ -203,11 +216,11 @@ function renderTimetable() {
     let html = "";
 
     for (const x of current) {
-        html += slot("now", x, `ends ${t12(x.e)} · ${left(x.to - mins)} left`, true);
+        html += slot("now", x, countPlate(x.to - mins, "ends in"), true);
     }
     for (const x of upcoming) {
         html += slot(current.length ? "then" : "next", x,
-            `${t12(x.s)} · in ${left(x.from - mins)}`, false);
+            countPlate(x.from - mins, "starts in"), false);
     }
 
     if (!current.length && !upcoming.length) {
@@ -220,7 +233,13 @@ function renderTimetable() {
             const dn = ymd(nd.date) === ymd(new Date(now.getTime() + 864e5))
                 ? "tomorrow" : DAY_NAME[nd.date.getDay()];
             for (const x of nd.list.filter((y) => y.from === first)) {
-                html += slot(why, x, `${dn} · ${t12(x.s)}`, false);
+                const [hh, mm] = x.s.split(":");
+                const h12 = (Number(hh) % 12) || 12;
+                html += slot(why, x, {
+                    lab: dn,
+                    no: mm === "00" ? String(h12) : `${h12}:${mm}`,
+                    sub: (Number(hh) < 12 ? "am" : "pm"),
+                }, false);
             }
         } else {
             html += `<p class="tt-quiet">${why}.</p>`;
