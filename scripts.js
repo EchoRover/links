@@ -15,8 +15,8 @@ const linksData = {
     TimeTable: "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/2026/Year%203%20%20Semester%205%20%20B.%20TECH%20Computer%20Science%20and%20Engineering.pdf",
   },
 
-  // Dummy links per course — placeholder URLs ("#"). Replace as real URLs land.
-  // Varied counts on purpose so the row layout looks like a real sem.
+  // Only real, working URLs live here. A course with nothing published
+  // yet shows just its Blackboard link rather than a row of dead ones.
   courses: {
     "ACOL333 (AI)": {
       // class root, not the /post/1 permalink Evan pasted — that would
@@ -253,9 +253,10 @@ function renderUpdates() {
       const code = colon >= 0 ? head.slice(0, colon).trim() : "";
       const event = colon >= 0 ? head.slice(colon + 1).trim() : head.trim();
 
-      const row = document.createElement("a");
+      // A div, not an anchor: these rows have nowhere to go, and an
+      // <a href="#"> invites a tap that does nothing.
+      const row = document.createElement("div");
       row.className = "upd-row";
-      row.href = "#";
 
       const dateBox = document.createElement("div");
       dateBox.className = "upd-date";

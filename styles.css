@@ -1041,11 +1041,12 @@ a:focus-visible, button:focus-visible {
     border: 1px solid transparent;
     color: var(--fg);
     text-decoration: none;
-    transition: background 0.2s, border-color 0.2s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: background 0.2s, border-color 0.2s;
 }
+/* Row highlight only — no slide. These rows are not clickable, and a
+   transform on hover promises a tap target that isn't there. */
 .upd-row:hover {
     background: var(--bg-elevated);
-    transform: translateX(2px);
 }
 .upd-date {
     display: flex; flex-direction: column;
