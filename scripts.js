@@ -24,10 +24,13 @@ const linksData = {
       Labs: "#",
       Assignments: "#",
       Quiz: "#",
-      Piazza: "#",
+      // class root, not the /post/1 permalink Evan pasted — that would
+      // drop everyone on one thread instead of the feed
+      Piazza: "https://piazza.com/class/mszz8gz1dn16yo",
       Gradescope: "#",
-      "Course Page": "#",
-      Blackboard: "https://iida.blackboard.com/ultra/course",
+      "Course Page":
+        "https://docs.google.com/document/d/18RPlGs-hLt2yOPu9Z7A5d4DK2JYJnXqAEEbuhu0zeic/edit",
+      Blackboard: "https://iida.blackboard.com/ultra/courses/_158_1/outline",
     },
     "ACOL331 (Operating Systems)": {
       Lectures: "#",
