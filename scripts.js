@@ -35,7 +35,7 @@ const linksData = {
       Assignments: "#",
       Piazza: "#",
       "Course Page": "#",
-      Blackboard: "https://iida.blackboard.com/ultra/course",
+      Blackboard: "https://iida.blackboard.com/ultra/courses/_157_1/outline",
     },
     "ACOL351 (Algos)": {
       Lectures: "#",
