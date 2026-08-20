@@ -50,7 +50,7 @@ const linksData = {
       Slides: "#",
       Readings: "#",
       "Course Page": "#",
-      Blackboard: "https://iida.blackboard.com/ultra/course",
+      Blackboard: "https://iida.blackboard.com/ultra/courses/_179_1/outline",
     },
     "AHUL256 (Crit Think)": {
       Readings: "#",
