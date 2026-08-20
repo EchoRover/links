@@ -63,7 +63,7 @@ const linksData = {
       Readings: "#",
       Assignments: "#",
       "Course Page": "#",
-      Blackboard: "https://iida.blackboard.com/ultra/course",
+      Blackboard: "https://iida.blackboard.com/ultra/courses/_183_1/outline",
     },
   },
 };
