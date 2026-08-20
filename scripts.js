@@ -56,7 +56,7 @@ const linksData = {
       Readings: "#",
       Notes: "#",
       "Course Page": "#",
-      Blackboard: "https://iida.blackboard.com/ultra/course",
+      Blackboard: "https://iida.blackboard.com/ultra/courses/_182_1/outline",
     },
     "AHUL261 (Psych)": {
       Lectures: "#",
