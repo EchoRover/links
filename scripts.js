@@ -19,53 +19,27 @@ const linksData = {
   // Varied counts on purpose so the row layout looks like a real sem.
   courses: {
     "ACOL333 (AI)": {
-      Lectures: "#",
-      Tutorials: "#",
-      Labs: "#",
-      Assignments: "#",
-      Quiz: "#",
       // class root, not the /post/1 permalink Evan pasted — that would
       // drop everyone on one thread instead of the feed
       Piazza: "https://piazza.com/class/mszz8gz1dn16yo",
-      Gradescope: "#",
       "Course Page":
         "https://docs.google.com/document/d/18RPlGs-hLt2yOPu9Z7A5d4DK2JYJnXqAEEbuhu0zeic/edit",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_158_1/outline",
     },
     "ACOL331 (Operating Systems)": {
-      Lectures: "#",
-      Labs: "#",
-      Assignments: "#",
-      Piazza: "#",
-      "Course Page": "#",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_157_1/outline",
     },
     "ACOL351 (Algos)": {
-      Lectures: "#",
-      Tutorials: "#",
-      Quiz: "#",
-      Piazza: "#",
-      "Course Page": "#",
       // no assignments in this course — deliberately absent, not a TODO
       Blackboard: "https://iida.blackboard.com/ultra/courses/_159_1/outline",
     },
     "AGRL130 (Entrepren)": {
-      Slides: "#",
-      Readings: "#",
-      "Course Page": "#",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_179_1/outline",
     },
     "AHUL256 (Crit Think)": {
-      Readings: "#",
-      Notes: "#",
-      "Course Page": "#",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_182_1/outline",
     },
     "AHUL261 (Psych)": {
-      Lectures: "#",
-      Readings: "#",
-      Assignments: "#",
-      "Course Page": "#",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_183_1/outline",
     },
   },
