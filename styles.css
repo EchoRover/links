@@ -1349,6 +1349,15 @@ a:focus-visible, button:focus-visible {
     font-variant-numeric: tabular-nums;
 }
 
+/* A room we have not confirmed shows its raw code, not an invented
+   classroom number — smaller, because the code is longer and because
+   it should not read as authoritative. */
+.tt-p-raw .tt-p-no {
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    color: var(--fg-soft);
+}
+
 /* the class you are in gets both plates lit */
 .tt-on .tt-plate {
     border-color: var(--coral);

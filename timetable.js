@@ -93,26 +93,26 @@ function ymd(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-// Room codes -> what people actually call the room. Only four rooms
-// appear in the whole Sem 5 timetable, so this is an explicit table
-// rather than a rule — the codes do not decode arithmetically.
+// Room codes -> what people actually call the room.
 //
-// M4-1-017 = "classroom 7" is Evan's, confirmed off the door. The other
-// three are the code's last group with the leading zero dropped and are
-// NOT confirmed — if a door disagrees, fix it here, one line.
+// These do NOT decode arithmetically and it is not close: M4-1-017 is
+// "classroom 7" and M4-0-011 is "classroom 3". No string rule produces
+// both. So this is a lookup, and anything not in it is NOT guessed —
+// an unconfirmed room shows its raw code under a "room code" label
+// instead of a friendly number that might send you to the wrong door.
 const ROOMS = {
-    "M4-1-017": { bldg: "M4", floor: "1F", no: "7" },
-    "M4-0-011": { bldg: "M4", floor: "G", no: "11" },
-    "M3-0-022": { bldg: "M3", floor: "G", no: "22" },
-    "M4.0.019": { bldg: "M4", floor: "G", no: "19" },
+    "M4-1-017": { bldg: "M4", floor: "1F", no: "7", ok: true },   // confirmed, Evan
+    "M4-0-011": { bldg: "M4", floor: "G", no: "3", ok: true },    // confirmed, Evan
+    "M3-0-022": { bldg: "M3", floor: "G", no: "022" },            // unconfirmed
+    "M4.0.019": { bldg: "M4", floor: "G", no: "019" },            // unconfirmed
 };
 
 function whereIs(code) {
     const r = ROOMS[code];
-    if (r) return { raw: code, no: r.no, sub: `${r.bldg} · ${r.floor}` };
+    if (r) return { raw: code, no: r.no, sub: `${r.bldg} · ${r.floor}`, ok: !!r.ok };
     const m = String(code || "").match(/^([A-Za-z]\d+)[.\-](\d)[.\-](\d+)$/);
-    if (!m) return { raw: code || "", no: code || "?", sub: "" };
-    return { raw: code, no: String(Number(m[3])), sub: `${m[1].toUpperCase()} · ${m[2] === "0" ? "G" : m[2] + "F"}` };
+    if (!m) return { raw: code || "", no: code || "?", sub: "", ok: false };
+    return { raw: code, no: m[3], sub: `${m[1].toUpperCase()} · ${m[2] === "0" ? "G" : m[2] + "F"}`, ok: false };
 }
 
 function left(mins) {
@@ -190,7 +190,9 @@ function renderTimetable() {
                 <span class="tt-code">${L.code}<em>${L.name}</em></span>
                 <span class="tt-clock">${t12(x.s)} – ${t12(x.e)}</span>
             </div>
-            ${plate("room", { lab: L.kind === "Lab" ? "lab" : "room", no: w.no, sub: w.sub })}
+            ${plate("room" + (w.ok ? "" : " tt-p-raw"),
+                { lab: w.ok ? (L.kind === "Lab" ? "lab" : "classroom") : "room code",
+                  no: w.no, sub: w.sub })}
         </div>`;
     };
 
