@@ -40,11 +40,11 @@ const linksData = {
     "ACOL351 (Algos)": {
       Lectures: "#",
       Tutorials: "#",
-      Assignments: "#",
       Quiz: "#",
       Piazza: "#",
       "Course Page": "#",
-      Blackboard: "https://iida.blackboard.com/ultra/course",
+      // no assignments in this course — deliberately absent, not a TODO
+      Blackboard: "https://iida.blackboard.com/ultra/courses/_159_1/outline",
     },
     "AGRL130 (Entrepren)": {
       Slides: "#",
