@@ -7,8 +7,9 @@
 // against every course's L-T-P-C credits — lecture, tutorial and lab
 // hours all reconcile, which is what says the block spans are right.
 //
-// Groups only matter for the two HUL tutorials. Everything else is
-// common to both groups, so the toggle changes 3 entries in the week.
+// Both groups are shown together. Only three entries in the week are
+// group-specific (all HUL tutorials); those carry a G1/G2 badge and
+// everything else applies to everyone.
 // ============================================================
 
 const COURSES = {
@@ -22,7 +23,7 @@ const COURSES = {
 
 // [start, end, code, room, kind, group]
 //   kind:  "" lecture · "tut" tutorial · "lab" lab · "free" reserved slot
-//   group: 0 both · 1 group 1 only · 2 group 2 only
+//   group: 0 everyone · 1 group 1 only · 2 group 2 only
 const WEEK = {
     1: [ // Monday
         ["08:00", "10:00", null, null, "free", 0],
@@ -92,6 +93,21 @@ function ymd(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+// "M4-1-017" / "M4.0.019" -> building, floor, room number.
+// The middle digit is the floor. The room number is printed EXACTLY as
+// the PDF has it — Evan thinks 017 is "classroom 7" but wasn't certain,
+// and guessing wrong sends someone to the wrong door.
+function whereIs(code) {
+    const m = String(code || "").match(/^([A-Za-z]\d+)[.\-](\d)[.\-](\d+)$/);
+    if (!m) return { raw: code || "", text: code || "" };
+    const [, bldg, fl, num] = m;
+    const floor = fl === "0" ? "ground floor"
+        : fl === "1" ? "1st floor"
+            : fl === "2" ? "2nd floor"
+                : fl === "3" ? "3rd floor" : fl + "th floor";
+    return { raw: code, text: `${bldg.toUpperCase()} · ${floor} · rm ${num}` };
+}
+
 function left(mins) {
     if (mins < 1) return "now";
     if (mins < 60) return `${mins} min`;
@@ -99,30 +115,23 @@ function left(mins) {
     return m ? `${h}h ${m}m` : `${h}h`;
 }
 
-function group() {
-    const g = Number(localStorage.getItem("linkcs-group"));
-    return g === 2 ? 2 : 1;
-}
-
-// Entries for a given weekday, filtered to the chosen group.
-function dayEntries(dow, g) {
+// Everything on a given weekday — both groups, in time order.
+function dayEntries(dow) {
     return (WEEK[dow] || [])
-        .filter(([, , , , , grp]) => grp === 0 || grp === g)
-        .map(([s, e, code, room, kind]) => ({
-            s, e, code, room, kind, from: tmin(s), to: tmin(e),
+        .map(([s, e, code, room, kind, grp]) => ({
+            s, e, code, room, kind, grp, from: tmin(s), to: tmin(e),
         }))
-        .sort((a, b) => a.from - b.from);
+        .sort((a, b) => a.from - b.from || a.grp - b.grp);
 }
 
 // The next teaching day with something on it, up to a week ahead.
 function nextDayWithClass(after) {
-    const g = group();
     for (let i = 1; i <= 8; i++) {
         const d = new Date(after);
         d.setDate(d.getDate() + i);
         if (ymd(d) > TERM.end) return null;
         if (NO_CLASS[ymd(d)]) continue;
-        const list = dayEntries(d.getDay(), g).filter((x) => x.kind !== "free");
+        const list = dayEntries(d.getDay()).filter((x) => x.kind !== "free");
         if (list.length) return { date: d, list };
     }
     return null;
@@ -131,7 +140,7 @@ function nextDayWithClass(after) {
 function label(x) {
     const c = COURSES[x.code];
     const suffix = x.kind === "lab" ? " lab" : x.kind === "tut" ? " tutorial" : "";
-    return { code: x.code, name: (c ? c.name : x.code) + suffix, prof: c ? c.prof : "" };
+    return { code: x.code, name: (c ? c.name : x.code) + suffix };
 }
 
 // ---------- render ----------
@@ -143,11 +152,20 @@ function renderTimetable() {
     const now = new Date();
     const today = ymd(now);
     const mins = now.getHours() * 60 + now.getMinutes();
-    const g = group();
 
-    const chip = (txt) => `<span class="tt-chip">${txt}</span>`;
+    // course code -> where -> when. Group badge only when it differs.
+    const slot = (tag, x, timeText, on) => {
+        const L = label(x);
+        const w = whereIs(x.room);
+        return `
+        <div class="tt-slot${on ? " tt-on" : ""}">
+            <span class="tt-tag">${tag}${x.grp ? `<b class="tt-g">G${x.grp}</b>` : ""}</span>
+            <span class="tt-code">${L.code}<em>${L.name}</em></span>
+            <span class="tt-where" title="${w.raw}">${w.text}</span>
+            <span class="tt-time">${timeText}</span>
+        </div>`;
+    };
 
-    // outside the teaching term
     if (today < TERM.start) {
         box.innerHTML = `<p class="tt-quiet">Classes start ${TERM.start.split("-").reverse().join("/")}.</p>`;
         return;
@@ -158,83 +176,62 @@ function renderTimetable() {
     }
 
     const off = NO_CLASS[today];
-    const list = off ? [] : dayEntries(now.getDay(), g).filter((x) => x.kind !== "free");
+    const list = off ? [] : dayEntries(now.getDay()).filter((x) => x.kind !== "free");
 
-    const current = list.find((x) => mins >= x.from && mins < x.to);
-    const upcoming = list.find((x) => x.from > mins);
+    // Both groups are on screen, so more than one thing can be running
+    // or starting next — G1 and G2 diverge on three tutorials a week.
+    const current = list.filter((x) => mins >= x.from && mins < x.to);
+    const later = list.filter((x) => x.from > mins);
+    const nextAt = later.length ? Math.min(...later.map((x) => x.from)) : null;
+    const upcoming = nextAt === null ? [] : later.filter((x) => x.from === nextAt);
 
     let html = "";
 
-    if (current) {
-        const L = label(current);
-        html += `
-        <div class="tt-slot tt-on">
-            <span class="tt-when">now · ends ${t12(current.e)}</span>
-            <span class="tt-course">${L.code} <em>${L.name}</em></span>
-            <span class="tt-meta">${chip(current.room)} ${left(current.to - mins)} left</span>
-        </div>`;
+    for (const x of current) {
+        html += slot("now", x, `ends ${t12(x.e)} · ${left(x.to - mins)} left`, true);
+    }
+    for (const x of upcoming) {
+        html += slot(current.length ? "then" : "next", x,
+            `${t12(x.s)} · in ${left(x.from - mins)}`, false);
     }
 
-    if (upcoming) {
-        const L = label(upcoming);
-        html += `
-        <div class="tt-slot">
-            <span class="tt-when">${current ? "then" : "next"} · ${t12(upcoming.s)}</span>
-            <span class="tt-course">${L.code} <em>${L.name}</em></span>
-            <span class="tt-meta">${chip(upcoming.room)} in ${left(upcoming.from - mins)}</span>
-        </div>`;
-    }
-
-    if (!current && !upcoming) {
+    if (!current.length && !upcoming.length) {
         const nd = nextDayWithClass(now);
         const why = off ? off
             : list.length ? "Done for today"
                 : (now.getDay() === 0 || now.getDay() === 6) ? "Weekend" : "Nothing scheduled";
-        html += `<div class="tt-slot tt-none"><span class="tt-when">${why}</span>`;
         if (nd) {
-            const L = label(nd.list[0]);
+            const first = nd.list[0].from;
             const dn = ymd(nd.date) === ymd(new Date(now.getTime() + 864e5))
                 ? "tomorrow" : DAY_NAME[nd.date.getDay()];
-            html += `<span class="tt-course">${L.code} <em>${L.name}</em></span>
-                     <span class="tt-meta">${chip(nd.list[0].room)} ${dn} ${t12(nd.list[0].s)}</span>`;
+            for (const x of nd.list.filter((y) => y.from === first)) {
+                html += slot(why, x, `${dn} · ${t12(x.s)}`, false);
+            }
+        } else {
+            html += `<p class="tt-quiet">${why}.</p>`;
         }
-        html += `</div>`;
     }
 
     box.innerHTML = html;
-
-    const gb = document.getElementById("tt-group");
-    if (gb) gb.textContent = "G" + g;
 }
 
 // ---------- wiring ----------
 
-function initTimetable() {
-    const gb = document.getElementById("tt-group");
-    if (gb) {
-        gb.addEventListener("click", () => {
-            localStorage.setItem("linkcs-group", group() === 1 ? "2" : "1");
-            renderTimetable();
-        });
-    }
+// Same contract as the bus page: cheap tick, and a forced re-render
+// whenever the page comes back in front of a human, because phones
+// freeze timers on a backgrounded tab.
+renderTimetable();
+
+let ttLastMin = null;
+setInterval(() => {
+    const d = new Date(), m = d.getHours() * 60 + d.getMinutes();
+    if (m === ttLastMin) return;
+    ttLastMin = m;
     renderTimetable();
+}, 1000);
 
-    // Same contract as the bus page: cheap tick, and a forced re-render
-    // whenever the page comes back in front of a human, because phones
-    // freeze timers on a backgrounded tab.
-    let lastMin = null;
-    setInterval(() => {
-        const d = new Date(), m = d.getHours() * 60 + d.getMinutes();
-        if (m === lastMin) return;
-        lastMin = m;
-        renderTimetable();
-    }, 1000);
-
-    document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) renderTimetable();
-    });
-    window.addEventListener("pageshow", () => renderTimetable());
-    window.addEventListener("focus", () => renderTimetable());
-}
-
-initTimetable();
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) renderTimetable();
+});
+window.addEventListener("pageshow", () => renderTimetable());
+window.addEventListener("focus", () => renderTimetable());
