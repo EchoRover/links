@@ -478,6 +478,42 @@
             color: var(--coral);
         }
 
+        /* A cancelled run stays in the table, keeping its poster trip number,
+           struck through. Deleting the row would leave a silent hole that
+           looks identical to a bug; striking it answers "why is there no
+           12:30?" without anyone having to ask. */
+        tr.cancelled .c-time {
+            text-decoration: line-through;
+            text-decoration-thickness: 1px;
+            color: var(--fg-soft);
+            font-weight: 400;
+        }
+
+        tr.cancelled .c-no,
+        tr.cancelled .c-route {
+            color: var(--fg-soft);
+        }
+
+        tr.cancelled .c-veh {
+            color: var(--fg-soft);
+            font-style: italic;
+            text-transform: uppercase;
+            font-size: 0.64rem;
+            letter-spacing: 0.06em;
+        }
+
+        /* Why the countdown is pointing so far ahead. Without this a 45-minute
+           wait mid-afternoon just looks like the page is wrong. */
+        .next-gap {
+            margin: 0.7rem 0 0;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            line-height: 1.5;
+            color: var(--fg-soft);
+            border-left: 2px solid var(--rule);
+            padding-left: 0.6rem;
+        }
+
         /* tap-confirmation for "jump to next departure" */
         .flash {
             animation: flashRow 1.1s ease-out 1;
@@ -679,7 +715,8 @@
             <div>
                 <h1 class="bus-title">Shuttle <em>Schedule</em></h1>
                 <p class="bus-sub">KCA 1&amp;2 · KCA 3 · Campus — one clockwise loop, both directions.<br>
-                    Mon&ndash;Fri runs the poster timetable; Sat &amp; Sun runs every 30 minutes from 7:30 AM.</p>
+                    Mon&ndash;Thu runs the poster timetable, Friday the same minus the 12:30&ndash;1:15 prayer break,
+                    Sat &amp; Sun every 30 minutes from 7:30 AM.</p>
             </div>
             <div class="bus-now">
                 <span class="live-dot" aria-hidden="true"></span>
@@ -715,7 +752,8 @@
         <div class="day-switch">
             <span class="day-switch-label">Timetable</span>
             <div class="seg seg-day">
-                <button type="button" data-day="weekday">Mon &ndash; Fri</button>
+                <button type="button" data-day="weekday">Mon &ndash; Thu</button>
+                <button type="button" data-day="friday">Fri</button>
                 <button type="button" data-day="weekend">Sat &amp; Sun</button>
             </div>
             <span class="day-today" id="day-today"></span>
@@ -727,7 +765,11 @@
         <div class="sched-wrap" id="sched-wrap"></div>
 
         <p class="bus-note">
-            <strong>Sources.</strong> Mon&ndash;Fri comes from the printed shift poster, transcribed 19 Aug 2026.
+            <strong>Sources.</strong> Mon&ndash;Thu comes from the printed shift poster, transcribed 19 Aug 2026.
+            Friday is that same poster minus the campus notice of 22 Aug: <em>&ldquo;there will be no trips between
+            Campus and Dorms from 12:30 PM to 1:15 PM for friday.&rdquo;</em> The three cancelled runs are struck
+            through rather than removed, so the trip numbers still match the printed sheet; whether the 1:15 PM run
+            itself departs is not stated, and this page assumes it does.
             Sat &amp; Sun comes from the campus notice of 22 Aug 2026: <em>&ldquo;Saturdays and Sundays, vehicles
             will operate between the campus and KCA 1,2 &amp; 3 every 30 minutes in both directions, starting
             from 7:30 AM.&rdquo;</em> Countdowns use your device clock, so they only line up if your phone is on
