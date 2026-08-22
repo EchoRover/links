@@ -11,6 +11,18 @@
 //   Mon–Fri  the printed shift poster (photographed 2026-08-19).
 //            A 7-vehicle day rota, then a two-van night shift.
 //
+//   Friday   the SAME poster timetable as Mon–Thu, minus a prayer break.
+//            Campus notice, 2026-08-22, verbatim: "there will be no trips
+//            between Campus and Dorms from 12:30 PM to 1:15 PM for friday."
+//            Read as the break spanning [12:30, 1:15), service resuming
+//            WITH the 1:15 run — so 12:30 / 12:45 / 1:00 are cancelled in
+//            both directions and 1:15 still departs. That boundary reading
+//            is the one judgement call here and it is flagged on the page.
+//            Cancelled runs are NOT deleted from the table: they stay in
+//            place, struck through, keeping the poster's trip numbers, so
+//            someone holding the printed poster can see why 12:30 is gone
+//            instead of wondering whether the page lost a row.
+//
 //   Sat–Sun  the campus notice of 2026-08-22, verbatim: "Saturdays and
 //            Sundays, vehicles will operate between the campus and
 //            KCA 1,2 & 3 every 30 minutes in both directions, starting
@@ -64,15 +76,11 @@ function everyN(startHHMM, lastHHMM, stepMin) {
     return out;
 }
 
-const SCHEDULES = {
-    // ---------- Mon–Fri: the printed poster ----------
-    weekday: {
-        key: "weekday",
-        label: "Mon – Fri",
-        short: "Mon – Fri",
-        numbering: "perBlock",       // the poster restarts at 1 for the night shift
-        dirs: {
-            toCampus: {
+// The poster timetable. Mon–Thu and Friday are the SAME arrays — Friday
+// only differs by the prayer window, which is applied at render time from
+// `noService`, so there is exactly one copy of these times to keep correct.
+const POSTER_DIRS = {
+    toCampus: {
                 ...DIRS.toCampus,
                 blocks: [
                     {
@@ -139,7 +147,32 @@ const SCHEDULES = {
                     },
                 ],
             },
-        },
+};
+
+const SCHEDULES = {
+    // ---------- Mon–Thu: the printed poster ----------
+    weekday: {
+        key: "weekday",
+        label: "Mon – Thu",
+        short: "Mon – Thu",
+        numbering: "perBlock",       // the poster restarts at 1 for the night shift
+        dirs: POSTER_DIRS,
+    },
+
+    // ---------- Friday: the poster, minus the prayer break ----------
+    friday: {
+        key: "friday",
+        label: "Friday",
+        short: "Fri",
+        numbering: "perBlock",
+        dirs: POSTER_DIRS,
+        noService: { from: "12:30", to: "13:15", reason: "Friday prayer" },
+        caveat: "Friday runs the same poster timetable as Mon–Thu, except the campus notice of 22 Aug: " +
+            "no trips between Campus and Dorms from 12:30 PM to 1:15 PM. The three struck-through runs below " +
+            "are cancelled in both directions; they keep their poster trip numbers so this page lines up with " +
+            "the printed sheet. The notice does not say whether the 1:15 PM run itself departs — this page " +
+            "assumes service resumes WITH it, which is the ordinary reading of \u201cfrom 12:30 to 1:15\u201d. " +
+            "If you are catching the first bus back, treat 1:15 as the earliest it could be, not a promise.",
     },
 
     // ---------- Sat–Sun: the notice ----------
@@ -203,10 +236,14 @@ function to12h(hhmm) {
     return `${display}:${String(m).padStart(2, "0")} ${suffix}`;
 }
 
-// Which service runs on a given date. 0 = Sunday, 6 = Saturday.
+// Which service runs on a given date. 0 = Sunday, 5 = Friday, 6 = Saturday.
+// Friday is NOT the weekend here — it is a full teaching day at IITD-AD that
+// happens to carry a prayer break, so it runs the poster with a hole in it.
 function dayKey(d) {
     const n = d.getDay();
-    return (n === 0 || n === 6) ? "weekend" : "weekday";
+    if (n === 0 || n === 6) return "weekend";
+    if (n === 5) return "friday";
+    return "weekday";
 }
 
 function todayKey() {
@@ -221,22 +258,35 @@ function tomorrowKey() {
 
 // Number the trips of one direction and hand back both the blocks (for
 // the tables) and one flat ordered list (for "what leaves next").
+// `blocks` keeps every row including cancelled ones, because the TABLE has to
+// show them struck through — a silently missing 12:30 row is indistinguishable
+// from a bug. `all` drops them, because a cancelled run is not a departure and
+// must never be what a countdown points at.
 function trips(sched, dir) {
+    const gap = sched.noService;
+    const gapFrom = gap ? toMinutes(gap.from) : 0;
+    const gapTo = gap ? toMinutes(gap.to) : 0;
     let n = 0;
     const blocks = dir.blocks.map((b) => {
         if (sched.numbering !== "continuous") n = 0;
-        const rows = b.times.map((t, i) => ({
-            no: ++n,
-            time: t,
-            mins: toMinutes(t),
-            vehicle: b.rota ? b.rota[i % b.rota.length] : null,
-            tag: b.tag || null,
-            tagTone: b.tagTone || "day",
-            assumed: !!b.assumed,
-        }));
+        const rows = b.times.map((t, i) => {
+            const mins = toMinutes(t);
+            return {
+                no: ++n,
+                time: t,
+                mins,
+                vehicle: b.rota ? b.rota[i % b.rota.length] : null,
+                tag: b.tag || null,
+                tagTone: b.tagTone || "day",
+                assumed: !!b.assumed,
+                // half-open [from, to): the run AT the end of the break departs
+                cancelled: !!gap && mins >= gapFrom && mins < gapTo,
+            };
+        });
         return { ...b, rows };
     });
-    return { blocks, all: blocks.reduce((acc, b) => acc.concat(b.rows), []) };
+    const every = blocks.reduce((acc, b) => acc.concat(b.rows), []);
+    return { blocks, every, all: every.filter((t) => !t.cancelled) };
 }
 
 function hasVehicles(dir) {
@@ -284,6 +334,12 @@ function renderNext(dirId, now) {
     const head = upcoming[0];
     const rest = upcoming.slice(1);
 
+    // If the wait is long because runs were cancelled, SAY SO. A silent
+    // "45 min" during the prayer break reads as the page being broken.
+    const gap = sched.noService;
+    const skipped = gap && !tomorrow &&
+        data.every.some((t) => t.cancelled && t.mins >= now && t.mins < head.mins);
+
     return `
     <article class="next-card" data-dir="${dir.id}">
         <header class="next-head">
@@ -298,6 +354,7 @@ function renderNext(dirId, now) {
             ${head.tag ? `<span class="tag tag-${head.tagTone}">${head.tag}</span>` : ""}
             ${head.vehicle ? `<span class="next-veh">${head.vehicle}</span>` : ""}
         </div>
+        ${skipped ? `<p class="next-gap">no trips ${to12h(gap.from)} – ${to12h(gap.to)} · ${gap.reason}</p>` : ""}
         <ul class="next-then">
             ${rest.map((t) => `
                 <li>
@@ -332,15 +389,16 @@ function renderTable(dir, block, now, showVeh, nextMins) {
                 </thead>
                 <tbody>
                     ${block.rows.map((t) => {
-                        const past = nextMins !== null && t.mins < now;
-                        const isNext = t.mins === nextMins;
-                        const cls = [past ? "past" : "", isNext ? "next" : ""].filter(Boolean).join(" ");
+                        const past = nextMins !== null && t.mins < now && !t.cancelled;
+                        const isNext = !t.cancelled && t.mins === nextMins;
+                        const cls = [past ? "past" : "", isNext ? "next" : "",
+                                     t.cancelled ? "cancelled" : ""].filter(Boolean).join(" ");
                         return `
                         <tr class="${cls}"${isNext ? ' id="next-' + dir.id + '"' : ""}>
                             <td class="c-no">${t.no}</td>
                             <td class="c-time">${to12h(t.time)}</td>
                             <td class="c-route">${dir.stops.join(" → ")}</td>
-                            ${showVeh ? `<td class="c-veh">${t.vehicle || ""}</td>` : ""}
+                            ${showVeh ? `<td class="c-veh">${t.cancelled ? "no trip" : (t.vehicle || "")}</td>` : ""}
                         </tr>`;
                     }).join("")}
                 </tbody>
