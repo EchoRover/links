@@ -215,6 +215,14 @@
             color: var(--indigo);
         }
 
+        /* Neutral tone for a time that is NOT confirmed. It must not
+           borrow the confidence of the coral/indigo tags. */
+        .tag-soft {
+            background: transparent;
+            border: 1px dashed var(--rule);
+            color: var(--fg-soft);
+        }
+
         .next-veh {
             font-family: var(--font-mono);
             font-size: 0.75rem;
@@ -487,8 +495,65 @@
             }
         }
 
-        .sched-night .sched-scroll {
+        /* A dashed edge means "different footing from the block above" —
+           the night van shift on weekdays, the assumed late runs on
+           weekends. */
+        .sched-dashed .sched-scroll {
             border-style: dashed;
+        }
+
+        /* ---------- weekday / weekend switch ----------
+           This governs the TABLES only. The countdown cards above always
+           speak for today, so switching here can never make the live
+           numbers lie about which day they belong to. */
+        .day-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.85rem;
+        }
+
+        .day-switch-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--fg-soft);
+        }
+
+        /* .seg is mobile-only; this one is always on, at both widths,
+           so it beats the media query on specificity rather than order. */
+        .seg.seg-day {
+            display: inline-flex;
+            flex: 0 0 auto;
+        }
+
+        .seg.seg-day button {
+            flex: 0 0 auto;
+            font-size: 0.8rem;
+            padding: 0.42rem 0.8rem;
+            min-height: 36px;
+        }
+
+        .day-today {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--fg-soft);
+        }
+
+        .sched-caveat {
+            margin: 0 0 1.1rem;
+            padding-left: 0.8rem;
+            border-left: 2px solid var(--rule);
+            max-width: 46rem;
+            font-size: 0.78rem;
+            line-height: 1.6;
+            color: var(--fg-soft);
+        }
+
+        .sched-caveat[hidden] {
+            display: none;
         }
 
         /* ---------- footnote ---------- */
@@ -613,7 +678,8 @@
         <section class="bus-hero">
             <div>
                 <h1 class="bus-title">Shuttle <em>Schedule</em></h1>
-                <p class="bus-sub">KCA 1&amp;2 · KCA 3 · Campus — one clockwise loop, both directions.</p>
+                <p class="bus-sub">KCA 1&amp;2 · KCA 3 · Campus — one clockwise loop, both directions.<br>
+                    Mon&ndash;Fri runs the poster timetable; Sat &amp; Sun runs every 30 minutes from 7:30 AM.</p>
             </div>
             <div class="bus-now">
                 <span class="live-dot" aria-hidden="true"></span>
@@ -645,16 +711,32 @@
             <div class="road" id="road" aria-live="polite"></div>
         </div>
 
+        <!-- WHICH TIMETABLE — defaults to today's -->
+        <div class="day-switch">
+            <span class="day-switch-label">Timetable</span>
+            <div class="seg seg-day">
+                <button type="button" data-day="weekday">Mon &ndash; Fri</button>
+                <button type="button" data-day="weekend">Sat &amp; Sun</button>
+            </div>
+            <span class="day-today" id="day-today"></span>
+        </div>
+
+        <p class="sched-caveat" id="sched-caveat" hidden></p>
+
         <!-- FULL TABLES -->
         <div class="sched-wrap" id="sched-wrap"></div>
 
         <p class="bus-note">
-            <strong>Source:</strong> the printed shift poster, transcribed 19 Aug 2026. Countdowns use your
-            device clock, so they only line up if your phone is on Gulf time.
-            <strong>Known gaps:</strong> the poster shows no weekday/weekend or holiday variation, so this page
-            shows the same times every day — check the physical board before relying on it for a weekend trip.
-            Trips 16 and 17 on the Campus → Dorms leg are both printed as 10:00 AM; that is reproduced as printed,
-            not corrected.
+            <strong>Sources.</strong> Mon&ndash;Fri comes from the printed shift poster, transcribed 19 Aug 2026.
+            Sat &amp; Sun comes from the campus notice of 22 Aug 2026: <em>&ldquo;Saturdays and Sundays, vehicles
+            will operate between the campus and KCA 1,2 &amp; 3 every 30 minutes in both directions, starting
+            from 7:30 AM.&rdquo;</em> Countdowns use your device clock, so they only line up if your phone is on
+            Gulf time.
+            <strong>Known gaps.</strong> The weekend notice gives no last departure and no vehicle rota, so the
+            weekend table has no Vehicle column and its post-7 PM runs sit in their own dashed block marked
+            <em>assumed</em> &mdash; they are this page&rsquo;s guess, not the notice. Neither source says anything
+            about public holidays. Trips 16 and 17 on the Campus &rarr; Dorms weekday leg are both printed as
+            10:00 AM; that is reproduced as printed, not corrected.
         </p>
     </main>
 
