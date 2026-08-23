@@ -1223,7 +1223,13 @@ a:focus-visible, button:focus-visible {
    at a glance, mid-walk. */
 .tt-slot {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    /* Course first, then the room and countdown plates on the right.
+       The plate columns are max-content, NOT auto: an auto track with
+       leftover space in the row stretches to absorb it, which blew the
+       room plate out to 3x its contents once it stopped being the last
+       column. max-content makes each plate hug its own text and hands
+       the slack to the course, which is the part that can use it. */
+    grid-template-columns: 1fr max-content max-content;
     align-items: stretch;
     gap: 0.6rem;
     padding: 0.6rem 0.65rem;
@@ -1377,10 +1383,15 @@ a:focus-visible, button:focus-visible {
     .tt-slot {
         gap: 0.45rem;
         padding: 0.55rem;
+        /* narrow phones: the plates may shrink toward their min-width
+           rather than starving the course column into clipping */
+        grid-template-columns: minmax(0, 1fr) auto auto;
     }
 
     .tt-code {
         font-size: 0.95rem;
+        /* long codes wrap here instead of spilling out of the track */
+        overflow-wrap: anywhere;
     }
 
     .tt-p-no {

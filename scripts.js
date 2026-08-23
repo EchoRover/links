@@ -12,7 +12,11 @@ const linksData = {
     Faculty: "https://iitdabudhabi.ac.ae/faculty",
     Bus: "bus.html",
     "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-2026-27Sem1.pdf",
-    TimeTable: "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/2026/Year%203%20%20Semester%205%20%20B.%20TECH%20Computer%20Science%20and%20Engineering.pdf",
+    // The 23 Aug 2026 reissue, served from this repo. The institute page
+    // (iitdabudhabi.ac.ae/timetable) still serves the superseded 13 Aug
+    // version, so linking upstream would contradict the class card.
+    // Swap back to the official URL once they publish the new one.
+    TimeTable: "assets/timetable-sem5-2026-08-23.pdf",
   },
 
   // Only real, working URLs live here. A course with nothing published
