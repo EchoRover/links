@@ -34,7 +34,7 @@ const linksData = {
       Blackboard: "https://iida.blackboard.com/ultra/courses/_157_1/outline",
     },
     "ACOL351 (Algos)": {
-      // no assignments in this course — deliberately absent, not a TODO
+      Gradescope: "https://www.gradescope.com/courses/1366330",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_159_1/outline",
     },
     "AGRL130 (Entrepren)": {
