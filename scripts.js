@@ -31,11 +31,15 @@ const linksData = {
       Blackboard: "https://iida.blackboard.com/ultra/courses/_158_1/outline",
     },
     "ACOL331 (Operating Systems)": {
+      "Course Page": "https://abhilash-jindal.com/teaching/2026-1-acol-331/",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_157_1/outline",
     },
     "ACOL351 (Algos)": {
       Gradescope: "https://www.gradescope.com/courses/1366330",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_159_1/outline",
+    },
+    "ACOD310 (Mini Project)": {
+      Blackboard: "https://iida.blackboard.com/ultra/courses/_197_1/outline",
     },
     "AGRL130 (Entrepren)": {
       Blackboard: "https://iida.blackboard.com/ultra/courses/_179_1/outline",
@@ -118,6 +122,12 @@ const linksDataSem4 = {
 // Per-course metadata. Each course gets editorial treatment:
 // title (short display), subtitle (descriptive tagline), dept, credits, LTP.
 const COURSE_META = {
+  ACOD310: {
+    title: "Mini Project",
+    subtitle: "A Supervised Build, Start To Finish",
+    dept: "COMP. SCI.",
+    credits: 3, ltp: "0-0-6",
+  },
   ACOL333: {
     title: "Artificial Intelligence",
     subtitle: "A Study Of Inference, Search & Learning",
