@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Rooms — linkCS</title>
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <script src="theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .rooms-wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; }
+
+        .rooms-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 34px 0 8px; flex-wrap: wrap; }
+        .rooms-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.7rem, 4vw, 2.6rem); color: var(--fg); margin: 0; }
+        .rooms-title em { color: var(--coral); }
+        .rooms-sub { font-size: 0.86rem; color: var(--fg-soft); max-width: 560px; line-height: 1.45; margin: 6px 0 0; }
+        .rooms-now { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); white-space: nowrap; }
+        .rooms-now .live-dot2 { width: 7px; height: 7px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 8px var(--coral-glow); }
+
+        /* Day switcher */
+        .rooms-days { display: flex; align-items: center; gap: 10px; margin: 18px 0 26px; flex-wrap: wrap; }
+        .rooms-days-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); }
+        .rooms-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; background: var(--bg-card); }
+        .rooms-seg button { font-family: var(--font-mono); font-size: 0.78rem; padding: 7px 14px; border: none; background: transparent; color: var(--fg-soft); cursor: pointer; }
+        .rooms-seg button.on { background: var(--coral); color: var(--bg-card); }
+        .rooms-offnote { font-family: var(--font-mono); font-size: 0.74rem; color: var(--red); }
+
+        /* Building sections */
+        .bldg-title { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg-faint); margin: 30px 0 12px; border-bottom: 1px solid var(--rule-faint); padding-bottom: 6px; }
+        .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+
+        /* Room card */
+        .room-card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; cursor: pointer; box-shadow: var(--shadow-sm); transition: border-color 0.15s; }
+        .room-card:hover { border-color: var(--coral); }
+        .room-card.busy { border-left: 3px solid var(--coral); }
+        .room-head { display: flex; align-items: baseline; gap: 10px; }
+        .room-name { font-family: var(--font-serif); font-style: italic; font-size: 1.15rem; color: var(--fg); }
+        .room-code { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); margin-left: auto; }
+        .room-floor { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); }
+
+        .room-status { margin-top: 10px; font-size: 0.85rem; line-height: 1.45; }
+        .st-free { color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; }
+        .st-busy-course { font-weight: 700; color: var(--fg); }
+        .st-busy-title { color: var(--fg-soft); }
+        .st-when { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-faint); display: block; margin-top: 3px; }
+        .st-when b { color: var(--coral); font-weight: 600; }
+
+        .prog-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.66rem; padding: 1px 7px; border-radius: 999px; background: var(--coral-soft); color: var(--coral); margin-right: 4px; white-space: nowrap; }
+        .kind-chip { display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--rule); color: var(--fg-faint); margin-left: 6px; vertical-align: 1px; }
+
+        /* Expanded day timeline */
+        .room-day { display: none; margin-top: 12px; border-top: 1px dashed var(--rule); padding-top: 10px; }
+        .room-card.open .room-day { display: block; }
+        .slot-row { display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--rule-faint); align-items: baseline; }
+        .slot-row:last-child { border-bottom: none; }
+        .slot-row.past { opacity: 0.45; }
+        .slot-row.live { background: var(--coral-soft); border-radius: 6px; padding-left: 8px; padding-right: 8px; }
+        .slot-time { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-soft); white-space: nowrap; min-width: 108px; }
+        .slot-main { flex: 1; font-size: 0.82rem; }
+        .slot-course { font-weight: 700; color: var(--fg); }
+        .slot-title { color: var(--fg-soft); }
+        .slot-progs { margin-top: 2px; }
+        .slot-empty { font-family: var(--font-mono); font-size: 0.76rem; color: var(--fg-faint); padding: 6px 0; }
+
+        .rooms-foot { margin-top: 40px; font-size: 0.74rem; font-family: var(--font-mono); color: var(--fg-faint); line-height: 1.6; max-width: 720px; }
+
+        @media (max-width: 560px) {
+            .rooms-grid { grid-template-columns: 1fr; }
+            .rooms-hero { margin-top: 22px; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <img src="assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="assets/circle.webp" class="circle-img" alt="">
+                </div>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">rooms · occupancy</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="./" class="pill">
+                    <span class="pill-name">← Home</span>
+                </a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="rooms-wrap">
+            <section class="rooms-hero">
+                <div>
+                    <h1 class="rooms-title">Room <em>Occupancy</em></h1>
+                    <p class="rooms-sub">Every classroom and lab, live — who's in it, which program and
+                        group, until when. Built from all eleven Sem&nbsp;1 timetables: Y1&#8209;Y3, every
+                        branch, MTech included. Tap a room for its full day.</p>
+                </div>
+                <div class="rooms-now">
+                    <span class="live-dot2" aria-hidden="true"></span>
+                    <span>now</span><span id="rooms-clock">—</span>
+                </div>
+            </section>
+
+            <div class="rooms-days">
+                <span class="rooms-days-label">Day</span>
+                <div class="rooms-seg" id="rooms-seg"></div>
+                <span class="rooms-offnote" id="rooms-offnote"></span>
+            </div>
+
+            <div id="rooms-body"></div>
+
+            <p class="rooms-foot">
+                Room codes are the sheets' own; the friendly names printed beside them disagree on a
+                few rooms across PDFs, so the codes are the ground truth here.
+                Y1 schedules are provisional until registrations freeze on 4&nbsp;Sep.
+                Two Wednesday bookings genuinely overlap in Classroom&nbsp;5 on the source sheets —
+                shown as printed.
+            </p>
+        </div>
+    </main>
+
+    <script src="timetable.js"></script>
+    <script src="rooms-data.js"></script>
+    <script src="rooms.js"></script>
+</body>
+
+</html>
