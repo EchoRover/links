@@ -24,7 +24,7 @@
         
         .block { position: absolute; top: 0; bottom: 0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; text-align: center; line-height: 1.2; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); padding: 2px; }
         
-        /* CSE Class Block */
+        /* Base Class Block */
         .block-class { background: var(--rule-light); color: var(--fg); z-index: 2; border: 1px solid var(--rule); }
         
         /* Common Free Block */
@@ -35,7 +35,13 @@
         .time-ticks { position: relative; height: 20px; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; color: var(--fg-light); opacity: 0.6; }
         .tick { position: absolute; transform: translateX(-50%); }
 
-        .legend { display: flex; gap: 20px; justify-content: center; margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--fg); }
+        .bottom-tools { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 30px; }
+
+        .toggle-container { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--fg); background: var(--rule-light); padding: 5px; border-radius: 8px; border: 1px solid var(--rule); }
+        .toggle-btn { padding: 8px 16px; border: none; background: transparent; color: var(--fg-light); border-radius: 4px; cursor: pointer; font-family: inherit; font-size: inherit; transition: all 0.2s; }
+        .toggle-btn.active { background: var(--bg); color: var(--fg); font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .legend { display: flex; gap: 20px; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--fg); }
         .legend-item { display: flex; align-items: center; gap: 8px; }
         .legend-box { width: 16px; height: 16px; border-radius: 3px; }
         .lb-class { background: var(--rule-light); border: 1px solid var(--rule); }
@@ -84,10 +90,16 @@
                 <div class="tt-grid" id="grid"></div>
             </div>
 
-            <div class="legend">
-                <div class="legend-item"><div class="legend-box lb-class"></div> CSE Class</div>
-                <div class="legend-item"><div class="legend-box lb-free"></div> Both Free</div>
-                <div class="legend-item"><div class="legend-box lb-busy"></div> Energy Busy</div>
+            <div class="bottom-tools">
+                <div class="toggle-container">
+                    <button class="toggle-btn active" id="btn-cse" onclick="setPerspective('cse')">CSE Perspective</button>
+                    <button class="toggle-btn" id="btn-een" onclick="setPerspective('een')">Energy Perspective</button>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-box lb-class"></div> <span id="leg-class">CSE Class</span></div>
+                    <div class="legend-item"><div class="legend-box lb-free"></div> Both Free</div>
+                    <div class="legend-item"><div class="legend-box lb-busy"></div> <span id="leg-busy">Energy Busy</span></div>
+                </div>
             </div>
         </div>
     </main>
@@ -97,17 +109,17 @@
         const START_MIN = 8 * 60; // 08:00
         const END_MIN = 19 * 60;  // 19:00
         const TOTAL_MINS = END_MIN - START_MIN;
+        let currentPerspective = 'cse';
 
         const tmin = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
         const t12 = (mins) => {
             let h = Math.floor(mins / 60);
             let m = mins % 60;
-            return m ? `${h}:${String(m).padStart(2, "0")}` : `${h}:00`; // 24h short format for blocks
+            return m ? `${h}:${String(m).padStart(2, "0")}` : `${h}:00`; 
         };
         const pos = (m) => ((m - START_MIN) / TOTAL_MINS) * 100;
         const wid = (s, e) => ((e - s) / TOTAL_MINS) * 100;
 
-        // Render Ticks
         const ticksEl = document.getElementById("ticks");
         for (let h = 8; h <= 19; h++) {
             const m = h * 60;
@@ -127,6 +139,15 @@
                 }
             }
             return blocks.sort((a, b) => a.s - b.s);
+        }
+
+        function setPerspective(p) {
+            currentPerspective = p;
+            document.getElementById("btn-cse").classList.toggle("active", p === 'cse');
+            document.getElementById("btn-een").classList.toggle("active", p === 'een');
+            document.getElementById("leg-class").textContent = p === 'cse' ? 'CSE Class' : 'Energy Class';
+            document.getElementById("leg-busy").textContent = p === 'cse' ? 'Energy Busy' : 'CSE Busy';
+            calculate();
         }
 
         function calculate() {
@@ -151,9 +172,10 @@
 
                 const cseBlocks = getBlocks(CSE_WEEK, cse_g, d);
                 const eenBlocks = getBlocks(EEN_WEEK, een_g, d);
+                
+                const baseBlocks = currentPerspective === 'cse' ? cseBlocks : eenBlocks;
 
-                // 1. Draw CSE Classes
-                for (let b of cseBlocks) {
+                for (let b of baseBlocks) {
                     const block = document.createElement("div");
                     block.className = "block block-class";
                     block.style.left = pos(b.s) + "%";
@@ -162,8 +184,6 @@
                     track.appendChild(block);
                 }
 
-                // 2. Calculate Common Free Time
-                // Busy = union of CSE and EEN blocks
                 const allBusy = [...cseBlocks, ...eenBlocks].map(b => [b.s, b.e]).sort((a, b) => a[0] - b[0]);
                 let mergedBusy = [];
                 if (allBusy.length > 0) {
@@ -187,9 +207,7 @@
                 }
                 if (last < END_MIN) free.push([last, END_MIN]);
 
-                // 3. Draw Common Free Blocks
                 for (let f of free) {
-                    // Only show free blocks that are >= 30 mins to avoid tiny slivers
                     if (f[1] - f[0] >= 30) {
                         const block = document.createElement("div");
                         block.className = "block block-free";
