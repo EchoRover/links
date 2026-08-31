@@ -7,6 +7,10 @@
 // against every course's L-T-P-C credits — lecture, tutorial and lab
 // hours all reconcile, which is what says the block spans are right.
 //
+// REVISION 3: the 27 August 2026 reissue. 
+//   - All computer labs (ACOL331, ACOL333) moved from M3-0-022 to M3-0-004 (Computer Lab 03).
+//   - ACOD310 (Mini Project) moved from Thursday 9-10 to Friday 10:00-11:50 in M4-1-017.
+//
 // REVISION 2: the 23 August 2026 reissue. It differs from the launch
 // version in four ways, all of them taken from the new grid:
 //   - every block now prints its own start/end time, and they are NOT
@@ -63,10 +67,10 @@ const WEEK = {
         // its only practical block: 110 min in M3-Computer Lab 02 is
         // exactly the 2 P-hours, and without it the credits do not
         // reconcile. Tagged from the credits, not from the caption.
-        ["16:30", "18:20", "ACOL333", "M3-0-022", "lab", 0],
+        ["16:30", "18:20", "ACOL333", "M3-0-004", "lab", 0],
     ],
     3: [ // Wednesday
-        ["08:00", "09:50", "ACOL331", "M3-0-022", "lab", 0],
+        ["08:00", "09:50", "ACOL331", "M3-0-004", "lab", 0],
         ["10:00", "10:50", "ACOL351", "M4-0-019", "tut", 0],
         ["11:00", "11:50", "AHUL261", "M4-1-017", "tut", 2],
         ["14:00", "15:20", "AHUL256", "M4-0-011", "", 0],
@@ -75,17 +79,14 @@ const WEEK = {
     ],
     4: [ // Thursday
         ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],
-        // "Reserved for ACOD310" on the grid — held for the mini
-        // project, with no room printed. Shown rather than skipped:
-        // an hour that is spoken for is not an hour off.
-        ["09:00", "10:00", "ACOD310", null, "proj", 0],
         ["10:00", "10:50", "ACOL331", "M4-1-017", "", 0],
         ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
         ["14:00", "15:20", "AHUL261", "M4-0-011", "", 0],
-        ["15:30", "17:20", "ACOL331", "M3-0-022", "lab", 0],
+        ["15:30", "17:20", "ACOL331", "M3-0-004", "lab", 0],
     ],
     5: [ // Friday
         ["09:00", "09:50", "ACOL351", "M4-1-017", "", 0],
+        ["10:00", "11:50", "ACOD310", "M4-1-017", "proj", 0],
     ],
 };
 
@@ -138,6 +139,7 @@ const ROOMS = {
     "M4-1-017": { bldg: "M4", floor: "1F", no: "7", ok: true },
     "M4-0-011": { bldg: "M4", floor: "G", no: "3", ok: true },
     "M3-0-022": { bldg: "M3", floor: "G", no: "02", ok: true, lab: true },
+    "M3-0-004": { bldg: "M3", floor: "G", no: "03", ok: true, lab: true },
     "M4-0-019": { bldg: "M4", floor: "G", no: "5", ok: true },
     "M4.0.019": { bldg: "M4", floor: "G", no: "5", ok: true },  // spelling used on the earlier sheet
 };
