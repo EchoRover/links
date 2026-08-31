@@ -48,6 +48,19 @@
         .lb-free { background: rgba(0, 200, 100, 0.15); border: 1px solid rgba(0, 200, 100, 0.3); }
         .lb-busy { background: var(--bg); border: 1px dashed var(--rule); }
 
+        @media (max-width: 768px) {
+            .controls { flex-direction: column; gap: 15px; }
+            .person { width: 100%; justify-content: space-between; padding: 12px 20px; }
+            .person h3 { font-size: 1.1rem; }
+            .tt-grid { min-width: 750px; }
+            .day-label { font-size: 0.75rem; width: 50px; padding-right: 5px; }
+            .tt-row { grid-template-columns: 50px 1fr; gap: 5px; }
+            .time-header { grid-template-columns: 50px 1fr; gap: 5px; }
+            .toggle-container { flex-direction: column; width: 100%; }
+            .toggle-btn { width: 100%; text-align: center; padding: 12px; }
+            .legend { flex-direction: column; gap: 12px; align-items: flex-start; padding-top: 10px; }
+        }
+
     </style>
 </head>
 <body>
