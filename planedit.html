@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Plan editor · linkCS</title>
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <script src="theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .ed-wrap { max-width: 1500px; margin: 0 auto; padding: 0 20px 60px; }
+        .ed-hero { margin: 34px 0 6px; }
+        .ed-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.6rem, 4vw, 2.4rem); color: var(--fg); margin: 0; }
+        .ed-title em { color: var(--coral); }
+        .ed-sub { font-size: 0.86rem; color: var(--fg-soft); max-width: 720px; line-height: 1.45; margin: 6px 0 0; }
+
+        .ed-bar { display: flex; align-items: center; gap: 8px; margin: 16px 0 12px; flex-wrap: wrap; }
+        .ed-lab { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); }
+        .ed-btn { font-family: var(--font-mono); font-size: 0.75rem; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg-card); color: var(--fg-soft); cursor: pointer; }
+        .ed-btn:hover { border-color: var(--coral); color: var(--coral); }
+        .ed-btn.on { background: var(--indigo); border-color: var(--indigo); color: var(--bg-card); }
+        .ed-btn.danger:hover { border-color: var(--red); color: var(--red); }
+        .ed-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; background: var(--bg-card); }
+        .ed-seg button { font-family: var(--font-mono); font-size: 0.75rem; padding: 6px 12px; border: none; background: transparent; color: var(--fg-soft); cursor: pointer; }
+        .ed-seg button.on { background: var(--coral); color: var(--bg-card); }
+
+        .ed-stage { display: grid; grid-template-columns: 1fr 300px; gap: 14px; align-items: start; }
+        @media (max-width: 900px) { .ed-stage { grid-template-columns: 1fr; } }
+
+        .ed-canvas { position: relative; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        #ed { display: block; width: 100%; height: min(74vh, 780px); touch-action: none; cursor: grab; }
+        #ed.dragging { cursor: grabbing; }
+        body.drawing #ed { cursor: crosshair; }
+        .ed-help { position: absolute; left: 10px; bottom: 10px; font-family: var(--font-mono); font-size: 0.66rem; color: var(--fg-faint); line-height: 1.65;
+                   background: color-mix(in srgb, var(--bg-card) 90%, transparent); border: 1px solid var(--rule-faint); border-radius: 8px; padding: 6px 10px; }
+        .ed-help b { color: var(--fg-soft); }
+
+        .ed-side { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 15px; box-shadow: var(--shadow-sm); }
+        .ed-side h4 { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-faint); margin: 0 0 8px; font-weight: 500; }
+        .ed-side input, .ed-side select { width: 100%; font-family: var(--font-mono); font-size: 0.76rem; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 7px; background: var(--bg); color: var(--fg); margin-bottom: 7px; }
+        .ed-empty { font-size: 0.82rem; color: var(--fg-faint); line-height: 1.5; }
+        .ed-count { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-faint); margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--rule-faint); line-height: 1.7; }
+        .ed-count b { color: var(--fg-soft); }
+        .ed-list { max-height: 260px; overflow-y: auto; margin-top: 8px; }
+        .ed-row { display: flex; justify-content: space-between; gap: 6px; font-size: 0.74rem; padding: 4px 6px; border-radius: 5px; cursor: pointer; }
+        .ed-row:hover { background: var(--bg); }
+        .ed-row.on { background: var(--coral-soft); color: var(--coral); }
+        .ed-row .n { font-family: var(--font-mono); font-size: 0.66rem; color: var(--fg-faint); }
+        .ed-row.named .t { font-weight: 600; }
+        .ed-row.unnamed .t { color: var(--fg-faint); font-style: italic; }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <img src="assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="assets/circle.webp" class="circle-img" alt="">
+                </div>
+                <span class="brand-name"><span class="brand-part-link">link</span><span class="brand-part-cs">CS</span></span>
+                <span class="brand-meta">plan editor</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="campus.html" class="pill"><span class="pill-name">Campus 3D</span></a>
+                <a href="./" class="pill"><span class="pill-name">← Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="ed-wrap">
+            <section class="ed-hero">
+                <h1 class="ed-title">Plan <em>editor</em></h1>
+                <p class="ed-sub">The evacuation boards, with the auto-detected rooms drawn on top. Fix
+                    what the detector got wrong: redraw a room it broke up, delete one it invented,
+                    drag a corner that sits off the wall, and name each one. Everything saves as you go.</p>
+            </section>
+
+            <div class="ed-bar">
+                <span class="ed-lab">board</span>
+                <div class="ed-seg" id="ed-boards"></div>
+                <span style="flex:1"></span>
+                <div class="ed-seg" id="ed-modes">
+                    <button data-mode="select" class="on">select</button>
+                    <button data-mode="draw">draw</button>
+                </div>
+                <button class="ed-btn" id="ed-fit">fit</button>
+                <button class="ed-btn" id="ed-export">export</button>
+            </div>
+
+            <div class="ed-stage">
+                <div class="ed-canvas">
+                    <canvas id="ed"></canvas>
+                    <div class="ed-help">
+                        <b>select</b>: click a room · drag a corner to move it · <b>Del</b> removes the room<br>
+                        <b>draw</b>: click each corner, <b>Enter</b> or click the first dot to close, <b>Esc</b> cancels<br>
+                        drag empty space to pan · scroll to zoom · <b>Z</b> undo
+                    </div>
+                </div>
+
+                <aside class="ed-side" id="ed-side"></aside>
+            </div>
+        </div>
+    </main>
+
+    <script src="timetable.js"></script>
+    <script src="rooms-data.js"></script>
+    <script src="boards-data.js"></script>
+    <script src="planedit.js"></script>
+</body>
+
+</html>

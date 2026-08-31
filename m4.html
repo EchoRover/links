@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>M4 in 3D · linkCS</title>
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <script src="theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .b-wrap { max-width: 1500px; margin: 0 auto; padding: 0 20px 60px; }
+        .b-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 34px 0 6px; flex-wrap: wrap; }
+        .b-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.7rem, 4vw, 2.5rem); color: var(--fg); margin: 0; }
+        .b-title em { color: var(--coral); }
+        .b-sub { font-size: 0.86rem; color: var(--fg-soft); max-width: 660px; line-height: 1.45; margin: 6px 0 0; }
+        .b-now { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); white-space: nowrap; }
+        .b-now .live-dot2 { width: 7px; height: 7px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 8px var(--coral-glow); }
+
+        .b-bar { display: flex; align-items: center; gap: 9px; margin: 16px 0 12px; flex-wrap: wrap; }
+        .b-lab { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); }
+        .b-btn { font-family: var(--font-mono); font-size: 0.75rem; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg-card); color: var(--fg-soft); cursor: pointer; }
+        .b-btn:hover { border-color: var(--coral); color: var(--coral); }
+        .b-btn.on { background: var(--indigo); border-color: var(--indigo); color: var(--bg-card); }
+        .b-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; background: var(--bg-card); }
+        .b-seg button { font-family: var(--font-mono); font-size: 0.75rem; padding: 6px 12px; border: none; background: transparent; color: var(--fg-soft); cursor: pointer; }
+        .b-seg button.on { background: var(--coral); color: var(--bg-card); }
+        input[type=range] { width: 150px; accent-color: var(--coral); }
+
+        .b-stage { display: grid; grid-template-columns: 1fr 300px; gap: 14px; align-items: start; }
+        @media (max-width: 900px) { .b-stage { grid-template-columns: 1fr; } }
+        .b-canvas { position: relative; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        #scene { display: block; width: 100%; height: min(76vh, 800px); touch-action: none; cursor: grab; }
+        #scene.dragging { cursor: grabbing; }
+        #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .tag { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg);
+               background: color-mix(in srgb, var(--bg-card) 88%, transparent); border: 1px solid var(--rule-faint); border-radius: 6px;
+               padding: 2px 7px; white-space: nowrap; pointer-events: auto; cursor: pointer; box-shadow: var(--shadow-sm); }
+        .tag.sel { border-color: var(--coral); color: var(--coral); font-weight: 600; }
+        .tag.busy { border-color: var(--red); background: var(--red-soft); color: var(--red); }
+        .tag.free { border-color: var(--cyan); background: var(--cyan-soft); color: var(--cyan); font-weight: 600; }
+        .tag.anon { color: var(--fg-faint); border-style: dashed; }
+        .b-help { position: absolute; left: 10px; bottom: 10px; font-family: var(--font-mono); font-size: 0.66rem; color: var(--fg-faint);
+                  background: color-mix(in srgb, var(--bg-card) 90%, transparent); border: 1px solid var(--rule-faint); border-radius: 8px; padding: 6px 10px; }
+        .b-legend { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 3px;
+                    background: color-mix(in srgb, var(--bg-card) 90%, transparent); border: 1px solid var(--rule-faint); border-radius: 8px; padding: 7px 10px;
+                    font-family: var(--font-mono); font-size: 0.64rem; color: var(--fg-faint); }
+        .b-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 5px; }
+
+        .b-side { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; padding: 15px 16px; box-shadow: var(--shadow-sm); min-height: 200px; }
+        .side-empty { font-size: 0.83rem; color: var(--fg-faint); line-height: 1.5; }
+        .side-name { font-family: var(--font-serif); font-style: italic; font-size: 1.25rem; color: var(--fg); margin: 0 0 2px; }
+        .side-code { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); }
+        .side-meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--rule-faint); line-height: 1.7; }
+        .st-free { color: var(--cyan); font-family: var(--font-mono); font-size: 0.78rem; }
+        .st-busy-course { font-weight: 700; color: var(--fg); }
+        .st-when { font-family: var(--font-mono); font-size: 0.73rem; color: var(--fg-faint); display: block; margin-top: 3px; }
+        .st-when b { color: var(--coral); }
+        .slot-row { display: flex; gap: 9px; padding: 5px 0; border-bottom: 1px solid var(--rule-faint); font-size: 0.77rem; align-items: baseline; }
+        .slot-row:last-child { border-bottom: none; }
+        .slot-row.past { opacity: 0.42; }
+        .slot-time { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-faint); white-space: nowrap; }
+        .slot-course { font-family: var(--font-mono); font-weight: 600; }
+
+        .geo-box { border: 1px solid var(--rule); border-left: 3px solid var(--fg-faint); border-radius: 8px; padding: 10px 12px; margin: 0 0 12px; font-size: 0.8rem; line-height: 1.55; color: var(--fg-soft); }
+        .geo-box h4 { font-family: var(--font-mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-faint); margin: 0 0 6px; font-weight: 500; }
+        .geo-box.warn { border-left-color: var(--red); }
+        .geo-box.ok { border-left-color: var(--cyan); }
+        .b-geo { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); line-height: 1.6; margin: 2px 0 0; }
+        .b-foot { font-size: 0.78rem; color: var(--fg-faint); line-height: 1.55; margin: 20px 0 0; max-width: 900px; }
+        .b-foot b { color: var(--fg-soft); font-weight: 600; }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <img src="assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="assets/circle.webp" class="circle-img" alt="">
+                </div>
+                <span class="brand-name"><span class="brand-part-link">link</span><span class="brand-part-cs">CS</span></span>
+                <span class="brand-meta">M4 · 3d</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="m3.html" class="pill"><span class="pill-name">M3</span></a>
+                <a href="both.html" class="pill"><span class="pill-name">Both</span></a>
+                <a href="planedit.html" class="pill"><span class="pill-name">Edit plans</span></a>
+                <a href="rooms.html" class="pill"><span class="pill-name">Rooms</span></a>
+                <a href="./" class="pill"><span class="pill-name">← Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="b-wrap">
+            <section class="b-hero">
+                <div>
+                    <h1 class="b-title">M4, <em>both floors</em></h1>
+                    <p class="b-sub">Rooms and names from the fire-evacuation boards, envelope and doors
+                        from the university's CAD. Drag to orbit, scroll to zoom, right-drag to pan.
+                        Click a room for what is happening in it.</p>
+                </div>
+                <div class="b-now"><span class="live-dot2"></span><span>now</span><span id="b-clock">…</span></div>
+            </section>
+
+            <div class="b-bar">
+                <span class="b-lab">floors</span>
+                <div class="b-seg" id="b-floors"></div>
+                <span class="b-lab" style="margin-left:8px">explode</span>
+                <input type="range" id="b-explode" min="0" max="18" step="0.5" value="7">
+                <span class="b-lab" style="margin-left:8px">colour</span>
+                <div class="b-seg" id="b-modes">
+                    <button data-mode="free" class="on">free now</button>
+                    <button data-mode="type">by type</button>
+                </div>
+                <span style="flex:1"></span>
+                <button class="b-btn on" id="b-labels">labels</button>
+                <button class="b-btn" id="b-locate">locate me</button>
+                <button class="b-btn" id="b-here">I am here</button>
+                <button class="b-btn" id="b-reset">reset view</button>
+            </div>
+
+            <div class="b-stage">
+                <div class="b-canvas">
+                    <canvas id="scene"></canvas>
+                    <div id="tags"></div>
+                    <div class="b-help">drag orbit · scroll zoom · right-drag pan</div>
+                    <div class="b-legend" id="b-legend"></div>
+                </div>
+                <aside class="b-side" id="b-side"><p class="side-empty">Click a room.</p></aside>
+                <p id="b-geo-msg" class="b-geo"></p>
+            </div>
+
+            <p class="b-foot">
+                <b>Where the rooms come from.</b> The two fire-evacuation boards inside M4, segmented by
+                colour. The boards are the source of truth for layout because the CAD has stray linework
+                inside the big rooms that keeps splitting them.
+                <b>What is still rough.</b> Scale is a bounding-box fit onto M4's CAD footprint, not yet a
+                proper four-corner registration, so every dimension carries a few percent of the
+                photograph's perspective. Sanity check: the Lectures Hall comes out 131 m².
+                <b>Not in here yet.</b> Doors, stairs, the corridor and the top-centre service rooms on the
+                ground floor, and the Library and conference rooms on the first floor — the detector
+                missed those and they get added by hand in the plan editor.
+            </p>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="timetable.js"></script>
+    <script src="rooms-data.js"></script>
+    <script src="m4-data.js"></script>
+    <script src="building.js"></script>
+</body>
+
+</html>

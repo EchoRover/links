@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Campus 3D · linkCS</title>
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <script src="theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .cmp-wrap { max-width: 1400px; margin: 0 auto; padding: 0 20px 60px; }
+        .cmp-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 34px 0 6px; flex-wrap: wrap; }
+        .cmp-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.7rem, 4vw, 2.6rem); color: var(--fg); margin: 0; }
+        .cmp-title em { color: var(--coral); }
+        .cmp-sub { font-size: 0.86rem; color: var(--fg-soft); max-width: 640px; line-height: 1.45; margin: 6px 0 0; }
+
+        .cmp-bar { display: flex; align-items: center; gap: 9px; margin: 18px 0 12px; flex-wrap: wrap; }
+        .cmp-bar-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); }
+        .cmp-btn { font-family: var(--font-mono); font-size: 0.76rem; padding: 7px 13px; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg-card); color: var(--fg-soft); cursor: pointer; }
+        .cmp-btn:hover { border-color: var(--coral); color: var(--coral); }
+        .cmp-btn.on { background: var(--indigo); border-color: var(--indigo); color: var(--bg-card); }
+
+        .cmp-stage { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+        @media (max-width: 900px) { .cmp-stage { grid-template-columns: 1fr; } }
+
+        .cmp-canvas { position: relative; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        #scene { display: block; width: 100%; height: min(76vh, 760px); touch-action: none; cursor: grab; }
+        #scene.dragging { cursor: grabbing; }
+
+        /* floating building labels, drawn over the canvas */
+        #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .tag { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-mono); font-size: 0.72rem;
+               color: var(--fg); background: color-mix(in srgb, var(--bg-card) 86%, transparent); border: 1px solid var(--rule-faint);
+               border-radius: 7px; padding: 3px 8px; white-space: nowrap; pointer-events: auto; cursor: pointer; box-shadow: var(--shadow-sm); }
+        .tag.unnamed { color: var(--fg-faint); border-style: dashed; }
+        .tag.sel { border-color: var(--coral); color: var(--coral); }
+        .tag.guess::after { content: "~"; color: var(--fg-faint); margin-left: 4px; }
+
+        .cmp-help { position: absolute; left: 12px; bottom: 12px; font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-faint);
+                    background: color-mix(in srgb, var(--bg-card) 88%, transparent); border: 1px solid var(--rule-faint); border-radius: 9px; padding: 7px 11px; line-height: 1.6; }
+        .cmp-help b { color: var(--fg-soft); font-weight: 600; }
+        .cmp-loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-mono); font-size: 0.82rem; color: var(--fg-faint); }
+
+        .cmp-side { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 17px; box-shadow: var(--shadow-sm); min-height: 200px; }
+        .side-empty { font-size: 0.84rem; color: var(--fg-faint); line-height: 1.5; }
+        .side-name { font-family: var(--font-serif); font-style: italic; font-size: 1.3rem; color: var(--fg); margin: 0 0 2px; }
+        .side-code { font-family: var(--font-mono); font-size: 0.74rem; color: var(--fg-faint); }
+        .side-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--rule-faint); line-height: 1.7; }
+        .side-meta .warn { color: var(--red); }
+        .side-rooms { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--rule); }
+        .side-rooms h4 { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-faint); margin: 0 0 7px; font-weight: 500; }
+        .rrow { display: flex; justify-content: space-between; gap: 8px; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px solid var(--rule-faint); }
+        .rrow:last-child { border-bottom: none; }
+        .rrow .c { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); }
+        .rrow.busy .n { color: var(--coral); font-weight: 600; }
+        .rrow.free .n { color: var(--cyan); }
+
+        .lbl-box { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule); }
+        .lbl-box h4 { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-faint); margin: 0 0 8px; font-weight: 500; }
+        .lbl-box input, .lbl-box select { width: 100%; font-family: var(--font-mono); font-size: 0.78rem; padding: 7px 9px; border: 1px solid var(--rule); border-radius: 8px; background: var(--bg); color: var(--fg); margin-bottom: 7px; }
+        .lbl-actions { display: flex; gap: 7px; }
+        .lbl-actions .cmp-btn { flex: 1; text-align: center; }
+        .lbl-count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); margin-top: 9px; }
+
+        .cmp-foot { font-size: 0.78rem; color: var(--fg-faint); line-height: 1.55; margin: 22px 0 0; max-width: 940px; }
+        .cmp-foot b { color: var(--fg-soft); font-weight: 600; }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <img src="assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="assets/circle.webp" class="circle-img" alt="">
+                </div>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">campus 3d</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="plan.html" class="pill"><span class="pill-name">M4 plan</span></a>
+                <a href="rooms.html" class="pill"><span class="pill-name">Rooms</span></a>
+                <a href="./" class="pill"><span class="pill-name">← Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="cmp-wrap">
+            <section class="cmp-hero">
+                <div>
+                    <h1 class="cmp-title">Campus <em>in 3D</em></h1>
+                    <p class="cmp-sub">M1&ndash;M4 in detail, with their real interior walls. The rest of the
+                        site is rough massing for context. Footprints are cut from the university's
+                        CAD; heights are an assumption, not a survey. Drag to orbit, scroll to zoom,
+                        <b>W A S D</b> to fly. Click a building to name it.</p>
+                </div>
+            </section>
+
+            <div class="cmp-bar">
+                <span class="cmp-bar-label">view</span>
+                <button class="cmp-btn on" id="btn-core">M cluster</button>
+                <button class="cmp-btn" id="btn-all">whole campus</button>
+                <button class="cmp-btn" id="btn-top">top down</button>
+                <button class="cmp-btn on" id="btn-walls">interior walls</button>
+                <span style="flex:1"></span>
+                <button class="cmp-btn" id="btn-label">label buildings</button>
+            </div>
+
+            <div class="cmp-stage">
+                <div class="cmp-canvas">
+                    <canvas id="scene"></canvas>
+                    <div id="tags"></div>
+                    <div class="cmp-help">
+                        <b>drag</b> orbit &nbsp; <b>scroll</b> zoom &nbsp; <b>right-drag</b> pan<br>
+                        <b>W A S D</b> fly &nbsp; <b>Q E</b> up/down &nbsp; <b>shift</b> faster
+                    </div>
+                    <div class="cmp-loading" id="loading">loading three.js…</div>
+                </div>
+
+                <aside class="cmp-side" id="cmp-side">
+                    <p class="side-empty">Click a building.</p>
+                </aside>
+            </div>
+
+            <p class="cmp-foot">
+                <b>Real:</b> every footprint outline and every interior wall in M1–M4, taken from the
+                ground-floor CAD embedded in the public campus PDF.
+                <b>Assumed:</b> storey counts, and therefore every height. That drawing is a single
+                level and says nothing about how tall anything is, so heights are a guess except for
+                M2, M3 and M4 — a <code>~</code> on a label means the height is guessed. M3 and M4 are
+                two storeys because the fire-evacuation boards inside them show Ground and Level 01;
+                M2 has at least three because the timetable books a room on level 2.
+                <b>Incomplete:</b> the site drawing's massing layer does not cover the whole campus, so
+                the library, convention centre, dining halls and some residences are missing entirely.
+            </p>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="timetable.js"></script>
+    <script src="rooms-data.js"></script>
+    <script src="campus-data.js"></script>
+    <script src="campus.js"></script>
+</body>
+
+</html>

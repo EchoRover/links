@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Floor plan · linkCS</title>
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <script src="theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .plan-wrap { max-width: 1400px; margin: 0 auto; padding: 0 20px 60px; }
+
+        .plan-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 34px 0 6px; flex-wrap: wrap; }
+        .plan-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.7rem, 4vw, 2.6rem); color: var(--fg); margin: 0; }
+        .plan-title em { color: var(--coral); }
+        .plan-sub { font-size: 0.86rem; color: var(--fg-soft); max-width: 620px; line-height: 1.45; margin: 6px 0 0; }
+        .plan-now { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); white-space: nowrap; }
+        .plan-now .live-dot2 { width: 7px; height: 7px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 8px var(--coral-glow); }
+
+        /* toolbar */
+        .plan-bar { display: flex; align-items: center; gap: 10px; margin: 18px 0 12px; flex-wrap: wrap; }
+        .plan-bar-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); }
+        .plan-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; background: var(--bg-card); }
+        .plan-seg button { font-family: var(--font-mono); font-size: 0.78rem; padding: 7px 14px; border: none; background: transparent; color: var(--fg-soft); cursor: pointer; }
+        .plan-seg button.on { background: var(--coral); color: var(--bg-card); }
+        .plan-seg button:disabled { opacity: 0.38; cursor: not-allowed; }
+        .plan-btn { font-family: var(--font-mono); font-size: 0.76rem; padding: 7px 13px; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg-card); color: var(--fg-soft); cursor: pointer; }
+        .plan-btn:hover { border-color: var(--coral); color: var(--coral); }
+        .plan-btn.on { background: var(--indigo); border-color: var(--indigo); color: var(--bg-card); }
+
+        /* stage */
+        .plan-stage { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+        @media (max-width: 900px) { .plan-stage { grid-template-columns: 1fr; } }
+
+        .plan-canvas { position: relative; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        #plan { display: block; width: 100%; height: min(72vh, 720px); touch-action: none; cursor: grab; }
+        #plan.dragging { cursor: grabbing; }
+        body.labelling #plan { cursor: crosshair; }
+
+        /* Geometry. Line weight is a drawing convention, not a physical width, so
+           it stays constant in screen pixels however far you zoom in. */
+        #plan path { fill: none; vector-effect: non-scaling-stroke; }
+        .l-wall { stroke: var(--fg); stroke-width: 1.7px; stroke-linecap: square; }
+        .l-structure { stroke: var(--indigo); stroke-width: 1.3px; opacity: 0.55; }
+        .l-glazing { stroke: var(--cyan); stroke-width: 1.2px; opacity: 0.75; }
+        .l-door { stroke: var(--red); stroke-width: 1.3px; opacity: 0.8; }
+
+        .rm { stroke: transparent; stroke-width: 1.5px; vector-effect: non-scaling-stroke; cursor: pointer; transition: fill 0.14s, stroke 0.14s; }
+        .rm.s-none { fill: color-mix(in srgb, var(--fg-faint) 11%, transparent); }
+        .rm.s-free { fill: color-mix(in srgb, var(--cyan) 20%, transparent); }
+        .rm.s-busy { fill: color-mix(in srgb, var(--coral) 26%, transparent); }
+        .rm.s-skip { fill: color-mix(in srgb, var(--fg-faint) 5%, transparent); }
+        .rm:hover { stroke: var(--coral); }
+        .rm.sel { stroke: var(--coral); stroke-width: 2.6px; }
+
+        /* Labels live inside the zoomed group, so divide by the zoom to hold them
+           at a fixed size on screen. --kz is set by applyView(). */
+        #plan text { font-family: var(--font-mono); text-anchor: middle; pointer-events: none; }
+        .rlab { font-size: calc(11px / var(--kz, 1)); fill: var(--fg); font-weight: 600; }
+        .rlab.sub { font-size: calc(8.5px / var(--kz, 1)); fill: var(--fg-faint); font-weight: 400; }
+        .rnum { font-size: calc(11px / var(--kz, 1)); fill: var(--fg-faint); }
+
+        .plan-legend { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 12px; flex-wrap: wrap; background: color-mix(in srgb, var(--bg-card) 88%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--rule-faint); border-radius: 9px; padding: 7px 11px; font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-faint); }
+        .lg { display: inline-flex; align-items: center; gap: 5px; }
+        .lg i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+        .plan-scale { position: absolute; right: 12px; bottom: 12px; font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-faint); background: color-mix(in srgb, var(--bg-card) 88%, transparent); border: 1px solid var(--rule-faint); border-radius: 9px; padding: 7px 11px; }
+        .plan-scale .bar { display: block; height: 3px; background: var(--fg-faint); margin-bottom: 4px; }
+
+        /* side panel */
+        .plan-side { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 17px; box-shadow: var(--shadow-sm); min-height: 220px; }
+        .side-empty { font-size: 0.84rem; color: var(--fg-faint); line-height: 1.5; }
+        .side-name { font-family: var(--font-serif); font-style: italic; font-size: 1.3rem; color: var(--fg); margin: 0 0 2px; }
+        .side-code { font-family: var(--font-mono); font-size: 0.74rem; color: var(--fg-faint); }
+        .side-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule-faint); }
+        .side-status { margin: 12px 0 4px; font-size: 0.88rem; line-height: 1.45; }
+        .st-free { color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; }
+        .st-busy-course { font-weight: 700; color: var(--fg); }
+        .st-busy-title { color: var(--fg-soft); }
+        .st-when { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-faint); display: block; margin-top: 3px; }
+        .st-when b { color: var(--coral); font-weight: 600; }
+        .slot-row { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--rule-faint); align-items: baseline; font-size: 0.8rem; }
+        .slot-row:last-child { border-bottom: none; }
+        .slot-row.past { opacity: 0.45; }
+        .slot-time { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); white-space: nowrap; }
+        .slot-course { font-family: var(--font-mono); font-weight: 600; color: var(--fg); }
+        .slot-title { color: var(--fg-soft); }
+        .prog-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.64rem; padding: 1px 6px; border-radius: 999px; background: var(--coral-soft); color: var(--coral); margin-right: 3px; white-space: nowrap; }
+        .kind-chip { display: inline-block; font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 5px; border-radius: 4px; border: 1px solid var(--rule); color: var(--fg-faint); margin-left: 5px; }
+
+        /* label mode */
+        .lbl-box { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule); }
+        .lbl-box h4 { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-faint); margin: 0 0 8px; font-weight: 500; }
+        .lbl-box select, .lbl-box input { width: 100%; font-family: var(--font-mono); font-size: 0.78rem; padding: 7px 9px; border: 1px solid var(--rule); border-radius: 8px; background: var(--bg); color: var(--fg); margin-bottom: 7px; }
+        .lbl-actions { display: flex; gap: 7px; }
+        .lbl-actions .plan-btn { flex: 1; text-align: center; }
+        .lbl-count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); margin-top: 9px; }
+
+        .plan-foot { font-size: 0.78rem; color: var(--fg-faint); line-height: 1.55; margin: 22px 0 0; max-width: 900px; }
+        .plan-foot b { color: var(--fg-soft); font-weight: 600; }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <img src="assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="assets/circle.webp" class="circle-img" alt="">
+                </div>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">floor plan</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="rooms.html" class="pill"><span class="pill-name">Rooms</span></a>
+                <a href="./" class="pill"><span class="pill-name">← Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="plan-wrap">
+            <section class="plan-hero">
+                <div>
+                    <h1 class="plan-title">M4 <em>Ground Floor</em></h1>
+                    <p class="plan-sub">The real plan, traced from the university's own CAD drawing:
+                        every wall, door swing and column where the architect drew it. Rooms fill in
+                        by what is happening in them right now. Drag to pan, scroll to zoom.</p>
+                </div>
+                <div class="plan-now">
+                    <span class="live-dot2" aria-hidden="true"></span>
+                    <span>now</span><span id="plan-clock">…</span>
+                </div>
+            </section>
+
+            <div class="plan-bar">
+                <span class="plan-bar-label">day</span>
+                <div class="plan-seg" id="plan-days"></div>
+                <span style="flex:1"></span>
+                <button class="plan-btn" id="btn-fit">fit</button>
+                <button class="plan-btn" id="btn-label">label rooms</button>
+            </div>
+
+            <div class="plan-stage">
+                <div class="plan-canvas">
+                    <svg id="plan" xmlns="http://www.w3.org/2000/svg"></svg>
+                    <div class="plan-legend">
+                        <span class="lg"><i style="background:color-mix(in srgb,var(--coral) 40%,transparent)"></i>in use</span>
+                        <span class="lg"><i style="background:color-mix(in srgb,var(--cyan) 32%,transparent)"></i>free</span>
+                        <span class="lg"><i style="background:color-mix(in srgb,var(--fg-faint) 18%,transparent)"></i>unmapped</span>
+                        <span class="lg"><i style="background:var(--red);opacity:.8"></i>door</span>
+                    </div>
+                    <div class="plan-scale"><span class="bar" id="scale-bar"></span><span id="scale-txt">10 m</span></div>
+                </div>
+
+                <aside class="plan-side" id="plan-side">
+                    <p class="side-empty">Tap any room on the plan.</p>
+                </aside>
+            </div>
+
+            <p class="plan-foot">
+                <b>Where this comes from.</b> The public ZU Abu&nbsp;Dhabi campus PDF is an AutoCAD
+                export, not a picture. It still carries 795 named CAD layers and 414,355 line
+                segments, so walls, doors, columns and glazing come out separated and exact.
+                Extractor: <code>tools/extract_floorplan.py</code>.
+                <b>What it does not cover.</b> That drawing is the <b>ground floor only</b>
+                (<code>…REV9_G.F</code>), so M3&nbsp;level&nbsp;1, M4&nbsp;level&nbsp;1 and
+                M2&nbsp;level&nbsp;2 are not here yet. The CAD carries no room numbers either, so
+                which polygon is which code is set by hand in label mode.
+            </p>
+        </div>
+    </main>
+
+    <script src="timetable.js"></script>
+    <script src="rooms-data.js"></script>
+    <script src="floors-data.js"></script>
+    <script src="plan.js"></script>
+</body>
+
+</html>

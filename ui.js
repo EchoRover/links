@@ -180,3 +180,14 @@
         window._eqT = setTimeout(equalize, 120);
     });
 })();
+
+// LAB MENU — the unfinished 3D work, reachable without cluttering the topbar.
+(function () {
+    const btn = document.getElementById("lab-toggle");
+    const list = document.getElementById("lab-list");
+    if (!btn || !list) return;
+    const set = on => { list.hidden = !on; btn.setAttribute("aria-expanded", String(on)); };
+    btn.addEventListener("click", e => { e.stopPropagation(); set(list.hidden); });
+    document.addEventListener("click", e => { if (!list.contains(e.target)) set(false); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") set(false); });
+})();
