@@ -11,14 +11,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
-        .common-container { max-width: 800px; margin: 40px auto; padding: 20px; background: var(--bg); border-radius: 12px; border: 1px solid var(--rule); }
-        .controls { display: flex; gap: 20px; margin-bottom: 30px; justify-content: center; flex-wrap: wrap; }
-        .person { padding: 15px; border: 1px solid var(--rule); border-radius: 8px; background: var(--rule-light); }
-        select { background: var(--bg); color: var(--fg); border: 1px solid var(--rule); padding: 5px; border-radius: 4px; font-family: inherit; }
-        h2 { font-family: 'Fraunces', serif; margin-bottom: 20px; text-align: center; color: var(--fg); }
-        .day { margin-bottom: 20px; }
-        .day h3 { font-family: 'JetBrains Mono', monospace; color: var(--coral); border-bottom: 1px solid var(--rule); padding-bottom: 5px; margin-bottom: 10px; }
-        .slot { display: inline-block; background: var(--cyan); color: var(--bg); padding: 5px 10px; border-radius: 4px; margin: 0 10px 10px 0; font-family: 'JetBrains Mono', monospace; font-weight: bold; }
+        .common-container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+        .controls { display: flex; gap: 40px; margin-bottom: 30px; justify-content: center; align-items: center; }
+        .person { padding: 15px 30px; border: 1px solid var(--rule); border-radius: 8px; background: var(--rule-light); display: flex; align-items: center; gap: 15px; }
+        .person h3 { margin: 0; font-family: 'Fraunces', serif; color: var(--fg); font-size: 1.2rem; }
+        select { background: var(--bg); color: var(--fg); border: 1px solid var(--rule); padding: 5px 10px; border-radius: 4px; font-family: inherit; font-size: 1rem; }
+        .grid-wrapper { overflow-x: auto; padding-bottom: 20px; }
+        .tt-grid { display: flex; flex-direction: column; gap: 10px; min-width: 900px; }
+        .tt-row { display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: stretch; }
+        .day-label { font-family: 'JetBrains Mono', monospace; font-weight: bold; color: var(--fg); display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; text-transform: uppercase; font-size: 0.85rem; }
+        .day-track { position: relative; height: 60px; background: var(--bg); border: 1px dashed var(--rule); border-radius: 6px; overflow: hidden; }
+        
+        .block { position: absolute; top: 0; bottom: 0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; text-align: center; line-height: 1.2; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); padding: 2px; }
+        
+        /* CSE Class Block */
+        .block-class { background: var(--rule-light); color: var(--fg); z-index: 2; border: 1px solid var(--rule); }
+        
+        /* Common Free Block */
+        .block-free { background: rgba(0, 200, 100, 0.15); color: #00c864; z-index: 1; border: 1px solid rgba(0, 200, 100, 0.3); font-weight: bold; }
+        
+        /* Header Row */
+        .time-header { display: grid; grid-template-columns: 80px 1fr; gap: 10px; margin-bottom: 5px; }
+        .time-ticks { position: relative; height: 20px; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; color: var(--fg-light); opacity: 0.6; }
+        .tick { position: absolute; transform: translateX(-50%); }
+
+        .legend { display: flex; gap: 20px; justify-content: center; margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--fg); }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-box { width: 16px; height: 16px; border-radius: 3px; }
+        .lb-class { background: var(--rule-light); border: 1px solid var(--rule); }
+        .lb-free { background: rgba(0, 200, 100, 0.15); border: 1px solid rgba(0, 200, 100, 0.3); }
+        .lb-busy { background: var(--bg); border: 1px dashed var(--rule); }
+
     </style>
 </head>
 <body>
@@ -35,110 +58,155 @@
     </header>
     <main class="page">
         <div class="common-container">
-            <h2>Find Common Free Time</h2>
             <div class="controls">
                 <div class="person">
-                    <strong>Person A:</strong>
-                    <select id="pA_branch">
-                        <option value="CSE">CSE</option>
-                        <option value="EEN">EEN</option>
-                    </select>
-                    <select id="pA_group">
-                        <option value="1">G1</option>
-                        <option value="2">G2</option>
+                    <h3>Computer Science</h3>
+                    <select id="cse_group">
+                        <option value="1">Group 1</option>
+                        <option value="2">Group 2</option>
                     </select>
                 </div>
+                <div style="font-family: 'Fraunces', serif; color: var(--fg-light); font-style: italic;">meets</div>
                 <div class="person">
-                    <strong>Person B:</strong>
-                    <select id="pB_branch">
-                        <option value="CSE">CSE</option>
-                        <option value="EEN">EEN</option>
-                    </select>
-                    <select id="pB_group">
-                        <option value="1">G1</option>
-                        <option value="2" selected>G2</option>
+                    <h3>Energy Eng.</h3>
+                    <select id="een_group">
+                        <option value="1">Group 1</option>
+                        <option value="2">Group 2</option>
                     </select>
                 </div>
             </div>
-            <div id="results"></div>
+            
+            <div class="grid-wrapper">
+                <div class="time-header">
+                    <div></div>
+                    <div class="time-ticks" id="ticks"></div>
+                </div>
+                <div class="tt-grid" id="grid"></div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-box lb-class"></div> CSE Class</div>
+                <div class="legend-item"><div class="legend-box lb-free"></div> Both Free</div>
+                <div class="legend-item"><div class="legend-box lb-busy"></div> Energy Busy</div>
+            </div>
         </div>
     </main>
     <script src="ui.js"></script>
     <script src="common.js"></script>
     <script>
+        const START_MIN = 8 * 60; // 08:00
+        const END_MIN = 19 * 60;  // 19:00
+        const TOTAL_MINS = END_MIN - START_MIN;
+
         const tmin = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
         const t12 = (mins) => {
             let h = Math.floor(mins / 60);
             let m = mins % 60;
-            const s = h < 12 ? "am" : "pm";
-            let d = h % 12; if (d === 0) d = 12;
-            return m ? `${d}:${String(m).padStart(2, "0")}${s}` : `${d}${s}`;
+            return m ? `${h}:${String(m).padStart(2, "0")}` : `${h}:00`; // 24h short format for blocks
         };
+        const pos = (m) => ((m - START_MIN) / TOTAL_MINS) * 100;
+        const wid = (s, e) => ((e - s) / TOTAL_MINS) * 100;
 
-        function getBusy(branch, group, day) {
-            const data = branch === "CSE" ? CSE_WEEK : EEN_WEEK;
+        // Render Ticks
+        const ticksEl = document.getElementById("ticks");
+        for (let h = 8; h <= 19; h++) {
+            const m = h * 60;
+            const el = document.createElement("div");
+            el.className = "tick";
+            el.style.left = pos(m) + "%";
+            el.textContent = h + ":00";
+            ticksEl.appendChild(el);
+        }
+
+        function getBlocks(data, group, day) {
             const dayData = data[day] || [];
-            let busy = [];
+            let blocks = [];
             for (let [s, e, code, g] of dayData) {
                 if (g === 0 || g === parseInt(group)) {
-                    busy.push([tmin(s), tmin(e)]);
+                    blocks.push({ s: tmin(s), e: tmin(e), code });
                 }
             }
-            return busy;
+            return blocks.sort((a, b) => a.s - b.s);
         }
 
         function calculate() {
-            const pA_b = document.getElementById("pA_branch").value;
-            const pA_g = document.getElementById("pA_group").value;
-            const pB_b = document.getElementById("pB_branch").value;
-            const pB_g = document.getElementById("pB_group").value;
+            const cse_g = document.getElementById("cse_group").value;
+            const een_g = document.getElementById("een_group").value;
 
-            const days = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"};
-            let html = "";
-            const START = 8 * 60;
-            const END = 19 * 60;
+            const days = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri"};
+            const gridEl = document.getElementById("grid");
+            gridEl.innerHTML = "";
 
             for (let d = 1; d <= 5; d++) {
-                const busyA = getBusy(pA_b, pA_g, d);
-                const busyB = getBusy(pB_b, pB_g, d);
-                const allBusy = [...busyA, ...busyB].sort((a, b) => a[0] - b[0]);
+                const row = document.createElement("div");
+                row.className = "tt-row";
                 
+                const label = document.createElement("div");
+                label.className = "day-label";
+                label.textContent = days[d];
+                row.appendChild(label);
+
+                const track = document.createElement("div");
+                track.className = "day-track";
+
+                const cseBlocks = getBlocks(CSE_WEEK, cse_g, d);
+                const eenBlocks = getBlocks(EEN_WEEK, een_g, d);
+
+                // 1. Draw CSE Classes
+                for (let b of cseBlocks) {
+                    const block = document.createElement("div");
+                    block.className = "block block-class";
+                    block.style.left = pos(b.s) + "%";
+                    block.style.width = wid(b.s, b.e) + "%";
+                    block.innerHTML = `<span>${b.code}</span>`;
+                    track.appendChild(block);
+                }
+
+                // 2. Calculate Common Free Time
+                // Busy = union of CSE and EEN blocks
+                const allBusy = [...cseBlocks, ...eenBlocks].map(b => [b.s, b.e]).sort((a, b) => a[0] - b[0]);
                 let mergedBusy = [];
                 if (allBusy.length > 0) {
-                    let current = allBusy[0];
+                    let current = [...allBusy[0]];
                     for (let i = 1; i < allBusy.length; i++) {
                         if (allBusy[i][0] <= current[1]) {
                             current[1] = Math.max(current[1], allBusy[i][1]);
                         } else {
                             mergedBusy.push(current);
-                            current = allBusy[i];
+                            current = [...allBusy[i]];
                         }
                     }
                     mergedBusy.push(current);
                 }
 
                 let free = [];
-                let last = START;
+                let last = START_MIN;
                 for (let b of mergedBusy) {
                     if (b[0] > last) free.push([last, b[0]]);
                     last = Math.max(last, b[1]);
                 }
-                if (last < END) free.push([last, END]);
+                if (last < END_MIN) free.push([last, END_MIN]);
 
-                html += `<div class="day"><h3>${days[d]}</h3>`;
-                if (free.length === 0) {
-                    html += `<span>No common free time.</span>`;
-                } else {
-                    for (let f of free) {
-                        html += `<span class="slot">${t12(f[0])} - ${t12(f[1])}</span>`;
+                // 3. Draw Common Free Blocks
+                for (let f of free) {
+                    // Only show free blocks that are >= 30 mins to avoid tiny slivers
+                    if (f[1] - f[0] >= 30) {
+                        const block = document.createElement("div");
+                        block.className = "block block-free";
+                        block.style.left = pos(f[0]) + "%";
+                        block.style.width = wid(f[0], f[1]) + "%";
+                        block.innerHTML = `<span>Free<br>${t12(f[0])}-${t12(f[1])}</span>`;
+                        track.appendChild(block);
                     }
                 }
-                html += `</div>`;
+
+                row.appendChild(track);
+                gridEl.appendChild(row);
             }
-            document.getElementById("results").innerHTML = html;
         }
 
-        document.querySelectorAll("select").forEach(el => el.addEventListener("change", calculate));
+        document.getElementById("cse_group").addEventListener("change", calculate);
+        document.getElementById("een_group").addEventListener("change", calculate);
         calculate();
     </script>
 </body>
