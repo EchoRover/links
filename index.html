@@ -11,22 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Unfinished work, reachable but not advertised: a closed menu in the
-           topbar rather than a row of pills competing with the real links. */
-        .lab-menu { position: relative; }
-        .lab-toggle { cursor: pointer; font-family: var(--font-mono); }
-        .lab-list { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60;
-            min-width: 210px; display: flex; flex-direction: column; padding: 7px;
-            background: var(--bg-card); border: 1px solid var(--rule); border-radius: 11px;
-            box-shadow: var(--shadow-md); }
-        .lab-list[hidden] { display: none; }
-        .lab-head { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase;
-            letter-spacing: 0.11em; color: var(--fg-faint); padding: 4px 9px 7px; }
-        .lab-list a { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-soft);
-            text-decoration: none; padding: 7px 9px; border-radius: 7px; }
-        .lab-list a:hover { background: var(--bg); color: var(--coral); }
-    </style>
 </head>
 
 <body>
@@ -155,22 +139,6 @@
                     <span class="pill-quote pill-quote-top" aria-hidden="true">you and I are polar opposite</span>
                     <span class="pill-quote pill-quote-bot" aria-hidden="true">if your laptop dies, blame them</span>
                 </a>
-                <div class="lab-menu">
-                    <button class="pill lab-toggle" id="lab-toggle" aria-expanded="false" aria-controls="lab-list">
-                        <span class="pill-name">lab</span>
-                    </button>
-                    <div class="lab-list" id="lab-list" hidden>
-                        <span class="lab-head">early / unfinished</span>
-                        <a href="both.html">M3 + M4 in 3D</a>
-                        <a href="m4.html">M4, both floors</a>
-                        <a href="m3.html">M3, both floors</a>
-                        <a href="campus.html">Whole campus</a>
-                        <a href="planedit.html">Plan editor</a>
-                        <span class="lab-head" style="padding-top:9px">university</span>
-                        <a href="https://teams.microsoft.com/" target="_blank" rel="noopener">Teams</a>
-                        <a href="https://outlook.office.com/" target="_blank" rel="noopener">Outlook</a>
-                    </div>
-                </div>
                 <a class="archive-link" href="archive/" title="Year 2 Archive"><img src="assets/box.webp" alt="Archive"></a>
                 <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
             </div>
@@ -191,23 +159,20 @@
                 <a href="https://iitdadierp.iitd.ac.in/student/login" target="_blank" class="pill">
                     <span class="pill-name">ERP</span>
                 </a>
-                <a href="https://teams.microsoft.com/" target="_blank" class="pill">
-                    <span class="pill-name">Teams</span>
-                </a>
-                <a href="https://outlook.office.com/" target="_blank" class="pill">
-                    <span class="pill-name">Outlook</span>
-                </a>
                 <a href="https://iida.blackboard.com/ultra/course" target="_blank" class="pill">
                     <span class="pill-name">Blackboard</span>
                 </a>
                 <a href="assets/timetable-sem5-2026-08-23.pdf" target="_blank" rel="noopener" class="pill">
                     <span class="pill-name">Timetable</span>
                 </a>
-                <a href="bus.html" class="pill pill-bus">
-                    <span class="pill-name">Bus</span>
+                <a href="both.html" class="pill" title="M3 and M4 in 3D, live room availability">
+                    <span class="pill-name">beta</span>
                 </a>
                 <a href="rooms.html" class="pill" title="Live room occupancy by classroom">
                     <span class="pill-name">Rooms</span>
+                </a>
+                <a href="bus.html" class="pill pill-bus">
+                    <span class="pill-name">Bus</span>
                 </a>
                 <button type="button" class="pill pill-more" id="more-toggle" aria-expanded="false" aria-label="More links">
                     <span class="pill-more-icon" aria-hidden="true"></span>
@@ -218,6 +183,12 @@
         <section class="quick-secondary" id="quick-secondary" aria-hidden="true">
             <a href="common.html" class="pill" title="Find Common Free Time">
                 <span class="pill-name">Common</span>
+            </a>
+            <a href="https://teams.microsoft.com/" target="_blank" rel="noopener" class="pill">
+                <span class="pill-name">Teams</span>
+            </a>
+            <a href="https://outlook.office.com/" target="_blank" rel="noopener" class="pill">
+                <span class="pill-name">Outlook</span>
             </a>
             <a href="https://iitdabudhabi.ac.ae/" target="_blank" rel="noopener" class="pill">
                 <span class="pill-name">Website</span>
@@ -262,23 +233,6 @@
     <script src="ui.js"></script>
     <script src="scripts.js"></script>
     <script src="timetable.js" defer></script>
-    <script>
-        // Inline on purpose. This lived in ui.js and a cached copy of that file
-        // left the menu dead on an already-loaded page; inline, it ships with
-        // the markup it controls and cannot go stale separately.
-        (function () {
-            var btn = document.getElementById("lab-toggle");
-            var list = document.getElementById("lab-list");
-            if (!btn || !list) return;
-            function set(on) { list.hidden = !on; btn.setAttribute("aria-expanded", String(on)); }
-            set(false);
-            btn.addEventListener("click", function (e) { e.stopPropagation(); set(list.hidden); });
-            document.addEventListener("click", function (e) {
-                if (!list.contains(e.target) && e.target !== btn) set(false);
-            });
-            document.addEventListener("keydown", function (e) { if (e.key === "Escape") set(false); });
-        })();
-    </script>
 </body>
 
 </html>
