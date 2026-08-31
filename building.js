@@ -442,7 +442,13 @@ const CAL_KEY = "linkcs.geo.calib";
 // laptop, so it ships in the data. GEO_FIX below is the baked-in calibration:
 // once it is filled in, nobody ever calibrates again. Until then anyone can
 // calibrate locally and press "copy calibration" to hand over the two readings.
-const GEO_FIX = null;   // e.g. [{lat, lon, x, z, room}, {lat, lon, x, z, room}]
+// Measured on Evan's phone, 2026-08-31. Baseline only 43 m and mostly east-west,
+// so a 6 m phone fix is +/-8 deg of rotation and +/-14% of scale here. Good
+// enough for which building; a longer walk would tighten it a lot.
+const GEO_FIX = [
+    { lat: 24.394675, lon: 54.586659, x: -9.4, z: -23.4, room: "Workshop / Makerspace Lab" },
+    { lat: 24.394711, lon: 54.587077, x: 22.2, z: 23.3, room: "Classroom" },
+];
 
 let CAL = GEO_FIX ? GEO_FIX.slice() : [];
 if (!CAL.length) {
