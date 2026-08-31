@@ -18,6 +18,13 @@
 // calendar with the rooms page so the two cannot disagree.
 // ============================================================
 
+// Render on demand. The loop used to render and re-project all ~130 labels
+// every frame forever, which pins a core for a scene that is static unless you
+// touch it. Anything that changes the picture sets this and gets one frame.
+// Declared first: several of the functions that set it run during setup.
+let dirty = true;
+const invalidate = () => { dirty = true; };
+
 const BS = window.BUILDINGS || [];
 const cvs = document.getElementById("scene");
 const tagBox = document.getElementById("tags");
@@ -206,6 +213,7 @@ const freeNow = r => r.code ? !liveState(r.code) : null;
 let mode = "free";        // "free" = grey building, availability lit · "type" = by room type
 
 function paint() {
+    dirty = true;
     for (const m of picks) {
         if (m.userData.plate) continue;
         const r = m.userData.room;
@@ -260,6 +268,7 @@ const target = new THREE.Vector3(0, FLOOR_H * 0.5, 0);
 const HOME = () => ({ r: SPAN * 1.5, theta: -0.95, phi: 0.85 });
 let orbit = HOME();
 function place() {
+    dirty = true;
     camera.position.set(
         target.x + orbit.r * Math.sin(orbit.phi) * Math.cos(orbit.theta),
         target.y + orbit.r * Math.cos(orbit.phi),
@@ -267,6 +276,7 @@ function place() {
     camera.lookAt(target);
 }
 function resize() {
+    dirty = true;
     const w = cvs.clientWidth, h = cvs.clientHeight;
     if (!w || !h) return;
     renderer.setSize(w, h, false);
@@ -323,6 +333,7 @@ function pick(ev) {
     select(room ? room.object : (hits[0] ? hits[0].object : null));
 }
 function select(mesh) {
+    dirty = true;
     sel = mesh;
     for (const m of picks) m.material.emissive = new THREE.Color(m === mesh ? 0x333333 : 0x000000);
     renderSide();
@@ -384,8 +395,8 @@ function buildFloorBar() {
         bar.appendChild(b);
     }
 }
-const applyFloors = () => { for (const [lvl, g] of levelGroups) g.visible = shown.has(lvl); };
-const applyExplode = () => { for (const [lvl, g] of levelGroups) g.position.y = lvl * (FLOOR_H + explode); };
+const applyFloors = () => { for (const [lvl, g] of levelGroups) g.visible = shown.has(lvl); dirty = true; };
+const applyExplode = () => { for (const [lvl, g] of levelGroups) g.position.y = lvl * (FLOOR_H + explode); dirty = true; };
 
 document.getElementById("b-explode").addEventListener("input", e => {
     explode = +e.target.value; applyExplode();
@@ -401,6 +412,7 @@ document.getElementById("b-labels").addEventListener("click", ev => {
     if (labelsOn && !showAnon) { showAnon = true; ev.target.textContent = "labels: all"; }
     else if (labelsOn && showAnon) { labelsOn = false; showAnon = false; ev.target.textContent = "labels: off"; ev.target.classList.remove("on"); }
     else { labelsOn = true; ev.target.textContent = "labels"; ev.target.classList.add("on"); }
+    dirty = true;
 });
 document.getElementById("b-reset").addEventListener("click", () => {
     orbit = HOME(); target.set(0, FLOOR_H * 0.5, 0); place();
@@ -529,6 +541,7 @@ document.getElementById("b-locate").addEventListener("click", async () => {
         }
         const [x, z] = geoToModel(lat, lon, g);
         showMe(x, z, acc);
+        dirty = true;
         geoStatus(`Placed, marker on the plan.<br><br>Fix is <b>±${Math.round(acc)} m</b>. ` +
                   `That is wider than most of these rooms, so read it as which building and which ` +
                   `end of it, not which room.`, "ok");
@@ -586,6 +599,7 @@ if (META) META.textContent = `${NAMES.toLowerCase()} · 3d`;
 
 buildFloorBar(); applyFloors(); applyExplode(); paint(); resize(); place();
 new ResizeObserver(resize).observe(cvs);
+addEventListener("focus", invalidate);
 
 function tick() {
     const n = new Date();
@@ -597,6 +611,8 @@ tick(); setInterval(tick, 30000);
 
 (function loop() {
     requestAnimationFrame(loop);
+    if (!dirty) return;
+    dirty = false;
     renderer.render(scene, camera);
     drawTags();
 })();
