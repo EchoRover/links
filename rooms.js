@@ -75,9 +75,9 @@ function offNote(now) {
     const today = ymd(now);
     if (today < TERM.start) return `classes start ${TERM.start.split("-").reverse().join("/")}`;
     if (today > TERM.end) return "semester's over";
-    if (NO_CLASS[today]) return `today: ${NO_CLASS[today]} — no classes`;
+    if (NO_CLASS[today]) return `today: ${NO_CLASS[today]}, no classes`;
     const dow = now.getDay();
-    if (dow === 0 || dow === 6) return "weekend — all rooms free today";
+    if (dow === 0 || dow === 6) return "weekend, all rooms free today";
     return "";
 }
 
@@ -103,7 +103,7 @@ function statusHTML(room, now) {
     if (nxt) {
         return `<span class="st-free">free</span>` +
             `<span class="st-when">next: ${nxt.code} ${nxt.who.map(w => PROGRAMS[w.prog]).join(", ")} ` +
-            `at ${t12(nxt.s)} — in <b>${left(nxt.from - mins)}</b></span>`;
+            `at ${t12(nxt.s)}, in <b>${left(nxt.from - mins)}</b></span>`;
     }
     return `<span class="st-free">free</span><span class="st-when">done for today</span>`;
 }

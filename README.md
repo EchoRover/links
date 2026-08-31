@@ -14,7 +14,7 @@ A quick-links hub for **IIT Delhi Abu Dhabi — B.Tech CSE Year 3** students. Ev
 | **Top bar** | IIT logo, `linkCS` wordmark, `sem v · 2026—27` meta, archive button, theme toggle, LINKEEN cross-link with hover-quotes |
 | **Hero** | Big course-program title (`B.Tech / Computer Science / Year 3`) |
 | **Quick Links** | Primary daily-use pills (ERP, Teams, Outlook, Blackboard, Timetable, Bus, Rooms) + a `>` button that reveals secondary (Common, Website, Faculty, Acd Cal) |
-| **Rooms** | `/rooms.html` — live room-by-room occupancy for every classroom and lab, built from all 11 programs' timetables (Y1–Y3 all branches + MTech ETS). Each room card shows who's in it right now (course, program, group, ends-in) and expands to the full day; Mon–Fri switcher on top. Data lives in `rooms-data.js` |
+| **Rooms** | `/rooms.html`, live room occupancy for every classroom and lab from all 11 programs' timetables. Each card shows the current class (course, program, group, time left) and expands to the full day with a Mon to Fri switcher. Data lives in `rooms-data.js` |
 | **Courses** | Bento grid of course cards: each with code chip, course title with colored first-letter, credits circle, LTP, and 2-column resource grid |
 | **Updates** | Assignments + Quizzes columns. Each entry shows a date box (`DOW · DD · MON`) + course code + event text. Expired items auto-hide |
 | **Hide button** | Appears at the bottom when scrolled down — toggles content visibility so you can play with the circuit-board background and interactive dots |
@@ -38,7 +38,7 @@ links/
 ├── scripts.js          # course data + COURSE_META + addUpdate calls + renderers
 ├── styles.css          # theme tokens + all layout
 ├── rooms.html          # room occupancy dashboard (page-local styles inline)
-├── rooms.js            # room dashboard logic — reuses timetable.js helpers/calendar
+├── rooms.js            # room dashboard logic, reuses timetable.js helpers/calendar
 ├── rooms-data.js       # all 11 programs' timetables pivoted by room, 313 entries
 ├── README.md
 ├── assets/
