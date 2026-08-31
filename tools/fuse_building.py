@@ -25,7 +25,11 @@ from extract_floorplan import load, parse, classify, building_layers
 
 M_PER_UNIT = 0.1177
 FLOOR_H, WALL_H = 4.0, 3.2
-SLIVER_M2 = 4.0     # below this an unnamed, non-stair blob is wall, not a room
+# A wall sliver is ELONGATED; a room is compact, however small. Filtering by
+# area instead deleted M4's fifteen faculty offices, which are only ~2.7-3.1 m2
+# each but square (aspect 1.1-1.4), while the real slivers run to aspect 24.
+SLIVER_ASPECT = 3.5
+SLIVER_MIN_M2 = 1.2
 
 # Read off the boards, index by index, against the rendered overlays.
 # Two of Evan's corrections are baked in: the board's "Copy/Print Centre" is
@@ -218,10 +222,16 @@ def main(code='M4'):
         # small: the stairs are what connect the floors and a name is knowledge
         # that cost something to get.
         before = len(rooms)
+        def compact(r):
+            q = np.array(r['p'], np.float32)
+            (_, _), (w, h), _ = cv2.minAreaRect(q)
+            return max(w, h) / max(min(w, h), 1e-6) <= SLIVER_ASPECT
         rooms = [r for r in rooms
-                 if r['name'] or r['kind'] == 'stair' or r['area'] >= SLIVER_M2]
+                 if r['name'] or r['kind'] == 'stair'
+                 or (r['area'] >= SLIVER_MIN_M2 and compact(r))]
         if before != len(rooms):
-            print(f'    dropped {before - len(rooms)} unnamed slivers under {SLIVER_M2} m2')
+            print(f'    dropped {before - len(rooms)} unnamed slivers '
+                  f'(aspect > {SLIVER_ASPECT} or under {SLIVER_MIN_M2} m2)')
 
         rooms.sort(key=lambda r: -r['area'])
         print(f'{bid}: {len(rooms)} rooms ({sum(1 for r in rooms if r["name"])} named, '
