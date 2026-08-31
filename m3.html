@@ -52,18 +52,41 @@
                     font-family: var(--font-mono); font-size: 0.64rem; color: var(--fg-faint); }
         .b-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 5px; }
 
+        /* The detail strip. Everything here was sized and coloured for a narrow
+           side column; laid out along the bottom it needs to carry at a glance,
+           so: larger type, and the text that matters uses --fg rather than the
+           faint tokens meant for secondary labels. */
         .b-side { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px;
-                  padding: 13px 16px; box-shadow: var(--shadow-sm);
-                  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 22px; }
-        .b-side > * { margin: 0; }
-        /* the day's slots run across, not down, so the strip stays one line deep */
-        .b-side .slot-row { border-bottom: none; padding: 0; gap: 7px; }
-        .b-side .side-meta { border-top: none; margin: 0; padding: 0; margin-left: auto; text-align: right; }
+                  padding: 12px 18px; min-height: 0; box-shadow: var(--shadow-sm);
+                  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px; }
+        .side-empty { font-size: 0.95rem; color: var(--fg-soft); margin: 0; }
+
+        .b-side .side-head { display: flex; flex-direction: column; gap: 2px; }
+        .side-name { font-family: var(--font-serif); font-style: italic; font-size: 1.5rem;
+                     color: var(--fg); margin: 0; line-height: 1.1; }
+        .side-code { font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); }
+
+        .b-side .side-status { display: flex; flex-direction: column; gap: 3px; }
+        .st-free { color: var(--cyan); font-family: var(--font-mono); font-size: 1rem; font-weight: 700; }
+        .st-busy-course { font-weight: 700; color: var(--fg); font-size: 1.05rem; }
+        .st-when { font-family: var(--font-mono); font-size: 0.85rem; color: var(--fg-soft); }
+        .st-when b { color: var(--coral); font-weight: 700; }
+
+        .b-side .slots { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+        .b-side .slot-row { border-bottom: none; padding: 0; gap: 8px; font-size: 0.9rem;
+                            color: var(--fg); align-items: baseline; }
+        .b-side .slot-row.past { opacity: 0.55; }
+        .slot-time { font-family: var(--font-mono); font-size: 0.82rem; color: var(--fg-soft); white-space: nowrap; }
+        .slot-course { font-family: var(--font-mono); font-weight: 700; color: var(--fg); }
+
+        .side-meta { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-faint);
+                     border-top: none; margin: 0 0 0 auto; padding: 0; text-align: right; line-height: 1.5;
+                     align-self: center; }
         .side-empty { font-size: 0.83rem; color: var(--fg-faint); line-height: 1.5; }
         .side-name { font-family: var(--font-serif); font-style: italic; font-size: 1.25rem; color: var(--fg); margin: 0 0 2px; }
         .side-code { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); }
         .side-meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--rule-faint); line-height: 1.7; }
-        .st-free { color: var(--cyan); font-family: var(--font-mono); font-size: 0.78rem; }
+        .st-free { color: var(--cyan); font-family: var(--font-mono); font-size: 1rem; font-weight: 700; }
         .st-busy-course { font-weight: 700; color: var(--fg); }
         .st-when { font-family: var(--font-mono); font-size: 0.73rem; color: var(--fg-faint); display: block; margin-top: 3px; }
         .st-when b { color: var(--coral); }

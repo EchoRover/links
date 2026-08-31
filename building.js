@@ -332,14 +332,14 @@ function renderSide() {
     const side = document.getElementById("b-side");
     if (!sel) { side.innerHTML = `<p class="side-empty">Click a room.</p>`; return; }
     const { room: r, floor, b } = sel.userData;
-    let h = `<h3 class="side-name">${r.name || "Unnamed space"}</h3>`;
-    h += `<div class="side-code">${r.code ? r.code + " · " : ""}${b.building} · level ${floor.level}</div>`;
+    let h = `<div class="side-head"><h3 class="side-name">${r.name || "Unnamed space"}</h3>` +
+            `<span class="side-code">${r.code ? r.code + " · " : ""}${b.building} · level ${floor.level}</span></div>`;
 
     if (r.code) {
         const t = today();
         const day = t ? SLOTS.filter(s => s.room === r.code && s.day === t.day) : [];
         const on = t ? day.find(s => t.mins >= s.from && t.mins < s.to) : null;
-        h += `<div style="margin:11px 0 4px">`;
+        h += `<div class="side-status">`;
         if (on) h += `<span class="st-busy-course">${on.code}</span> ${COURSE_TITLES[on.code] || ""}
                       <span class="st-when">until <b>${t12(on.e)}</b></span>`;
         else if (t) {
@@ -349,10 +349,10 @@ function renderSide() {
                      : `<span class="st-when">nothing else today</span>`);
         } else h += `<span class="st-free">no classes today</span>`;
         h += `</div>`;
-        h += day.map(s => `<div class="slot-row${t && t.mins >= s.to ? " past" : ""}">
+        h += `<div class="slots">` + day.map(s => `<div class="slot-row${t && t.mins >= s.to ? " past" : ""}">
               <span class="slot-time">${t12(s.s)}–${t12(s.e)}</span>
               <span><span class="slot-course">${s.code}</span> ${COURSE_TITLES[s.code] || ""}</span></div>`).join("")
-             || `<div class="slot-row">nothing scheduled today</div>`;
+             + `</div>` || `<div class="slot-row">nothing scheduled today</div>`;
     } else if (!sel.userData.plate) {
         h += `<p class="side-empty" style="margin-top:10px">Not a timetabled room.</p>`;
     }
