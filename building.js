@@ -528,34 +528,66 @@ async function geoDiagnose() {
     return bits;
 }
 
+// Which rooms is that fix actually consistent with? A single dot implies a
+// precision the hardware does not have; the honest answer is a shortlist.
+function roomsNear(x, z, radius) {
+    const out = [];
+    for (const t of allTags) {
+        if (!shown.has(t.f.level)) continue;
+        const d = Math.hypot(t.p[0] - x, t.p[1] - z);
+        if (d <= radius) out.push({ name: t.r.name || "#" + t.r.i, b: t.b.building,
+                                    lvl: t.f.level, d, mesh: t.mesh });
+    }
+    return out.sort((a, b) => a.d - b.d).slice(0, 4);
+}
+
+// Average several fixes rather than trusting one. WiFi positioning jitters by
+// metres between consecutive readings, and the mean of a handful is materially
+// steadier than any single one.
+function averageFix(n, ms, onDone, onFail) {
+    const got = [];
+    let done = false;
+    const finish = () => {
+        if (done) return; done = true;
+        if (!got.length) return onFail("no fix");
+        const m = k => got.reduce((a, g) => a + g[k], 0) / got.length;
+        onDone(m("lat"), m("lon"), m("acc"), got.length);
+    };
+    const id = navigator.geolocation.watchPosition(p => {
+        got.push({ lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy });
+        geoStatus(`sampling… ${got.length} of ${n}`);
+        if (got.length >= n) { navigator.geolocation.clearWatch(id); finish(); }
+    }, e => { navigator.geolocation.clearWatch(id); if (!got.length) onFail(e.message); else finish(); },
+       { enableHighAccuracy: true, maximumAge: 0, timeout: ms });
+    setTimeout(() => { navigator.geolocation.clearWatch(id); finish(); }, ms);
+}
+
 document.getElementById("b-locate").addEventListener("click", async () => {
     const bad = await geoDiagnose();
     if (bad.length) return geoStatus(bad.join("<br><br>"), "warn");
-    geoStatus("locating…");
-    navigator.geolocation.getCurrentPosition(pos => {
-        const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
-        const g = fitGeo(CAL);
-        if (!g) {
-            geoStatus(`Got a position (±${Math.round(acc)} m), but <b>the map is not calibrated</b>, so ` +
-                      `there is nothing to place it on yet.<br><br>` +
-                      `Nothing links latitude and longitude to this model's grid until you say where ` +
-                      `you are once. Click the room you are standing in, press <b>I am here</b>. Then ` +
-                      `walk to a room far away and do it again. ` +
-                      `<br><br>${CAL.length} of 2 points recorded.`, "warn");
-            window.__lastFix = { lat, lon, acc };
-            return;
-        }
+    const g = fitGeo(CAL);
+    if (!g) {
+        geoStatus(`<b>The map is not calibrated</b>, so there is nothing to place a position on.` +
+                  `<br><br>Click the room you are standing in, press <b>I am here</b>, walk somewhere ` +
+                  `far, and repeat. ${CAL.length} of 2 points recorded.`, "warn");
+        return;
+    }
+    geoStatus("sampling…");
+    averageFix(5, 8000, (lat, lon, acc, n) => {
         const [x, z] = geoToModel(lat, lon, g);
         showMe(x, z, acc);
         dirty = true;
-        geoStatus(`Placed, marker on the plan.<br><br>Fix is <b>±${Math.round(acc)} m</b>. ` +
-                  `That is wider than most of these rooms, so read it as which building and which ` +
-                  `end of it, not which room.`, "ok");
-    }, err => geoStatus(`The browser refused: <b>${err.message}</b>.<br><br>` +
-                        `On a Mac that is usually Location Services being off for this browser ` +
-                        `(System Settings &gt; Privacy &amp; Security &gt; Location Services), or the ` +
-                        `site permission being blocked in the padlock menu.`, "warn"),
-       { enableHighAccuracy: true, timeout: 10000 });
+        const near = roomsNear(x, z, Math.max(acc, 12) + 8);
+        const list = near.length
+            ? near.map(r => `<b>${r.name}</b> <span style="opacity:.65">${r.b} L${r.lvl} · ${r.d.toFixed(0)} m</span>`).join(" · ")
+            : "nothing close enough to name";
+        geoStatus(`<b>Nearest rooms:</b> ${list}<br><br>` +
+                  `Averaged ${n} fixes, ±${Math.round(acc)} m. On a laptop that is WiFi positioning, ` +
+                  `not GPS — expect the right building and roughly the right end of it, not the right ` +
+                  `room. A phone does much better.`, "ok");
+    }, msg => geoStatus(`The browser refused: <b>${msg}</b>.<br><br>On a Mac that is usually Location ` +
+                        `Services being off for this browser, or the site permission being blocked ` +
+                        `in the padlock menu.`, "warn"));
 });
 
 document.getElementById("b-here").addEventListener("click", async () => {
