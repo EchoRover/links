@@ -99,6 +99,12 @@
         .geo-box h4 { font-family: var(--font-mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-faint); margin: 0 0 6px; font-weight: 500; }
         .geo-box.warn { border-left-color: var(--red); }
         .geo-box.ok { border-left-color: var(--cyan); }
+        /* The readings, on screen and selectable. A clipboard link is easy to
+           miss on a phone, and a screenshot of this works just as well. */
+        .geo-fix { font-family: var(--font-mono); font-size: 0.74rem; color: var(--fg);
+                   background: var(--bg); border: 1px solid var(--rule); border-radius: 7px;
+                   padding: 8px 10px; margin: 8px 0 0; white-space: pre-wrap; word-break: break-all;
+                   user-select: all; -webkit-user-select: all; }
         .b-geo { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); line-height: 1.6; margin: 2px 0 0; }
         .b-foot { font-size: 0.78rem; color: var(--fg-faint); line-height: 1.55; margin: 20px 0 0; max-width: 900px; }
         .b-foot b { color: var(--fg-soft); font-weight: 600; }

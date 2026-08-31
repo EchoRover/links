@@ -570,10 +570,13 @@ document.getElementById("b-here").addEventListener("click", async () => {
         const g = fitGeo(CAL);
         geoStatus(CAL.length < 2
             ? `Point 1 recorded in <b>${CAL[0].room}</b>.<br><br>Now walk to a room far away and do it again.`
-            : g ? `<b>Calibrated</b> from ${CAL[0].room} and ${CAL[1].room}, ${g.sep.toFixed(0)} m apart.<br><br>` +
-                  `Press <b>locate me</b>. This is stored in your browser only — ` +
-                  `<a href="#" id="geo-copy">copy the two readings</a> so they can be baked into the ` +
-                  `page and nobody has to do this again.`
+            : g ? `<b>Calibrated</b> from ${CAL[0].room} and ${CAL[1].room}, ${g.sep.toFixed(0)} m apart.<br>` +
+                  `Press <b>locate me</b>.<br><br>` +
+                  `Stored in this browser only. To make it permanent for everyone, send these ` +
+                  `two lines (screenshot is fine) or <a href="#" id="geo-copy">copy them</a>:` +
+                  `<pre class="geo-fix">${CAL.map(c =>
+                      `${c.lat.toFixed(6)}, ${c.lon.toFixed(6)}  ${c.x.toFixed(1)} ${c.z.toFixed(1)}  ${c.room}`
+                   ).join("\n")}</pre>`
                 : `Those two points are too close together to work out a rotation. Try rooms further apart.`,
             g ? "ok" : "warn");
         const cp = document.getElementById("geo-copy");
