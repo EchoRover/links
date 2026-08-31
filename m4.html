@@ -30,10 +30,12 @@
         .b-seg button.on { background: var(--coral); color: var(--bg-card); }
         input[type=range] { width: 150px; accent-color: var(--coral); }
 
-        .b-stage { display: grid; grid-template-columns: 1fr 300px; gap: 14px; align-items: start; }
-        @media (max-width: 900px) { .b-stage { grid-template-columns: 1fr; } }
+        /* One column: the model gets the full width, and what you clicked reads
+           as a strip underneath it rather than a column stealing 300px from the
+           thing you are actually looking at. */
+        .b-stage { display: flex; flex-direction: column; gap: 12px; }
         .b-canvas { position: relative; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
-        #scene { display: block; width: 100%; height: min(76vh, 800px); touch-action: none; cursor: grab; }
+        #scene { display: block; width: 100%; height: min(82vh, 900px); touch-action: none; cursor: grab; }
         #scene.dragging { cursor: grabbing; }
         #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
         .tag { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg);
@@ -50,7 +52,13 @@
                     font-family: var(--font-mono); font-size: 0.64rem; color: var(--fg-faint); }
         .b-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 5px; }
 
-        .b-side { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; padding: 15px 16px; box-shadow: var(--shadow-sm); min-height: 200px; }
+        .b-side { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px;
+                  padding: 13px 16px; box-shadow: var(--shadow-sm);
+                  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 22px; }
+        .b-side > * { margin: 0; }
+        /* the day's slots run across, not down, so the strip stays one line deep */
+        .b-side .slot-row { border-bottom: none; padding: 0; gap: 7px; }
+        .b-side .side-meta { border-top: none; margin: 0; padding: 0; margin-left: auto; text-align: right; }
         .side-empty { font-size: 0.83rem; color: var(--fg-faint); line-height: 1.5; }
         .side-name { font-family: var(--font-serif); font-style: italic; font-size: 1.25rem; color: var(--fg); margin: 0 0 2px; }
         .side-code { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); }
