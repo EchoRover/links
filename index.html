@@ -166,6 +166,9 @@
                         <a href="m3.html">M3, both floors</a>
                         <a href="campus.html">Whole campus</a>
                         <a href="planedit.html">Plan editor</a>
+                        <span class="lab-head" style="padding-top:9px">university</span>
+                        <a href="https://teams.microsoft.com/" target="_blank" rel="noopener">Teams</a>
+                        <a href="https://outlook.office.com/" target="_blank" rel="noopener">Outlook</a>
                     </div>
                 </div>
                 <a class="archive-link" href="archive/" title="Year 2 Archive"><img src="assets/box.webp" alt="Archive"></a>
@@ -259,6 +262,23 @@
     <script src="ui.js"></script>
     <script src="scripts.js"></script>
     <script src="timetable.js" defer></script>
+    <script>
+        // Inline on purpose. This lived in ui.js and a cached copy of that file
+        // left the menu dead on an already-loaded page; inline, it ships with
+        // the markup it controls and cannot go stale separately.
+        (function () {
+            var btn = document.getElementById("lab-toggle");
+            var list = document.getElementById("lab-list");
+            if (!btn || !list) return;
+            function set(on) { list.hidden = !on; btn.setAttribute("aria-expanded", String(on)); }
+            set(false);
+            btn.addEventListener("click", function (e) { e.stopPropagation(); set(list.hidden); });
+            document.addEventListener("click", function (e) {
+                if (!list.contains(e.target) && e.target !== btn) set(false);
+            });
+            document.addEventListener("keydown", function (e) { if (e.key === "Escape") set(false); });
+        })();
+    </script>
 </body>
 
 </html>

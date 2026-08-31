@@ -25,6 +25,7 @@ from extract_floorplan import load, parse, classify, building_layers
 
 M_PER_UNIT = 0.1177
 FLOOR_H, WALL_H = 4.0, 3.2
+SLIVER_M2 = 4.0     # below this an unnamed, non-stair blob is wall, not a room
 
 # Read off the boards, index by index, against the rendered overlays.
 # Two of Evan's corrections are baked in: the board's "Copy/Print Centre" is
@@ -210,6 +211,18 @@ def main(code='M4'):
             corr.append({'area': round(a, 1),
                          'p': [to_m(*p) for p in cv2.approxPolyDP(c, 1.5, True).reshape(-1, 2)]})
         corr.sort(key=lambda c: -c['area'])
+        # Evan's edit in the plan editor was to delete the sliver "rooms" the
+        # segmentation leaves behind -- bits of wall that are not spaces. Apply
+        # that as a rule instead of a one-off export, so it holds for every board
+        # and every rebuild. A named room or a stair is never dropped, however
+        # small: the stairs are what connect the floors and a name is knowledge
+        # that cost something to get.
+        before = len(rooms)
+        rooms = [r for r in rooms
+                 if r['name'] or r['kind'] == 'stair' or r['area'] >= SLIVER_M2]
+        if before != len(rooms):
+            print(f'    dropped {before - len(rooms)} unnamed slivers under {SLIVER_M2} m2')
+
         rooms.sort(key=lambda r: -r['area'])
         print(f'{bid}: {len(rooms)} rooms ({sum(1 for r in rooms if r["name"])} named, '
               f'{sum(r["area"] for r in rooms):,.0f} m2) + {len(corr)} circulation pieces '
