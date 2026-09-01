@@ -299,7 +299,10 @@ cvs.addEventListener("pointermove", ev => {
         const k = orbit.r * 0.0014;
         const right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0);
         const fwd = right.clone().cross(camera.up).normalize();
-        target.copy(drag.t).addScaledVector(right, -dx * k).addScaledVector(fwd, dy * k);
+        // Grab-and-drag: the ground follows the cursor, so the target moves
+        // OPPOSITE the drag on BOTH axes. `fwd` is right x up, which points
+        // screen-down on the ground plane, so it needs -dy just as right needs -dx.
+        target.copy(drag.t).addScaledVector(right, -dx * k).addScaledVector(fwd, -dy * k);
     } else {
         orbit.theta = drag.th + dx * 0.005;
         orbit.phi = Math.max(0.05, Math.min(1.5, drag.ph - dy * 0.005));
