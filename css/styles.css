@@ -354,31 +354,7 @@ a:focus-visible, button:focus-visible {
     letter-spacing: -0.035em;
     line-height: 1;
     margin-left: 0.05em;
-    position: relative;
 }
-.brand-part-cs::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -0.18em;
-    height: 3px;
-    background: linear-gradient(90deg,
-        var(--coral) 0%,
-        var(--cyan) 25%,
-        var(--indigo) 50%,
-        var(--red) 75%,
-        var(--coral) 100%);
-    background-size: 300% 100%;
-    border-radius: 2px;
-    opacity: 0.85;
-    animation: brand-underline-slide 6s linear infinite;
-}
-@keyframes brand-underline-slide {
-    from { background-position: 0% 0; }
-    to   { background-position: 300% 0; }
-}
-
 .brand-meta {
     font-family: var(--font-mono);
     font-size: 0.85rem;
