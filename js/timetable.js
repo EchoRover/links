@@ -2,14 +2,25 @@
 // SEM 5 TIMETABLE — current + next class on the home page.
 //
 // Transcribed from the official PDF (iitdabudhabi.ac.ae/timetable ->
-// "Year 3 Semester 5 B.TECH Computer Science and Engineering"), read
+// "Year 3 Semester 5 B.TECH Computer Science and Engineering"; every
+// sheet is kept in data/timetables/, named by REVISION date), read
 // off the rendered grid rather than the text layer, then cross-checked
 // against every course's L-T-P-C credits — lecture, tutorial and lab
 // hours all reconcile, which is what says the block spans are right.
 //
-// REVISION 3: the 27 August 2026 reissue. 
+// Checked mechanically, not by eye: `python3 tools/check_timetable.py`
+// reconciles every block below against the L-T-P-C table the sheet prints,
+// which is the half of the document this file does NOT transcribe.
+//
+// REVISION 3: the 27 August 2026 reissue (stamped "27th August 2026 -
+// 5:30pm" in the sheet's own footer).
 //   - All computer labs (ACOL331, ACOL333) moved from M3-0-022 to M3-0-004 (Computer Lab 03).
 //   - ACOD310 (Mini Project) moved from Thursday 9-10 to Friday 10:00-11:50 in M4-1-017.
+//   - The eleven sheets the college circulated on 29 August are this same
+//     revision re-sent, NOT a fourth one: every one of them carries the 27
+//     August stamp, and a cell-by-cell recheck of the Sem 5 sheet on
+//     2026-09-01 found nothing to change. The date in a filename is when it
+//     was mailed; the date in the footer is the revision. Trust the footer.
 //
 // REVISION 2: the 23 August 2026 reissue. It differs from the launch
 // version in four ways, all of them taken from the new grid:
@@ -64,7 +75,7 @@ const WEEK = {
         ["15:30", "16:20", "AHUL256", "M4-1-017", "tut", 2],
         // The AI lab. The sheet does NOT print "Lab" on this block the
         // way it does on ACOL331's, but ACOL333 is 3-0-2-4 and this is
-        // its only practical block: 110 min in M3-Computer Lab 02 is
+        // its only practical block: 110 min in M3-Computer Lab 03 is
         // exactly the 2 P-hours, and without it the credits do not
         // reconcile. Tagged from the credits, not from the caption.
         ["16:30", "18:20", "ACOL333", "M3-0-004", "lab", 0],
