@@ -2,8 +2,8 @@
 """
 Fuse the CAD and the boards into one model of a building.
 
-    python3 tools/fuse_building.py M4        # -> m4-data.js
-    python3 tools/fuse_building.py M3        # -> m3-data.js
+    python3 tools/fuse_building.py M4        # -> data/m4-data.js
+    python3 tools/fuse_building.py M3        # -> data/m3-data.js
 
 Neither source is enough alone. The CAD has exact walls, doors and the true
 envelope, but no room identity and stray linework that splits big rooms. The
@@ -101,7 +101,7 @@ DROP = {'M4_G_gem': {17, 20}, 'M4_L1_gem': set(),
 
 
 def main(code='M4'):
-    src = open('boards-data.js').read()
+    src = open('data/boards-data.js').read()
     BOARDS = json.loads(src[src.index('=') + 1:].strip().rstrip(';'))
 
     plan = FLOORS[code]
@@ -264,8 +264,8 @@ def main(code='M4'):
           '// vertically and no level-1 CAD exists. Metres, y-down in plan.\n'
           '// Pushed onto a shared list so one page can show several buildings.\n'
           f'(window.BUILDINGS = window.BUILDINGS || []).push({json.dumps(data, separators=(",", ":"))});\n')
-    open(f'{code.lower()}-data.js', 'w').write(js)
-    print(f'\nwrote {code.lower()}-data.js  {len(js)/1024:.0f} KB  ({W:.1f} x {D:.1f} m)')
+    open(f'data/{code.lower()}-data.js', 'w').write(js)
+    print(f'\nwrote data/{code.lower()}-data.js  {len(js)/1024:.0f} KB  ({W:.1f} x {D:.1f} m)')
 
 
 if __name__ == '__main__':

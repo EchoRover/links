@@ -183,7 +183,7 @@ def coarse(src, dst):
 
 
 def main(board_id):
-    src = open('boards-data.js').read()
+    src = open('data/boards-data.js').read()
     BOARDS = json.loads(src[src.index('=') + 1:].strip().rstrip(';'))
     b = BOARDS[board_id]
 

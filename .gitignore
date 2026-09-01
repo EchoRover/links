@@ -7,3 +7,6 @@
 *.swp
 *.swo
 Thumbs.db
+
+# local dev server helper
+.devserver.py
