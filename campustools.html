@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Tools · linkCS</title>
+    <link rel="icon" href="assets/hacker.webp">
+    <script src="js/theme-init.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .ct-main { max-width: 1240px; margin: 0 auto; padding: 0 clamp(1rem, 3vw, 2.5rem) 4rem; }
+
+        .ct-hero { margin-bottom: 1.25rem; }
+        .ct-title { font-family: var(--font-sans); font-weight: 800; letter-spacing: -0.03em;
+                    font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1; margin: 0; }
+        .ct-title em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--coral); }
+        .ct-sub { color: var(--fg-soft); font-size: 0.9rem; margin: 0.4rem 0 0; }
+
+        /* tool switcher */
+        .ct-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.25rem 0 1rem; }
+        .ct-tab { padding: 0.5rem 1rem; border: 1px solid var(--rule); border-radius: 999px;
+                  background: var(--bg-card); color: var(--fg); cursor: pointer;
+                  font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; }
+        .ct-tab[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+        .ct-panel[hidden] { display: none; }
+
+        /* cohort / room pickers */
+        .ct-pick { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.35rem; }
+        .chip { padding: 0.35rem 0.7rem; border: 1px solid var(--rule); border-radius: 999px;
+                background: var(--bg-card); color: var(--fg-soft); cursor: pointer;
+                font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em; }
+        .chip[aria-pressed="true"] { background: var(--coral); border-color: var(--coral); color: var(--bg); }
+        .ct-bulk { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0.5rem 0 1rem; }
+        .ct-bulk button { background: none; border: none; color: var(--coral); cursor: pointer;
+                          font-family: var(--font-mono); font-size: 0.72rem; text-decoration: underline; padding: 0; }
+
+        /* ---------- the timetable grid ----------
+           One component, three uses: cohorts' combined week, one room's
+           week, one professor's week. Time runs down so a day reads like
+           a day, and a gap in the column IS the free time -- you should
+           not have to read a list to see when you are free. */
+        .tt-wrap { overflow-x: auto; padding-bottom: 0.5rem; }
+        .tt {
+            display: grid;
+            grid-template-columns: 52px repeat(5, minmax(120px, 1fr));
+            gap: 0 6px;
+            min-width: 660px;
+        }
+        .tt-head {
+            font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--fg-soft);
+            padding: 0 0 0.5rem; text-align: center;
+        }
+        .tt-col { position: relative; border-left: 1px solid var(--rule); }
+        .tt-axis { position: relative; }
+        .tt-hour {
+            position: absolute; left: 0; right: 0;
+            font-family: var(--font-mono); font-size: 0.62rem; color: var(--fg-soft);
+            transform: translateY(-0.4em); text-align: right; padding-right: 0.4rem;
+        }
+        .tt-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--rule); opacity: 0.5; }
+
+        /* a scheduled class */
+        .tt-b {
+            position: absolute; left: 2px; right: 2px;
+            border-radius: 6px; padding: 3px 5px; overflow: hidden;
+            font-family: var(--font-mono); font-size: 0.62rem; line-height: 1.25;
+            background: var(--bg-card); border: 1px solid var(--rule); color: var(--fg-soft);
+        }
+        .tt-b b { display: block; font-size: 0.68rem; color: var(--fg); font-weight: 700; }
+        .tt-b.lab { border-color: var(--coral); }
+        .tt-b.tutorial { border-style: dashed; }
+
+        /* a window where every selected cohort is free */
+        .tt-free {
+            position: absolute; left: 2px; right: 2px;
+            border-radius: 6px; background: var(--coral-soft);
+            border: 1px solid var(--coral);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 2px 5px; overflow: hidden;
+            font-family: var(--font-mono); font-size: 0.62rem; color: var(--coral);
+        }
+        .tt-free b { font-size: 0.7rem; font-weight: 700; }
+        /* lunch is free, but it is the gap the timetable already leaves --
+           shown, and named, so it never reads as a discovery */
+        .tt-free.lunch {
+            background: transparent; border-style: dashed;
+            border-color: var(--rule); color: var(--fg-soft);
+        }
+        .tt-free.lunch b { font-weight: 400; font-style: italic; color: var(--fg-soft); }
+        .tt-empty { color: var(--fg-soft); font-style: italic; font-size: 0.78rem; padding: 0.5rem 0; }
+
+        .ct-legend {
+            display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.75rem;
+            font-family: var(--font-mono); font-size: 0.66rem; color: var(--fg-soft);
+        }
+        .ct-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px;
+                       margin-right: 0.3rem; vertical-align: -1px; }
+
+        /* results list */
+        .ct-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.6rem; }
+        .ct-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--bg-card); padding: 0.7rem 0.85rem; }
+        .ct-card b { font-family: var(--font-mono); font-size: 0.85rem; }
+        .ct-card span { display: block; color: var(--fg-soft); font-size: 0.75rem; margin-top: 0.15rem; }
+
+        .ct-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+        .ct-row label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em;
+                        text-transform: uppercase; color: var(--fg-soft); }
+        .ct-row select, .ct-row input {
+            padding: 0.45rem 0.6rem; border: 1px solid var(--rule); border-radius: 8px;
+            background: var(--bg-card); color: var(--fg); font-family: var(--font-mono); font-size: 0.8rem; }
+
+        /* ---------- detail panel ----------
+           Clicking any block opens this; everything in it that names another
+           entity is a link. That is the whole point: a course names its
+           professor, the professor's name opens their week, the room code
+           opens the room's. No dropdown-hunting. */
+        .det {
+            position: fixed; right: 0; top: 0; bottom: 0; width: min(370px, 92vw);
+            background: var(--bg-card); border-left: 1px solid var(--rule);
+            box-shadow: -18px 0 44px rgba(0,0,0,0.13);
+            padding: 1.25rem 1.25rem 2rem; overflow-y: auto; z-index: 60;
+            transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
+        }
+        .det.open { transform: translateX(0); }
+        .det-x {
+            position: absolute; top: 0.75rem; right: 0.9rem; background: none; border: none;
+            color: var(--fg-soft); font-size: 1.3rem; cursor: pointer; line-height: 1;
+        }
+        .det-kind {
+            font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.16em;
+            text-transform: uppercase; color: var(--coral);
+        }
+        .det h2 { font-size: 1.15rem; margin: 0.25rem 0 0.15rem; letter-spacing: -0.02em; }
+        .det-code { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-soft); }
+        .det dl { margin: 1.1rem 0 0; display: grid; grid-template-columns: 74px 1fr; gap: 0.5rem 0.75rem; }
+        .det dt {
+            font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--fg-soft); padding-top: 0.15rem;
+        }
+        .det dd { margin: 0; font-size: 0.85rem; }
+        .det-link {
+            display: block; background: none; border: none; padding: 0.1rem 0; text-align: left;
+            color: var(--coral); font-size: 0.85rem; font-family: inherit; cursor: pointer;
+            border-bottom: 1px dashed currentColor; width: fit-content; margin-bottom: 0.2rem;
+        }
+        .det-link:hover { opacity: 0.7; }
+        .det-when { font-family: var(--font-mono); font-size: 0.78rem; }
+        .det-sub { color: var(--fg-soft); font-size: 0.75rem; margin-top: 0.2rem; }
+
+        .tt-b { cursor: pointer; }
+        .tt-b:hover { border-color: var(--coral); }
+
+        @media (max-width: 640px) {
+            /* the grid needs ~660px; below that it scrolls sideways inside its
+               own wrapper rather than pushing the page wide */
+            .tt { grid-template-columns: 34px repeat(5, minmax(104px, 1fr)); min-width: 560px; }
+            .tt-b, .tt-free { font-size: 0.56rem; }
+            .tt-b b, .tt-free b { font-size: 0.6rem; }
+            .tt-wrap {
+                overflow-x: auto; -webkit-overflow-scrolling: touch;
+                margin: 0 calc(-1 * clamp(1rem, 3vw, 2.5rem));
+                padding: 0 clamp(1rem, 3vw, 2.5rem) 0.5rem;
+            }
+            .ct-tab { padding: 0.45rem 0.8rem; font-size: 0.8rem; }
+            .chip { font-size: 0.66rem; padding: 0.3rem 0.55rem; }
+            .det { width: 100%; }
+            .ct-row { gap: 0.4rem; }
+            .ct-row input, .ct-row select { font-size: 0.75rem; padding: 0.4rem 0.45rem; }
+        }
+
+        .ct-note { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+                   font-size: 0.78rem; color: var(--fg-soft); max-width: 46rem; line-height: 1.6; }
+        .ct-note strong { color: var(--fg); font-weight: 600; }
+    </style>
+</head>
+
+<body>
+    <div class="ct-main">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">campus · tools</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="./" class="pill"><span class="pill-name">← Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <section class="ct-hero">
+            <h1 class="ct-title">Campus <em>Tools</em></h1>
+            <p class="ct-sub">Every program's timetable, asked backwards.</p>
+        </section>
+
+        <div class="ct-tabs" role="tablist">
+            <button class="ct-tab" role="tab" data-panel="free" aria-selected="true">Free time</button>
+            <button class="ct-tab" role="tab" data-panel="rooms" aria-selected="false">Free rooms</button>
+            <button class="ct-tab" role="tab" data-panel="faculty" aria-selected="false">Faculty</button>
+        </div>
+
+        <!-- ---------- FREE TIME ---------- -->
+        <section class="ct-panel" id="panel-free">
+            <div class="ct-pick" id="cohort-pick"></div>
+            <div class="ct-bulk">
+                <button data-bulk="y1">all Year 1</button>
+                <button data-bulk="y2">all Year 2</button>
+                <button data-bulk="y3">all Year 3</button>
+                <button data-bulk="all">everyone</button>
+                <button data-bulk="none">clear</button>
+            </div>
+            <div class="ct-row">
+                <label for="minlen">at least</label>
+                <select id="minlen">
+                    <option value="30">30 min</option>
+                    <option value="60" selected>1 hour</option>
+                    <option value="90">1.5 hours</option>
+                    <option value="120">2 hours</option>
+                </select>
+            </div>
+            <div class="tt-wrap"><div class="tt" id="free-week"></div></div>
+            <div class="ct-legend"><span><i style="background:var(--coral-soft);border:1px solid var(--coral)"></i>everyone free</span><span><i style="background:var(--bg-card);border:1px solid var(--rule)"></i>someone in class</span><span><i style="background:transparent;border:1px dashed var(--rule)"></i>lunch</span><span><i style="background:var(--bg-card);border:1px solid var(--coral)"></i>lab</span></div>
+        </section>
+
+        <!-- ---------- FREE ROOMS ---------- -->
+        <section class="ct-panel" id="panel-rooms" hidden>
+            <div class="ct-row">
+                <label for="room-day">day</label>
+                <select id="room-day"></select>
+                <label for="room-from">from</label>
+                <input type="time" id="room-from" value="14:00" step="900">
+                <label for="room-to">to</label>
+                <input type="time" id="room-to" value="16:00" step="900">
+            </div>
+            <div class="ct-list" id="room-out"></div>
+            <p class="ct-row" style="margin:1.25rem 0 0.5rem"><label>week for</label> <b id="room-week-for" style="font-family:var(--font-mono)"></b></p><div class="tt-wrap"><div class="tt" id="room-week"></div></div>
+        </section>
+
+        <!-- ---------- FACULTY ---------- -->
+        <section class="ct-panel" id="panel-faculty" hidden>
+            <div class="ct-row">
+                <label for="fac-pick">professor</label>
+                <select id="fac-pick"></select>
+            </div>
+            <p class="ct-sub" id="fac-count" style="margin:0 0 0.75rem"></p><div class="tt-wrap"><div class="tt" id="fac-week"></div></div>
+        </section>
+
+        <div class="ct-note" id="notes">
+            <p><strong>Source.</strong> The eleven official program timetables dated 29 August 2026.
+                Each sheet was read independently and cross-checked against the room-occupancy table
+                already in this site; anything the two disagreed on is listed as a known gap rather
+                than silently picked.</p>
+            <p><strong>What "free" means here.</strong> Nobody has a scheduled class. It says nothing
+                about exams, club bookings, or a room being locked. Year 1 schedules were provisional
+                until registrations froze on 4 September 2026.</p>
+        </div>
+    </div>
+
+    <aside class="det" id="det" aria-hidden="true">
+        <button class="det-x" id="det-x" aria-label="Close">×</button>
+        <div id="det-body"></div>
+    </aside>
+
+    <script src="data/campus-tools-data.js"></script>
+    <script src="js/campustools.js" defer></script>
+</body>
+
+</html>
