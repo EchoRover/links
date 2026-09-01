@@ -7,11 +7,11 @@
     <title>Bus Schedule — linkCS</title>
     <meta name="description" content="Shuttle schedule between KCA 1&2, KCA 3 and Campus — IIT Delhi Abu Dhabi.">
     <link rel="icon" type="image/webp" href="assets/hacker.webp">
-    <script src="theme-init.js"></script>
+    <script src="js/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         /* ============================================================
            BUS PAGE — scoped styles only. Nothing here leaks into
@@ -92,44 +92,6 @@
         }
 
         /* ---------- route strip ---------- */
-        .route-strip {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--fg-soft);
-        }
-
-        .stop {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.4rem 0.75rem;
-            background: var(--bg-card);
-            border: 1px solid var(--rule);
-            border-radius: 999px;
-        }
-
-        .stop::before {
-            content: "";
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--coral);
-        }
-
-        .route-arrow {
-            color: var(--fg-soft);
-        }
-
-        .route-loop {
-            color: var(--fg-soft);
-            font-style: italic;
-        }
-
         /* ---------- next-departure cards ---------- */
         .next-wrap {
             display: grid;
@@ -592,6 +554,43 @@
             display: none;
         }
 
+        /* KCA 3 pass-through estimate. Deliberately NOT styled like a
+           departure time -- lighter, smaller, dashed, and labelled -- so it
+           can never be mistaken for something off the poster. */
+        .next-kca3 {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin: 0.6rem 0 0;
+            padding-top: 0.55rem;
+            border-top: 1px dashed var(--rule);
+            font-size: 0.8rem;
+            color: var(--fg-soft);
+        }
+
+        .kca3-stop {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .kca3-win {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--fg);
+        }
+
+        .kca3-est {
+            margin-left: auto;
+            font-size: 0.68rem;
+            color: var(--coral);
+            text-decoration: none;
+            border-bottom: 1px dashed currentColor;
+        }
+
+        .kca3-est:hover { opacity: 0.75; }
+
         /* ---------- footnote ---------- */
         .bus-note {
             margin-top: 2rem;
@@ -603,8 +602,43 @@
             line-height: 1.6;
         }
 
+        .bus-note p {
+            margin: 0 0 0.5rem;
+        }
+
+        .bus-note p:last-child {
+            margin-bottom: 0;
+        }
+
         .bus-note strong {
-            color: var(--fg-soft);
+            color: var(--fg);
+            font-weight: 600;
+        }
+
+        .note-star {
+            color: var(--coral);
+            font-weight: 700;
+        }
+
+        /* The * on a day's caveat jumps to the footnote that explains it. */
+        .note-ref {
+            color: var(--coral);
+            font-weight: 700;
+            text-decoration: none;
+            padding: 0 0.15em;
+        }
+
+        .note-ref:hover {
+            text-decoration: underline;
+        }
+
+        #notes:target {
+            animation: note-flash 1.4s ease;
+        }
+
+        @keyframes note-flash {
+            from { background: var(--coral-soft); }
+            to   { background: transparent; }
         }
 
         /* ---------- narrow screens: the table ----------
@@ -714,25 +748,13 @@
         <section class="bus-hero">
             <div>
                 <h1 class="bus-title">Shuttle <em>Schedule</em></h1>
-                <p class="bus-sub">KCA 1&amp;2 · KCA 3 · Campus — one clockwise loop, both directions.<br>
-                    Mon&ndash;Thu runs the poster timetable, Friday the same minus the 12:30&ndash;1:15 prayer break,
-                    Sat &amp; Sun every 30 minutes from 7:30 AM.</p>
+                <p class="bus-sub">One clockwise loop, both directions.</p>
             </div>
             <div class="bus-now">
                 <span class="live-dot" aria-hidden="true"></span>
                 <span>now</span><span id="clock">—</span>
             </div>
         </section>
-
-        <div class="route-strip">
-            <span class="stop">KCA 1&amp;2</span>
-            <span class="route-arrow">→</span>
-            <span class="stop">KCA 3</span>
-            <span class="route-arrow">→</span>
-            <span class="stop">Campus</span>
-            <span class="route-arrow">→</span>
-            <span class="route-loop">back to KCA 1&amp;2</span>
-        </div>
 
         <!-- LIVE — next departures per direction -->
         <div class="next-wrap" id="next-wrap"></div>
@@ -764,25 +786,25 @@
         <!-- FULL TABLES -->
         <div class="sched-wrap" id="sched-wrap"></div>
 
-        <p class="bus-note">
-            <strong>Sources.</strong> Mon&ndash;Thu comes from the printed shift poster, transcribed 19 Aug 2026.
-            Friday is that same poster minus the campus notice of 22 Aug: <em>&ldquo;there will be no trips between
-            Campus and Dorms from 12:30 PM to 1:15 PM for friday.&rdquo;</em> The three cancelled runs are struck
-            through rather than removed, so the trip numbers still match the printed sheet; whether the 1:15 PM run
-            itself departs is not stated, and this page assumes it does.
-            Sat &amp; Sun comes from the campus notice of 22 Aug 2026: <em>&ldquo;Saturdays and Sundays, vehicles
-            will operate between the campus and KCA 1,2 &amp; 3 every 30 minutes in both directions, starting
-            from 7:30 AM.&rdquo;</em> Countdowns use your device clock, so they only line up if your phone is on
-            Gulf time.
-            <strong>Known gaps.</strong> The weekend notice gives no last departure and no vehicle rota, so the
-            weekend table has no Vehicle column and its post-7 PM runs sit in their own dashed block marked
-            <em>assumed</em> &mdash; they are this page&rsquo;s guess, not the notice. Neither source says anything
-            about public holidays. Trips 16 and 17 on the Campus &rarr; Dorms weekday leg are both printed as
-            10:00 AM; that is reproduced as printed, not corrected.
-        </p>
+        <div class="bus-note" id="notes">
+            <p><span class="note-star">*</span> <strong>Sources.</strong>
+                Mon&ndash;Thu: printed shift poster, transcribed 19 Aug 2026.
+                Fri: same poster, minus the 22 Aug notice &mdash; no Campus&ndash;Dorms trips 12:30&ndash;1:15 PM.
+                Sat &amp; Sun: 22 Aug notice &mdash; every 30 min from 7:30 AM, both directions.</p>
+            <p><strong>KCA 3.</strong> Not on the poster, which only prints departures from KCA 1&amp;2.
+                The KCA 1&amp;2 &rarr; KCA 3 leg is about 5 minutes, usually 3&ndash;7 &mdash; timed by hand,
+                and it varies with traffic and how long the driver holds. Shown for the outbound leg only:
+                the Campus &rarr; KCA 1&amp;2 run does not reliably carry on to KCA 3.</p>
+            <p><strong>Assumed, not stated.</strong> That the 1:15 PM run departs &mdash; treat it as the
+                earliest, not a promise. Weekend runs after 6:30 PM.</p>
+            <p><strong>Not covered.</strong> Public holidays. Which vehicle runs which weekend trip.</p>
+            <p><strong>As printed.</strong> Weekday trips 16 and 17 to Dorms are both 10:00 AM; reproduced,
+                not corrected. Cancelled runs are struck through rather than deleted, so trip numbers still
+                match the sheet. Countdowns use your device clock.</p>
+        </div>
     </main>
 
-    <script src="bus.js" defer></script>
+    <script src="js/bus.js" defer></script>
 </body>
 
 </html>

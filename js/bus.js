@@ -17,7 +17,8 @@
 //            Read as the break spanning [12:30, 1:15), service resuming
 //            WITH the 1:15 run — so 12:30 / 12:45 / 1:00 are cancelled in
 //            both directions and 1:15 still departs. That boundary reading
-//            is the one judgement call here and it is flagged on the page.
+//            is the one judgement call here; it is recorded in the footnote
+//            at the bottom of bus.html, not in prose above the table.
 //            Cancelled runs are NOT deleted from the table: they stay in
 //            place, struck through, keeping the poster's trip numbers, so
 //            someone holding the printed poster can see why 12:30 is gone
@@ -41,6 +42,22 @@
 // ============================================================
 
 const DAY_ROTA = ["Coaster 1", "Coaster 2", "Coaster 3", "Bus 1", "Bus 2", "Bus 3", "Coaster 4"];
+
+// KCA 1&2 -> KCA 3, the middle stop on the outbound leg. NOT from the poster:
+// the poster only prints departures from KCA 1&2. Evan timed this himself and
+// puts it at about 5 minutes most times, 3-7 depending on traffic and on how
+// long the driver holds. So it is rendered as a WINDOW, never as a single
+// clock time -- a minute-precise arrival here would be a number nobody has.
+// Only the outbound leg is offered: the Campus -> KCA 1&2 run does not
+// reliably carry on to KCA 3 (observed), so estimating it would be inventing
+// a service. If someone times Campus -> KCA 1&2, that leg can be added.
+const KCA3_LEG = { lo: 3, hi: 7 };
+
+// "10:15" + 5 -> "10:20"
+function addMins(hhmm, add) {
+    const m = (toMinutes(hhmm) + add) % (24 * 60);
+    return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+}
 
 // Weekend: start + interval are from the notice. The cut and the last
 // departure are not — see the header comment.
@@ -167,12 +184,6 @@ const SCHEDULES = {
         numbering: "perBlock",
         dirs: POSTER_DIRS,
         noService: { from: "12:30", to: "13:15", reason: "Friday prayer" },
-        caveat: "Friday runs the same poster timetable as Mon–Thu, except the campus notice of 22 Aug: " +
-            "no trips between Campus and Dorms from 12:30 PM to 1:15 PM. The three struck-through runs below " +
-            "are cancelled in both directions; they keep their poster trip numbers so this page lines up with " +
-            "the printed sheet. The notice does not say whether the 1:15 PM run itself departs — this page " +
-            "assumes service resumes WITH it, which is the ordinary reading of \u201cfrom 12:30 to 1:15\u201d. " +
-            "If you are catching the first bus back, treat 1:15 as the earliest it could be, not a promise.",
     },
 
     // ---------- Sat–Sun: the notice ----------
@@ -181,10 +192,6 @@ const SCHEDULES = {
         label: "Sat & Sun",
         short: "Sat & Sun",
         numbering: "continuous",     // one service, so the numbers just run on
-        caveat: "The campus notice gives the start (7:30 AM), the 30-minute interval and both directions. " +
-            "It does not give a last departure, and it says nothing about which vehicle runs which trip. " +
-            "Everything through 6:30 PM below is the notice; the later block is an assumption that the " +
-            "service keeps going as late as it does on weekdays. Check the board before counting on a late run.",
         dirs: {
             toCampus: {
                 ...DIRS.toCampus,
@@ -355,6 +362,11 @@ function renderNext(dirId, now) {
             ${head.vehicle ? `<span class="next-veh">${head.vehicle}</span>` : ""}
         </div>
         ${skipped ? `<p class="next-gap">no trips ${to12h(gap.from)} – ${to12h(gap.to)} · ${gap.reason}</p>` : ""}
+        ${dir.id === "toCampus" ? `<p class="next-kca3">
+            <span class="kca3-stop">KCA 3</span>
+            <span class="kca3-win">${to12h(addMins(head.time, KCA3_LEG.lo))} – ${to12h(addMins(head.time, KCA3_LEG.hi))}</span>
+            <a class="kca3-est" href="#notes">estimate</a>
+        </p>` : ""}
         <ul class="next-then">
             ${rest.map((t) => `
                 <li>
