@@ -12,10 +12,11 @@ const linksData = {
     Faculty: "https://iitdabudhabi.ac.ae/faculty",
     Bus: "bus.html",
     "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-2026-27Sem1.pdf",
-    // The 23 Aug 2026 reissue, served from this repo. The institute page
-    // (iitdabudhabi.ac.ae/timetable) still serves the superseded 13 Aug
+    // The 27 Aug 2026 revision, served from this repo (every sheet lives
+    // in data/timetables/, named by the date in its own footer). The
+    // institute page (iitdabudhabi.ac.ae/timetable) still serves an older
     // version, so linking upstream would contradict the class card.
-    // Swap back to the official URL once they publish the new one.
+    // Swap back to the official URL once they publish the current one.
     TimeTable: "data/timetables/2026-08-27-year3-sem5-btech-cse.pdf",
   },
 

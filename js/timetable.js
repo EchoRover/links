@@ -151,16 +151,47 @@ const ROOMS = {
     "M4-0-011": { bldg: "M4", floor: "G", no: "3", ok: true },
     "M3-0-022": { bldg: "M3", floor: "G", no: "02", ok: true, lab: true },
     "M3-0-004": { bldg: "M3", floor: "G", no: "03", ok: true, lab: true },
-    "M4-0-019": { bldg: "M4", floor: "G", no: "5", ok: true },
-    "M4.0.019": { bldg: "M4", floor: "G", no: "5", ok: true },  // spelling used on the earlier sheet
+    // The 27 August sheet RENAMED this room: it was "M4-Classroom 5" on
+    // the 23 August sheet and is "M4-Classroom 3" on the 27th. The room
+    // CODE did not change, which is why a diff of courses, times and codes
+    // showed this revision as a no-op and shipped a stale name to the page
+    // for the Wednesday ACOL351 tutorial. check_timetable.py now reads
+    // these labels off the PDF too, so a rename cannot pass silently again.
+    //
+    // Note this leaves M4-0-011 and M4-0-019 BOTH printing "Classroom 3"
+    // on the official sheet. That is what it says; whereIs() disambiguates
+    // rather than guessing which one is a typo.
+    "M4-0-019": { bldg: "M4", floor: "G", no: "3", ok: true },
+    "M4.0.019": { bldg: "M4", floor: "G", no: "3", ok: true },  // spelling used on the earlier sheet
 };
+
+// Two room codes can carry the same printed name (see M4-0-011 vs
+// M4-0-019). When that happens the plate alone is ambiguous, so the code
+// goes into the subtitle. Derived from ROOMS rather than hardcoded, so it
+// keeps working when the sheet changes again.
+const NAME_COLLIDES = (() => {
+    const seen = {};
+    for (const [code, r] of Object.entries(ROOMS)) {
+        const key = `${r.bldg}|${r.no}`;
+        (seen[key] ||= new Set()).add(code.replace(/\./g, "-"));
+    }
+    return new Set(
+        Object.entries(seen)
+            .filter(([, codes]) => codes.size > 1)
+            .flatMap(([, codes]) => [...codes])
+    );
+})();
 
 function whereIs(code) {
     // Some blocks carry no room at all (the ACOD310 hold). Say that
     // plainly rather than printing a bare "?" that reads like a bug.
     if (!code) return { raw: "", no: "—", sub: "not listed", ok: false, none: true };
     const r = ROOMS[code];
-    if (r) return { raw: code, no: r.no, sub: `${r.bldg} · ${r.floor}`, ok: !!r.ok, lab: !!r.lab };
+    if (r) {
+        const norm = String(code).replace(/\./g, "-");
+        const sub = NAME_COLLIDES.has(norm) ? norm : `${r.bldg} · ${r.floor}`;
+        return { raw: code, no: r.no, sub, ok: !!r.ok, lab: !!r.lab };
+    }
     const m = String(code).match(/^([A-Za-z]\d+)[.\-](\d)[.\-](\d+)$/);
     if (!m) return { raw: code, no: code, sub: "", ok: false };
     return { raw: code, no: m[3], sub: `${m[1].toUpperCase()} · ${m[2] === "0" ? "G" : m[2] + "F"}`, ok: false };

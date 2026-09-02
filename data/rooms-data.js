@@ -11,9 +11,13 @@
 //
 // Sheet quirks carried as printed, not "fixed":
 //   - Room CODES are authoritative. The friendly names printed next
-//     to them contradict each other across sheets (M4-0-019 is
-//     labelled Classroom 3, 4 and 5 on different PDFs); ROOM_NAMES
-//     below keeps only majority-consistent names.
+//     to them contradict each other across sheets. Checked mechanically
+//     across all 11 on 2026-09-02: exactly ONE room really conflicts,
+//     M4-0-019 (Classroom 3 on Y3-CSE, Classroom 4 on Y2 MTech-ETS,
+//     Classroom 5 on the superseded 23 Aug sheet). The other two apparent
+//     conflicts are only the "M4-" prefix being present on some sheets.
+//     14 of 17 rooms are identical everywhere. Rule: a course's own sheet
+//     wins for that course.
 //   - Two real overlaps exist in M4-0-019 on Wednesday because
 //     different sheets book it simultaneously. Shown as-is.
 //   - Y1 sheets say schedules are provisional until registrations
@@ -30,7 +34,12 @@ const ROOM_NAMES = {
     "M4-0-011": "Classroom 3",
     "M4-0-017": "Classroom 4",
     "M4-0-018": "Computer Lab",
-    "M4-0-019": "Classroom 5",
+    // The sheets disagree about this ONE room and nothing else: the Y3-CSE
+    // sheet prints "Classroom 3", the Y2 MTech-ETS sheet "Classroom 4", and
+    // the superseded 23 Aug sheet said "Classroom 5". Rule applied: the
+    // course's OWN sheet wins, so Y3-CSE's name is used here. The room CODE
+    // is what to trust and what the UI shows when a name is ambiguous.
+    "M4-0-019": "Classroom 3",
     "M4-0-021": "Classroom 6",
     "M4-1-011": "Classroom 8",
     "M4-1-017": "Classroom 7",
