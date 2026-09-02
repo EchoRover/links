@@ -31,9 +31,8 @@
 
 <body>
     <!-- Navigation included via JS or kept simple, let's keep it simple with a back link -->
-    <header class="topbar">
-        <div class="brand">
-            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
+        <header class="topbar">
+            <div class="brand">
                 <div class="brand-logo">
                     <img src="assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
                     <img src="assets/circle.webp" class="circle-img" alt="">
@@ -41,13 +40,17 @@
                 <span class="brand-name">
                     <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
                 </span>
-            </a>
-            <span class="brand-meta">sem v · 2026—27</span>
-        </div>
-        <div class="topbar-utils">
-            <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
-        </div>
-    </header>
+                <span class="brand-meta">all · timetables</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="./" class="pill">
+                    <span class="pill-name">← Home</span>
+                </a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+
 
     <main class="page tt-wrap">
         <div class="tt-hero">
