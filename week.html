@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Timetable · linkCS</title>
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <script src="js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ------------------------------------------------------------------
+           This page follows the calendar UI Evan picked as the reference:
+           white surface, hairline rules, two-tone blocks. It deliberately
+           does NOT inherit the site's cream paper -- a dense time grid needs
+           a neutral ground for seven course colours to stay distinguishable.
+           The topbar above it is still the site's, so the two meet at the rule.
+           ------------------------------------------------------------------ */
+        .wk-wrap {
+            --s: #FFFFFF;           /* surface */
+            --s2: #F7F8FA;          /* header cell / today column */
+            --ln: #E8EAEE;          /* hairline */
+            --ln2: #F0F1F4;         /* inner hour line */
+            --tx: #1A1D23;          /* ink */
+            --tx2: #6B7280;         /* muted */
+            --accent: #3B5BDB;      /* now-line */
+            max-width: 1280px; margin: 0 auto; padding: 0 20px 80px;
+        }
+
+        .wk-hero { display: flex; align-items: baseline; justify-content: space-between;
+                   gap: 16px; flex-wrap: wrap; margin: 18px 0 0; }
+        .wk-title { font-size: 1.3rem; font-weight: 700; color: var(--fg); margin: 0; letter-spacing: -0.01em; }
+        .wk-title span { font-weight: 500; color: var(--fg-soft); margin-left: 8px; }
+        .wk-src { font-size: 0.84rem; color: var(--coral); white-space: nowrap; }
+        #wk-note:not(:empty) { font-family: var(--font-mono); font-size: 0.78rem; color: var(--red); margin: 8px 0 0; }
+
+        /* ---- toolbar: month + Today | segmented + range ---- */
+        #wk-bar { display: flex; align-items: center; justify-content: space-between;
+                  gap: 14px; flex-wrap: wrap; margin: 14px 0 12px; }
+        .wk-bar-l, .wk-bar-r { display: flex; align-items: center; gap: 12px; }
+        .wk-month { font-size: 1.35rem; font-weight: 700; color: var(--tx); margin: 0; letter-spacing: -0.01em; }
+        .wk-today-btn { font-size: 0.85rem; font-weight: 500; color: var(--tx); background: var(--s);
+                        border: 1px solid var(--ln); border-radius: 8px; padding: 7px 16px; cursor: pointer; }
+        .wk-today-btn:hover { background: var(--s2); }
+        .wk-seg { display: inline-flex; background: var(--s2); border: 1px solid var(--ln);
+                  border-radius: 9px; padding: 3px; gap: 2px; }
+        .wk-seg button { font-size: 0.85rem; font-weight: 500; color: var(--tx2); background: transparent;
+                         border: none; border-radius: 6px; padding: 6px 18px; cursor: pointer; }
+        .wk-seg button.on { background: var(--s); color: var(--tx); box-shadow: 0 1px 2px rgba(0,0,0,0.07); }
+        .wk-range { font-size: 0.85rem; color: var(--tx); background: var(--s); border: 1px solid var(--ln);
+                    border-radius: 8px; padding: 7px 15px; white-space: nowrap; }
+
+        /* ---- legend ---- */
+        #wk-legend { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 0; }
+        .wk-chip { display: inline-flex; align-items: baseline; gap: 6px; font-size: 0.76rem; color: var(--tx2);
+                   padding: 4px 11px; border-radius: 999px; background: var(--cf); border: 1px solid var(--cb); }
+        .wk-chip b { font-family: var(--font-mono); font-size: 0.71rem; color: var(--ct); }
+
+        /* ---- grid shell ---- */
+        .wk-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch;
+                     background: var(--s); border: 1px solid var(--ln); border-radius: 12px;
+                     scrollbar-width: thin; scrollbar-color: var(--ln) transparent; }
+        /* iOS hides overlay scrollbars, so the week view gives no hint that it
+           scrolls sideways. A styled bar stays drawn. */
+        .wk-scroll::-webkit-scrollbar { height: 9px; }
+        .wk-scroll::-webkit-scrollbar-track { background: transparent; }
+        .wk-scroll::-webkit-scrollbar-thumb { background: var(--ln); border-radius: 99px;
+                                              border: 2px solid var(--s); }
+        .wk-scroll::-webkit-scrollbar-thumb:hover { background: var(--tx2); }
+        /* Day view fits, so it must not show a bar. */
+        .wk-scroll:has(.wk-dayview) { scrollbar-width: none; }
+        .wk-scroll:has(.wk-dayview)::-webkit-scrollbar { height: 0; }
+        #wk-grid { min-width: 760px; }
+        #wk-grid.wk-dayview { min-width: 0; }
+
+        .wk-head { display: grid; position: sticky; top: 0; z-index: 5;
+                   background: var(--s); border-bottom: 1px solid var(--ln); }
+        .wk-arrows { position: sticky; left: 0; z-index: 6; background: var(--s);
+                     display: flex; align-items: center; justify-content: center; gap: 2px;
+                     border-right: 1px solid var(--ln); }
+        .wk-arrows button { font-size: 0.9rem; line-height: 1; color: var(--tx2); background: transparent;
+                            border: none; padding: 10px 6px; cursor: pointer; border-radius: 6px; }
+        .wk-arrows button:hover { background: var(--s2); color: var(--tx); }
+        .wk-head-day { display: flex; align-items: baseline; justify-content: center; gap: 7px;
+                       padding: 14px 0; border-left: 1px solid var(--ln); }
+        .wk-hd-name { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.09em;
+                      text-transform: uppercase; color: var(--tx2); }
+        .wk-hd-num { font-size: 0.84rem; font-weight: 600; color: var(--tx2); }
+        .wk-head-day.on { background: var(--s2); }
+        .wk-head-day.on .wk-hd-name, .wk-head-day.on .wk-hd-num { color: var(--tx); }
+
+        .wk-body { display: grid; position: relative; }
+        /* The week view scrolls sideways on a phone; without this the hour
+           labels scroll off and the grid loses its vertical axis. */
+        .wk-rail { position: sticky; left: 0; z-index: 4;
+                   background: var(--s); border-right: 1px solid var(--ln); }
+        .wk-hour { position: absolute; right: 9px; transform: translateY(-50%);
+                   font-size: 0.76rem; color: var(--tx2); white-space: nowrap; }
+        .wk-col { position: relative; border-left: 1px solid var(--ln); }
+        /* Hour rules span the whole grid, rail included. Drawn once, behind
+           everything, so a time can be followed straight across the week. */
+        .wk-line { position: absolute; left: 62px; right: 0; height: 0;
+                   border-top: 1px solid var(--ln2); z-index: 0; }
+        .wk-col.wk-today { background-color: #FCFCFD; }
+        /* A cancelled day is hatched, the way the reference hatches non-working
+           columns -- visibly "not a normal day" without printing a red word. */
+        .wk-col.wk-isoff { background-image: repeating-linear-gradient(-45deg,
+                      var(--ln2) 0 1px, transparent 1px 7px); }
+        .wk-off { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+        .wk-off span { font-size: 0.74rem; color: var(--tx2); background: var(--s);
+                       border: 1px solid var(--ln); border-radius: 6px; padding: 4px 9px; }
+
+        /* ---- block: solid time strip, lighter body ---- */
+        .wk-block { position: absolute; z-index: 2; overflow: hidden; border-radius: 8px; margin-left: 6px;
+                    background: var(--cf); display: flex; flex-direction: column; }
+        /* The time strip is separated from the body by a dashed rule, as in the
+           reference -- it reads as a torn ticket stub rather than two boxes. */
+        .wk-strip { background: var(--cs); color: var(--ct); font-size: 0.88rem; font-weight: 500;
+                    padding: 4px 12px; flex: 0 0 auto; white-space: nowrap;
+                    border-bottom: 1px dashed var(--cd); }
+        .wk-body-in { padding: 5px 12px 7px; display: flex; flex-direction: column; gap: 3px; min-height: 0; }
+        .wk-name { font-size: 1.06rem; font-weight: 600; color: var(--ct); line-height: 1.25; }
+        .wk-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; }
+        .wk-kind { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;
+                   font-weight: 700; color: var(--ct); }
+        .wk-grp { font-size: 0.68rem; font-weight: 700; color: var(--s);
+                  background: var(--ct); border-radius: 3px; padding: 0 4px; }
+        .wk-place { font-size: 0.87rem; color: var(--tx2); }
+        .wk-place.wk-soft { font-family: var(--font-mono); font-size: 0.69rem; }
+
+        /* ---- collapsed empty stretch ---- */
+        .wk-gap { position: absolute; left: 0; right: 0; z-index: 1;
+                  display: flex; align-items: center; justify-content: center;
+                  background: var(--s2); border-top: 1px solid var(--ln); border-bottom: 1px solid var(--ln); }
+        .wk-gap span { font-size: 0.74rem; color: var(--tx2); letter-spacing: 0.03em; }
+
+        /* ---- now line + rail pill ---- */
+        /* Full-width now rule, faint; the solid segment sits on today only. */
+        .wk-nowfull { position: absolute; left: 62px; right: 0; height: 0;
+                      border-top: 1px solid var(--accent); opacity: 0.35; z-index: 2; }
+        .wk-now { position: absolute; left: 0; right: 0; height: 0;
+                  border-top: 1.5px solid var(--accent); z-index: 3; }
+        .wk-now i { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px;
+                    border-radius: 50%; background: var(--accent); }
+        .wk-nowpill { position: absolute; right: 6px; transform: translateY(-50%); z-index: 6;
+                      font-size: 0.74rem; font-weight: 500; color: var(--tx);
+                      background: var(--s2); border: 1px solid var(--ln);
+                      border-radius: 5px; padding: 2px 6px; white-space: nowrap; }
+
+        /* ---- course palette: fill / strip / ink ---- */
+        .c0 { --cd: #B9C8F4; --cf: #EEF1FD; --cs: #DCE3FB; --cb: #C9D4F7; --ct: #2743A8; }
+        .c1 { --cd: #D2BEF3; --cf: #F3EDFD; --cs: #E7DBFA; --cb: #DCCBF6; --ct: #6B28D9; }
+        .c2 { --cd: #A9DFD5; --cf: #E6F6F3; --cs: #CFEDE7; --cb: #BCE4DC; --ct: #0F766E; }
+        .c3 { --cd: #F0C7A2; --cf: #FDEEE1; --cs: #FADFC8; --cb: #F5D0B0; --ct: #A9541B; }
+        .c4 { --cd: #EFB6C8; --cf: #FCE9EF; --cs: #F8D5E0; --cb: #F2C1D1; --ct: #A81F53; }
+        .c5 { --cd: #C6DC9C; --cf: #EEF5DF; --cs: #DEEBC2; --cb: #CFE1AA; --ct: #4C6B18; }
+        .c6 { --cd: #EBD892; --cf: #FDF6DE; --cs: #F8EBBE; --cb: #F0DF9F; --ct: #86600A; }
+
+        [data-theme="dark"] .wk-wrap {
+            --s: #0F1729; --s2: #172034; --ln: rgba(226,232,245,0.13); --ln2: rgba(226,232,245,0.07);
+            --tx: #E2E8F5; --tx2: #94A3B8; --accent: #60A5FA;
+        }
+        [data-theme="dark"] .wk-col.wk-today { background-color: #131C2E; }
+        [data-theme="dark"] .c0 { --cd: #B9C8F4; --cf: rgba(96,165,250,0.13); --cs: rgba(96,165,250,0.26); --cb: rgba(96,165,250,0.30); --ct: #A9C8FD; }
+        [data-theme="dark"] .c1 { --cd: #D2BEF3; --cf: rgba(167,139,250,0.13); --cs: rgba(167,139,250,0.26); --cb: rgba(167,139,250,0.30); --ct: #CFC0FE; }
+        [data-theme="dark"] .c2 { --cd: #A9DFD5; --cf: rgba(45,212,191,0.12); --cs: rgba(45,212,191,0.24); --cb: rgba(45,212,191,0.28); --ct: #7EEEDC; }
+        [data-theme="dark"] .c3 { --cd: #F0C7A2; --cf: rgba(251,146,60,0.12); --cs: rgba(251,146,60,0.24); --cb: rgba(251,146,60,0.28); --ct: #FDC48D; }
+        [data-theme="dark"] .c4 { --cd: #EFB6C8; --cf: rgba(244,114,182,0.12); --cs: rgba(244,114,182,0.24); --cb: rgba(244,114,182,0.28); --ct: #FAB6D5; }
+        [data-theme="dark"] .c5 { --cd: #C6DC9C; --cf: rgba(163,230,53,0.11); --cs: rgba(163,230,53,0.22); --cb: rgba(163,230,53,0.26); --ct: #CBF178; }
+        [data-theme="dark"] .c6 { --cd: #EBD892; --cf: rgba(250,204,21,0.11); --cs: rgba(250,204,21,0.22); --cb: rgba(250,204,21,0.26); --ct: #FCE79A; }
+
+        /* Hour lines follow PX_PER_MIN, so the phone's taller scale needs its own. */
+        @media (max-width: 760px) {
+            .wk-wrap { padding: 0 12px 60px; }
+            #wk-bar { gap: 10px; }
+            .wk-bar-l, .wk-bar-r { width: 100%; justify-content: space-between; }
+            .wk-month { font-size: 1.15rem; }
+            #wk-grid { min-width: 700px; }
+            #wk-grid.wk-dayview .wk-name { font-size: 1.15rem; }
+            #wk-grid.wk-dayview .wk-strip { font-size: 0.95rem; padding: 4px 13px; }
+            #wk-grid.wk-dayview .wk-place { font-size: 0.94rem; }
+            #wk-grid.wk-dayview .wk-body-in { padding: 5px 13px 7px; }
+            .wk-seg button { padding: 7px 20px; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <img src="assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="assets/circle.webp" class="circle-img" alt="">
+                </div>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">timetable · sem 5</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="./" class="pill">
+                    <span class="pill-name">← Home</span>
+                </a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="wk-wrap">
+            <section class="wk-hero">
+                <h1 class="wk-title">Timetable <span>Year 3 CSE</span></h1>
+                <a class="wk-src" href="data/timetables/2026-08-27-year3-sem5-btech-cse.pdf"
+                   target="_blank" rel="noopener">source PDF ↗</a>
+            </section>
+            <p id="wk-note"></p>
+
+            <div id="wk-bar"></div>
+
+            <div class="wk-scroll">
+                <div id="wk-grid"></div>
+            </div>
+
+            <div id="wk-legend"></div>
+        </div>
+    </main>
+
+    <script src="js/timetable.js"></script>
+    <script src="js/week.js"></script>
+</body>
+
+</html>
