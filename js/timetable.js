@@ -151,18 +151,19 @@ const ROOMS = {
     "M4-0-011": { bldg: "M4", floor: "G", no: "3", ok: true },
     "M3-0-022": { bldg: "M3", floor: "G", no: "02", ok: true, lab: true },
     "M3-0-004": { bldg: "M3", floor: "G", no: "03", ok: true, lab: true },
-    // The 27 August sheet RENAMED this room: it was "M4-Classroom 5" on
-    // the 23 August sheet and is "M4-Classroom 3" on the 27th. The room
-    // CODE did not change, which is why a diff of courses, times and codes
-    // showed this revision as a no-op and shipped a stale name to the page
-    // for the Wednesday ACOL351 tutorial. check_timetable.py now reads
-    // these labels off the PDF too, so a rename cannot pass silently again.
+    // M4-0-019 is the one room the paperwork cannot agree on: the Y3-CSE
+    // sheet calls it Classroom 3 (Classroom 5 on the 23 Aug issue), the Y2
+    // MTech-ETS sheet Classroom 4, and the M4 fire-evacuation board
+    // Classroom 5. The code never changed, so a diff of courses, times and
+    // codes read the 27 Aug revision as a no-op and shipped the wrong name.
     //
-    // Note this leaves M4-0-011 and M4-0-019 BOTH printing "Classroom 3"
-    // on the official sheet. That is what it says; whereIs() disambiguates
-    // rather than guessing which one is a typo.
-    "M4-0-019": { bldg: "M4", floor: "G", no: "3", ok: true },
-    "M4.0.019": { bldg: "M4", floor: "G", no: "3", ok: true },  // spelling used on the earlier sheet
+    // WE PRINT WHAT THE DOOR SAYS. The physical sign is Classroom 5, and a
+    // room plate exists to get Evan to the right door, not to match a PDF.
+    // check_timetable.py still reads every label off the sheet; this one
+    // room is a declared override there (DOOR_SIGN) so the disagreement
+    // stays visible instead of being quietly absorbed.
+    "M4-0-019": { bldg: "M4", floor: "G", no: "5", ok: true },
+    "M4.0.019": { bldg: "M4", floor: "G", no: "5", ok: true },  // spelling used on the earlier sheet
 };
 
 // Two room codes can carry the same printed name (see M4-0-011 vs

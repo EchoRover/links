@@ -38,7 +38,8 @@ const CT = {
   "M4-0-011": "Classroom 3",
   "M4-0-017": "Classroom 4",
   "M4-0-018": "Computer Lab",
-  "M4-0-019": "Classroom 3",
+  // Door sign wins: sheets say 3 / 4 / 5, the physical sign says 5.
+  "M4-0-019": "Classroom 5",
   "M4-0-021": "Classroom 6",
   "M4-1-011": "Classroom 8",
   "M4-1-017": "Classroom 7"

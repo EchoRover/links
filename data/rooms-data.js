@@ -39,7 +39,8 @@ const ROOM_NAMES = {
     // the superseded 23 Aug sheet said "Classroom 5". Rule applied: the
     // course's OWN sheet wins, so Y3-CSE's name is used here. The room CODE
     // is what to trust and what the UI shows when a name is ambiguous.
-    "M4-0-019": "Classroom 3",
+    // Door sign wins: sheets say 3 / 4 / 5, the physical sign says 5.
+    "M4-0-019": "Classroom 5",
     "M4-0-021": "Classroom 6",
     "M4-1-011": "Classroom 8",
     "M4-1-017": "Classroom 7",

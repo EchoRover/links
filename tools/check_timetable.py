@@ -57,6 +57,17 @@ MIN_PER_HOUR = 50
 # rest of the project hours are unscheduled self-directed work.
 PARTIALLY_SCHEDULED = {"ACOD310"}
 
+# Rooms where we deliberately print something other than what the sheet
+# says, because the sheets contradict each other and the door sign is the
+# tiebreak (a room plate exists to get you to the right door). The value is
+# (what the sheet must still print, what we print). If the sheet ever moves
+# off the left-hand value the override is stale and this check fails, so the
+# disagreement stays visible instead of being quietly absorbed.
+#   M4-0-019: Y3-CSE says Classroom 3 (Classroom 5 on the 23 Aug issue),
+#   Y2 MTech-ETS says Classroom 4, the M4 evacuation board and the physical
+#   sign say Classroom 5.
+DOOR_SIGN = {"M4-0-019": ("M4-Classroom 3", "M4-Classroom 5")}
+
 
 def parse_week(js_text):
     """Pull WEEK out of timetable.js. Returns [(course, kind, minutes, group)]."""
@@ -285,11 +296,25 @@ def main():
                 )
 
     # --- room NAMES: a rename does not touch the room code ---
+    def same(a, b):
+        return a.replace("-", " ").split() == b.replace("-", " ").split()
+
     for code, printed in sorted(sheet_labels.items()):
         ours = rooms.get(code)
         if ours is None:
             failures.append(f"     {code}: on the sheet but missing from ROOMS")
-        elif ours.replace("-", " ").split() != printed.replace("-", " ").split():
+        elif code in DOOR_SIGN:
+            want_sheet, want_ours = DOOR_SIGN[code]
+            if not same(printed, want_sheet):
+                failures.append(
+                    f"     {code}: DOOR_SIGN override is stale - it expects the sheet to "
+                    f"print '{want_sheet}' but the sheet now prints '{printed}'"
+                )
+            elif not same(ours, want_ours):
+                failures.append(
+                    f"     {code}: DOOR_SIGN says print '{want_ours}', ROOMS says '{ours}'"
+                )
+        elif not same(ours, printed):
             failures.append(f"     {code}: sheet prints '{printed}', ROOMS says '{ours}'")
 
     if failures:
