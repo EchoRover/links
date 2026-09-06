@@ -12,17 +12,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        .rooms-wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; }
+        .rooms-wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px 48px; }
 
-        .rooms-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 34px 0 8px; flex-wrap: wrap; }
-        .rooms-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.7rem, 4vw, 2.6rem); color: var(--fg); margin: 0; }
+        .rooms-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 22px 0 6px; flex-wrap: wrap; }
+        .rooms-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--fg); margin: 0; }
         .rooms-title em { color: var(--coral); }
-        .rooms-sub { font-size: 0.86rem; color: var(--fg-soft); max-width: 560px; line-height: 1.45; margin: 6px 0 0; }
+        .rooms-sub { font-size: 0.8rem; color: var(--fg-soft); max-width: 620px; line-height: 1.4; margin: 4px 0 0; }
         .rooms-now { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); white-space: nowrap; }
         .rooms-now .live-dot2 { width: 7px; height: 7px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 8px var(--coral-glow); }
 
         /* Day switcher */
-        .rooms-days { display: flex; align-items: center; gap: 10px; margin: 18px 0 26px; flex-wrap: wrap; }
+        .rooms-days { display: flex; align-items: center; gap: 10px; margin: 12px 0 14px; flex-wrap: wrap; }
         .rooms-days-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); }
         .rooms-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; background: var(--bg-card); }
         .rooms-seg button { font-family: var(--font-mono); font-size: 0.78rem; padding: 7px 14px; border: none; background: transparent; color: var(--fg-soft); cursor: pointer; }
@@ -30,23 +30,23 @@
         .rooms-offnote { font-family: var(--font-mono); font-size: 0.74rem; color: var(--red); }
 
         /* Building sections */
-        .bldg-title { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg-faint); margin: 30px 0 12px; border-bottom: 1px solid var(--rule-faint); padding-bottom: 6px; }
-        .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+        .bldg-title { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg-faint); margin: 16px 0 8px; border-bottom: 1px solid var(--rule-faint); padding-bottom: 4px; }
+        .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 9px; }
 
         /* Room card */
-        .room-card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; cursor: pointer; box-shadow: var(--shadow-sm); transition: border-color 0.15s; }
+        .room-card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 10px; padding: 9px 11px; cursor: pointer; box-shadow: var(--shadow-sm); transition: border-color 0.15s; }
         .room-card:hover { border-color: var(--coral); }
         .room-card.busy { border-left: 3px solid var(--coral); }
-        .room-head { display: flex; align-items: baseline; gap: 10px; }
-        .room-name { font-family: var(--font-serif); font-style: italic; font-size: 1.15rem; color: var(--fg); }
+        .room-head { display: flex; align-items: baseline; gap: 7px; }
+        .room-name { font-family: var(--font-serif); font-style: italic; font-size: 1rem; color: var(--fg); }
         .room-code { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); margin-left: auto; }
         .room-floor { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); }
 
-        .room-status { margin-top: 10px; font-size: 0.85rem; line-height: 1.45; }
+        .room-status { margin-top: 5px; font-size: 0.8rem; line-height: 1.35; }
         .st-free { color: var(--cyan); font-family: var(--font-mono); font-size: 0.8rem; }
         .st-busy-course { font-weight: 700; color: var(--fg); }
         .st-busy-title { color: var(--fg-soft); }
-        .st-when { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-faint); display: block; margin-top: 3px; }
+        .st-when { font-family: var(--font-mono); font-size: 0.72rem; color: var(--fg-faint); display: block; margin-top: 2px; }
         .st-when b { color: var(--coral); font-weight: 600; }
 
         .prog-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.66rem; padding: 1px 7px; border-radius: 999px; background: var(--coral-soft); color: var(--coral); margin-right: 4px; white-space: nowrap; }
@@ -66,11 +66,72 @@
         .slot-progs { margin-top: 2px; }
         .slot-empty { font-family: var(--font-mono); font-size: 0.76rem; color: var(--fg-faint); padding: 6px 0; }
 
-        .rooms-foot { margin-top: 40px; font-size: 0.74rem; font-family: var(--font-mono); color: var(--fg-faint); line-height: 1.6; max-width: 720px; }
+        .rooms-foot { margin-top: 24px; font-size: 0.72rem; font-family: var(--font-mono); color: var(--fg-faint); line-height: 1.55; max-width: 720px; }
 
+        /* ---------- floor view ---------- */
+        /* One drawing per LEVEL holding BOTH buildings, so it is capped at a
+           readable width rather than stretched across a wide laptop. */
+        .floor-body { display: block; }
+        .fp-floor { margin-bottom: 10px; }
+        .fp-svg { max-width: 620px; margin: 0 auto; }
+        /* display:grid/flex beats the [hidden] attribute's display:none, so
+           the hidden view would stay on screen. Say it explicitly. */
+        .floor-body[hidden], .fp-modal[hidden] { display: none; }
+        .fp-floor { min-width: 0; }
+        .fp-count { float: right; letter-spacing: 0; text-transform: none; color: var(--cyan); }
+
+        .fp-svg { width: 100%; height: auto; display: block; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 10px; }
+        .fp-shell { fill: var(--bg); stroke: var(--rule); stroke-width: 0.28; }
+        .fp-corridor { fill: var(--bg-card); stroke: none; }
+        /* Everything with no timetable: drawn so the floor reads as a floor,
+           muted so it never competes with a room you can actually book. */
+        .fp-other { fill: var(--rule-faint); stroke: var(--rule); stroke-width: 0.1; opacity: 0.55; }
+
+        .fp-room { cursor: pointer; }
+        /* free, but with no schedule behind it - nothing to open */
+        .fp-untimed { cursor: default; }
+        .fp-untimed polygon { opacity: 0.62; }
+        .fp-room polygon { stroke: var(--bg-card); stroke-width: 0.22; transition: opacity 0.15s; }
+        .fp-room text { font-family: var(--font-mono); font-size: 1.35px; font-weight: 600; text-anchor: middle; dominant-baseline: middle; fill: var(--bg-card); pointer-events: none; }
+        /* named but not timetabled: there to orient you, not to be read first */
+        .fp-plain-label { font-family: var(--font-mono); font-size: 1.15px; text-anchor: middle; dominant-baseline: middle; fill: var(--fg-faint); pointer-events: none; }
+        /* which building you are looking at, parked above its own shell */
+        .fp-bldg-tag { font-family: var(--font-mono); font-size: 1.8px; font-weight: 700; letter-spacing: 0.06px; fill: var(--fg-soft); pointer-events: none; }
+        .fp-free polygon { fill: var(--cyan); }
+        .fp-busy polygon { fill: var(--coral); }
+        .fp-room:hover polygon, .fp-room:focus polygon { opacity: 0.75; }
+        .fp-room:focus { outline: none; }
+        .fp-room:focus polygon { stroke: var(--fg); stroke-width: 0.35; }
+
+        /* ---------- room popup ---------- */
+        .fp-modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(0, 0, 0, 0.45); }
+        body.fp-locked { overflow: hidden; }
+        .fp-sheet { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 12px; box-shadow: var(--shadow-lg, 0 18px 50px rgba(0, 0, 0, 0.35)); padding: 14px 16px; width: min(520px, 100%); max-height: 80vh; overflow-y: auto; }
+        .fp-sheet-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+        .fp-sheet-head .room-code { margin-left: 8px; }
+        .fp-close { background: none; border: none; color: var(--fg-soft); font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 2px; }
+        .fp-close:hover { color: var(--coral); }
+        .fp-sheet-day { margin-top: 10px; border-top: 1px dashed var(--rule); padding-top: 8px; }
+        .fp-day-label { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-faint); }
+
+        /* On a phone it becomes a bottom sheet - a centred dialog puts the
+           content under your own hand. */
         @media (max-width: 560px) {
-            .rooms-grid { grid-template-columns: 1fr; }
-            .rooms-hero { margin-top: 22px; }
+            .fp-modal { align-items: flex-end; padding: 0; }
+            .fp-sheet { border-radius: 14px 14px 0 0; max-height: 78vh; width: 100%; }
+        }
+
+        /* A phone was showing one full-width card per room - twenty of them,
+           stacked, so the last building was a long way down. Two columns of
+           short cards puts a whole building on one screen. An OPEN card breaks
+           out to full width, because the day timeline needs the room. */
+        @media (max-width: 560px) {
+            .rooms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+            .rooms-grid .room-card.open { grid-column: 1 / -1; }
+            .rooms-hero { margin-top: 16px; }
+            .room-name { font-size: 0.92rem; }
+            .room-head { flex-wrap: wrap; gap: 5px; }
+            .room-code { margin-left: 0; }
         }
     </style>
 </head>
@@ -113,10 +174,16 @@
             <div class="rooms-days">
                 <span class="rooms-days-label">Day</span>
                 <div class="rooms-seg" id="rooms-seg"></div>
+                <span class="rooms-days-label rooms-view-label">View</span>
+                <div class="rooms-seg" id="rooms-view-seg"></div>
                 <span class="rooms-offnote" id="rooms-offnote"></span>
             </div>
 
             <div id="rooms-body"></div>
+
+            <!-- Floor plans. Same occupancy, seen from above; the polygons are
+                 the ones the 3D viewer uses, so there is one model, not two. -->
+            <div id="floor-body" class="floor-body" hidden></div>
 
             <p class="rooms-foot">
                 Room names printed on the sheets disagree across PDFs, so the room codes are the
@@ -127,8 +194,12 @@
         </div>
     </main>
 
+    <div id="fp-modal" class="fp-modal" hidden></div>
+
     <script src="js/timetable.js"></script>
     <script src="data/rooms-data.js"></script>
+    <script src="data/m4-data.js"></script>
+    <script src="data/m3-data.js"></script>
     <script src="js/rooms.js"></script>
 </body>
 
