@@ -118,11 +118,27 @@ const POSTER_DIRS = {
                         ],
                     },
                     {
+                        // From the transport office's own workbook, "Released
+                        // on 17 Aug 2026" - the same release the poster carries.
+                        // It adds Coaster 5 to the night shift, so the rota is a
+                        // 3-cycle now, but NOT a clean one: trip 7 is printed
+                        // "Not Available", so the list is written out per trip
+                        // rather than generated. 20:50 here is not a typo for
+                        // 20:40 - the sheet prints 20:50 in this direction and
+                        // 20:40 in the other. Every time and vehicle below was
+                        // machine-compared against that workbook, not eyeballed.
                         title: "Night shift", tag: "night shift", tagTone: "night", dashed: true,
-                        rota: ["VAN 1", "VAN 2"],
+                        rota: [
+                            "VAN 1", "Coaster 5", "VAN 2",
+                            "VAN 1", "Coaster 5", "VAN 2",
+                            "not available",
+                            "Coaster 5", "VAN 2",
+                            "VAN 1", "Coaster 5", "VAN 2",
+                            "VAN 1", "Coaster 5",
+                        ],
                         times: [
                             "19:00", "19:20", "19:40",
-                            "20:00", "20:20", "20:40",
+                            "20:00", "20:20", "20:50",
                             "21:00", "21:20", "21:40",
                             "22:00", "22:20", "22:40",
                             "23:00", "23:20",
@@ -152,7 +168,24 @@ const POSTER_DIRS = {
                     },
                     {
                         title: "Night shift", tag: "night shift", tagTone: "night", dashed: true,
-                        rota: ["VAN 2", "VAN 1"],
+                        // NOT SHOWN, PENDING CONFIRMATION: the 17 Aug sheet
+                        // prints "Campus -> KCA 3 -> KCA 1 & 2" for every night
+                        // run in this direction - KCA 3 FIRST after dark, last
+                        // during the day. Evan is checking whether the vans
+                        // actually run that way before the page says so, since
+                        // a printed order nobody has ridden is not evidence.
+                        // To switch it on when he confirms, uncomment:
+                        //     stops: ["Campus", "KCA 3", "KCA 1&2"],
+                        // renderTable already prefers a block's stops over the
+                        // direction's, so that one line is the whole change.
+                        rota: [
+                            "Coaster 5", "VAN 2", "VAN 1",
+                            "Coaster 5", "VAN 2", "VAN 1",
+                            "Coaster 5", "VAN 2",
+                            "not available",
+                            "Coaster 5", "VAN 2", "VAN 1",
+                            "Coaster 5", "VAN 2", "VAN 1", "Coaster 5",
+                        ],
                         times: [
                             "19:00", "19:20", "19:40",
                             "20:00", "20:20", "20:40",
@@ -278,16 +311,24 @@ function trips(sched, dir) {
         if (sched.numbering !== "continuous") n = 0;
         const rows = b.times.map((t, i) => {
             const mins = toMinutes(t);
+            const veh = b.rota ? b.rota[i % b.rota.length] : null;
+            // The sheet prints "Not Available" against a trip with no vehicle
+            // assigned to it. That is a trip that does not run, not a trip
+            // with a strangely named van, and showing it as a departure is how
+            // someone ends up waiting at 9pm for nothing.
+            const unstaffed = /^not available$/i.test(String(veh || ""));
+            // half-open [from, to): the run AT the end of the break departs
+            const inGap = !!gap && mins >= gapFrom && mins < gapTo;
             return {
                 no: ++n,
                 time: t,
                 mins,
-                vehicle: b.rota ? b.rota[i % b.rota.length] : null,
+                vehicle: unstaffed ? null : veh,
                 tag: b.tag || null,
                 tagTone: b.tagTone || "day",
                 assumed: !!b.assumed,
-                // half-open [from, to): the run AT the end of the break departs
-                cancelled: !!gap && mins >= gapFrom && mins < gapTo,
+                cancelled: unstaffed || inGap,
+                why: unstaffed ? "no vehicle assigned" : (inGap ? gap.reason : null),
             };
         });
         return { ...b, rows };
@@ -342,10 +383,16 @@ function renderNext(dirId, now) {
     const rest = upcoming.slice(1);
 
     // If the wait is long because runs were cancelled, SAY SO. A silent
-    // "45 min" during the prayer break reads as the page being broken.
+    // "45 min" during the prayer break reads as the page being broken, and a
+    // silent 40-minute hole at 9pm reads the same way to someone who can see
+    // 9:00 PM sitting right there in the table.
     const gap = sched.noService;
-    const skipped = gap && !tomorrow &&
-        data.every.some((t) => t.cancelled && t.mins >= now && t.mins < head.mins);
+    const skipped = tomorrow ? []
+        : data.every.filter((t) => t.cancelled && t.mins >= now && t.mins < head.mins);
+    const gapNote = !skipped.length ? ""
+        : gap && skipped.some((t) => t.why === gap.reason)
+            ? `no trips ${to12h(gap.from)} – ${to12h(gap.to)} · ${gap.reason}`
+            : `${skipped.map((t) => to12h(t.time)).join(", ")} cancelled · ${skipped[0].why}`;
 
     return `
     <article class="next-card" data-dir="${dir.id}">
@@ -361,7 +408,7 @@ function renderNext(dirId, now) {
             ${head.tag ? `<span class="tag tag-${head.tagTone}">${head.tag}</span>` : ""}
             ${head.vehicle ? `<span class="next-veh">${head.vehicle}</span>` : ""}
         </div>
-        ${skipped ? `<p class="next-gap">no trips ${to12h(gap.from)} – ${to12h(gap.to)} · ${gap.reason}</p>` : ""}
+        ${gapNote ? `<p class="next-gap">${gapNote}</p>` : ""}
         ${dir.id === "toCampus" ? `<p class="next-kca3">
             <span class="kca3-stop">KCA 3</span>
             <span class="kca3-win">${to12h(addMins(head.time, KCA3_LEG.lo))} – ${to12h(addMins(head.time, KCA3_LEG.hi))}</span>
@@ -389,6 +436,7 @@ function renderTable(dir, block, now, showVeh, nextMins) {
     return `
     <div class="sched-block${block.dashed ? " sched-dashed" : ""}">
         <h3 class="sched-title">${block.title}</h3>
+        ${block.stops ? `<p class="sched-route sched-route-block">${block.stops.join("  →  ")}</p>` : ""}
         <div class="sched-scroll">
             <table class="sched">
                 <thead>
@@ -409,7 +457,7 @@ function renderTable(dir, block, now, showVeh, nextMins) {
                         <tr class="${cls}"${isNext ? ' id="next-' + dir.id + '"' : ""}>
                             <td class="c-no">${t.no}</td>
                             <td class="c-time">${to12h(t.time)}</td>
-                            <td class="c-route">${dir.stops.join(" → ")}</td>
+                            <td class="c-route">${(block.stops || dir.stops).join(" → ")}</td>
                             ${showVeh ? `<td class="c-veh">${t.cancelled ? "no trip" : (t.vehicle || "")}</td>` : ""}
                         </tr>`;
                     }).join("")}
