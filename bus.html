@@ -67,30 +67,6 @@
             color: var(--fg);
         }
 
-        /* the dot pulses so it reads as live, not as a frozen snapshot */
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--red-bright);
-            align-self: center;
-            animation: livePulse 2.4s ease-in-out infinite;
-        }
-
-        @keyframes livePulse {
-
-            0%,
-            100% {
-                opacity: 1;
-                box-shadow: 0 0 0 0 var(--red-glow);
-            }
-
-            50% {
-                opacity: 0.55;
-                box-shadow: 0 0 0 4px transparent;
-            }
-        }
-
         /* ---------- route strip ---------- */
         /* ---------- next-departure cards ---------- */
         .next-wrap {
@@ -305,6 +281,29 @@
             border-style: solid;
             border-color: var(--coral);
             color: var(--coral);
+        }
+
+        /* the same control as "jump to next", worn by a link */
+        a.link-btn {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        /* The transport office's own group sits directly above the clock: a
+           cancellation is announced there before it can reach this page. The
+           URL is the QR printed on the 17 Aug workbook, decoded and then
+           checked live (200, "IITD-AD Students Transportation Group"). */
+        .bus-aside {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.55rem;
+            /* On a phone the hero wraps and this column drops onto its own
+               line, where space-between has nothing to push against and it
+               would sit left under the title. margin-left:auto keeps the
+               button and the clock on the right edge at every width. */
+            margin-left: auto;
         }
 
         /* ---------- schedule tables ---------- */
@@ -716,7 +715,6 @@
                 scroll-behavior: auto;
             }
 
-            .live-dot,
             .flash {
                 animation: none;
             }
@@ -750,9 +748,12 @@
                 <h1 class="bus-title">Shuttle <em>Schedule</em></h1>
                 <p class="bus-sub">One clockwise loop, both directions.</p>
             </div>
-            <div class="bus-now">
-                <span class="live-dot" aria-hidden="true"></span>
-                <span>now</span><span id="clock">—</span>
+            <div class="bus-aside">
+                <a class="link-btn" href="https://chat.whatsapp.com/KuYPOTo3dnT6Y0JgTs2Y7G"
+                   target="_blank" rel="noopener">Transport WhatsApp group</a>
+                <div class="bus-now">
+                    <span>now</span><span id="clock">—</span>
+                </div>
             </div>
         </section>
 
