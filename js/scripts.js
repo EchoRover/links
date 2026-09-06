@@ -401,8 +401,63 @@ addUpdate("quizzes", "ACOL216: Quiz 3 (Pipelining), 15/05/2026", "2026-5-15");
 // SEM 5 (Year 3 Sem 1) — real entries go here as they drop
 // ============================================================
 
+// The two C lab exams. No time or room here on purpose: the notice said
+// "regular lab timings and venue", and both dates land on an ACOL331 lab
+// block anyway (Thu 10 Sep 15:30-17:20, Wed 16 Sep 08:00-09:50, M3-0-004),
+// so the class card and the week grid already answer that.
+addUpdate("quizzes", "ACOL331: OS C lab exam 1, 10/09/2026", "2026-09-10");
+addUpdate("quizzes", "ACOL331: OS C lab exam 2, 16/09/2026", "2026-09-16");
+
+addUpdate("quizzes", "AHUL261: Psychology quiz, 08/09/2026", "2026-09-08");
+
+// ACOL351 runs a quiz in EVERY tutorial (Wed 10:00-10:50, M4-0-019).
+// No list of dates was ever published, only the pattern, so posting a
+// whole semester of guesses would be inventing dates. Post exactly one:
+// the next tutorial. It stays up through that Wednesday and the day
+// after, the following one takes its place.
+//
+// If the prof calls the series off ("no tut quiz for a few weeks"),
+// delete this call - nothing else needs touching.
+function addNextAlgoTutQuiz() {
+  // timetable.js owns the term bounds and the no-class days, but it
+  // loads after this file, so read them defensively and fall back to
+  // the printed dates rather than crashing the whole updates panel.
+  let noClass = {};
+  let termEnd = "2026-12-16";
+  try {
+    noClass = NO_CLASS;
+    termEnd = TERM.end;
+  } catch (e) {
+    /* timetable.js not loaded on this page */
+  }
+
+  const [ey, em, ed] = termEnd.split("-").map(Number);
+  const last = new Date(ey, em - 1, ed);
+
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + ((3 - d.getDay() + 7) % 7)); // next Wednesday (today if it is one)
+
+  // Walk forward over holidays and the mid-sem block; give up rather
+  // than loop forever if the whole rest of term is cancelled.
+  for (let i = 0; i < 10 && d <= last; i++) {
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (!noClass[key]) {
+      const dmy = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+      addUpdate(
+        "quizzes",
+        `ACOL351: Algorithm tutorial quiz, ${dmy}`,
+        key,
+      );
+      return;
+    }
+    d.setDate(d.getDate() + 7);
+  }
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   renderLinks1("#course-grid", linksData.courses);
+  addNextAlgoTutQuiz();
   renderUpdates();
 });
 
