@@ -269,7 +269,7 @@ function renderWeek() {
                     <span class="wk-name">${c ? c.name : x.code}</span>
                     <span class="wk-meta">
                         <span class="wk-place${p.soft ? " wk-soft" : ""}">${p.name}</span>
-                        <b class="wk-kind">${KIND_WORD[x.kind] || "Lecture"}</b>${x.grp ? `<b class="wk-grp">G${x.grp}</b>` : ""}
+                        <span><b class="wk-kind">${KIND_WORD[x.kind] || "Lecture"}</b>${x.grp ? `<b class="wk-grp">G${x.grp}</b>` : ""}</span>
                     </span>
                 </div>
             </div>`;
