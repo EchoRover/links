@@ -362,13 +362,27 @@ function untilLabel(mins, now) {
 // The countdown card always speaks for TODAY, whatever timetable you are
 // browsing below. A countdown that belonged to a different day would be
 // worse than no countdown at all. If today is finished it rolls over to
+// A trip stays "active" for next-card and timetable highlighting as long as it has
+// not finished its leg. For outbound runs to Campus, the KCA 3 leg finishes
+// KCA3_LEG.hi (7) minutes after leaving KCA 1&2. For other runs, keep a 2-minute
+// window so a run departing at :00 is not dropped at :00:01 while boarding.
+function activeTrip(t, now, dirId) {
+    if (dirId === "toCampus") {
+        return t.mins + KCA3_LEG.hi >= now;
+    }
+    return t.mins + 2 >= now;
+}
+
+// The countdown card always speaks for TODAY, whatever timetable you are
+// browsing below. A countdown that belonged to a different day would be
+// worse than no countdown at all. If today is finished it rolls over to
 // tomorrow's FIRST run — and tomorrow may be the other service entirely
 // (Sunday night -> Monday), so the schedule is re-picked, not reused.
 function renderNext(dirId, now) {
     let sched = SCHEDULES[todayKey()];
     let dir = sched.dirs[dirId];
     let data = trips(sched, dir);
-    let upcoming = data.all.filter((t) => t.mins >= now).slice(0, 3);
+    let upcoming = data.all.filter((t) => activeTrip(t, now, dirId)).slice(0, 3);
     let tomorrow = false;
 
     if (!upcoming.length) {
@@ -381,6 +395,7 @@ function renderNext(dirId, now) {
 
     const head = upcoming[0];
     const rest = upcoming.slice(1);
+    const isEnRoute = !tomorrow && head.mins < now;
 
     // If the wait is long because runs were cancelled, SAY SO. A silent
     // "45 min" during the prayer break reads as the page being broken, and a
@@ -394,14 +409,17 @@ function renderNext(dirId, now) {
             ? `no trips ${to12h(gap.from)} – ${to12h(gap.to)} · ${gap.reason}`
             : `${skipped.map((t) => to12h(t.time)).join(", ")} cancelled · ${skipped[0].why}`;
 
+    const etaText = tomorrow ? "tomorrow" : (isEnRoute ? "en route" : untilLabel(head.mins, now));
+    const fromText = isEnRoute ? `left ${dir.from} at ${to12h(head.time)}` : `from ${dir.from} · ${sched.label}`;
+
     return `
     <article class="next-card" data-dir="${dir.id}">
         <header class="next-head">
             <span class="next-dir">${dir.label}</span>
-            <span class="next-from">from ${dir.from} · ${sched.label}</span>
+            <span class="next-from">${fromText}</span>
         </header>
         <div class="next-lead">
-            <span class="next-eta">${tomorrow ? "tomorrow" : untilLabel(head.mins, now)}</span>
+            <span class="next-eta">${etaText}</span>
             <span class="next-time">${to12h(head.time)}</span>
         </div>
         <div class="next-meta">
@@ -449,7 +467,7 @@ function renderTable(dir, block, now, showVeh, nextMins) {
                 </thead>
                 <tbody>
                     ${block.rows.map((t) => {
-                        const past = nextMins !== null && t.mins < now && !t.cancelled;
+                        const past = nextMins !== null && t.mins < now && t.mins !== nextMins && !t.cancelled;
                         const isNext = !t.cancelled && t.mins === nextMins;
                         const cls = [past ? "past" : "", isNext ? "next" : "",
                                      t.cancelled ? "cancelled" : ""].filter(Boolean).join(" ");
@@ -480,7 +498,7 @@ function nextKey(now) {
     const sched = SCHEDULES[todayKey()];
     return ["toCampus", "toDorms"]
         .map((id) => {
-            const up = trips(sched, sched.dirs[id]).all.find((t) => t.mins >= now);
+            const up = trips(sched, sched.dirs[id]).all.find((t) => activeTrip(t, now, id));
             return up ? up.time : "end";
         })
         .join("|");
@@ -501,7 +519,7 @@ function renderTables(now) {
             const dir = sched.dirs[id];
             const data = trips(sched, dir);
             const showVeh = hasVehicles(dir);
-            const up = markNext ? data.all.find((t) => t.mins >= now) : null;
+            const up = markNext ? data.all.find((t) => activeTrip(t, now, id)) : null;
             const nextMins = up ? up.mins : null;
             return `
             <section class="sched-col" data-dir="${dir.id}">
