@@ -266,10 +266,10 @@ function renderWeek() {
                         left:${x.col * w}%;width:calc(${w}% - 12px)">
                 <div class="wk-strip">${timeStr}</div>
                 <div class="wk-body-in">
-                    <span class="wk-name">${c ? c.name : x.code}</span>
+                    <span class="wk-name">${c ? c.name : x.code}${x.grp ? `<b class="wk-grp">G${x.grp}</b>` : ""}</span>
                     <span class="wk-meta">
                         <span class="wk-place${p.soft ? " wk-soft" : ""}">${p.name}</span>
-                        <span><b class="wk-kind">${KIND_WORD[x.kind] || "Lecture"}</b>${x.grp ? `<b class="wk-grp">G${x.grp}</b>` : ""}</span>
+                        <b class="wk-kind">${KIND_WORD[x.kind] || "Lecture"}</b>
                     </span>
                 </div>
             </div>`;
