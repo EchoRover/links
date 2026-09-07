@@ -49,7 +49,9 @@ ACOL333's two practical hours.
 | File | Revision | Notes |
 |---|---|---|
 | `2026-08-23-year3-sem5-btech-cse.pdf` | 23 Aug | superseded, kept for diffing |
-| `2026-08-27-*.pdf` (11 sheets) | 27 Aug | current; mailed 29 Aug |
+| `2026-08-27-year3-sem5-btech-cse.pdf` | 27 Aug | superseded by 7 Sep sheet |
+| `2026-08-27-*.pdf` (other 10 sheets) | 27 Aug | current for non-CSE; mailed 29 Aug |
+| `2026-09-07-year3-sem5-btech-cse.pdf` | 7 Sep | current for Year 3 CSE; mailed 7 Sep |
 
 The two MTECH-ETS sheets print no footer stamp at all; they are grouped
 with the 27 August set because they arrived in that mail.

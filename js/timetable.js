@@ -12,6 +12,13 @@
 // reconciles every block below against the L-T-P-C table the sheet prints,
 // which is the half of the document this file does NOT transcribe.
 //
+// REVISION 4: the 7 September 2026 reissue (stamped "7th September 2026 - 5:30pm" in footer).
+//   - AHUL261 G1 tutorial moved from Wed 15:30-16:20 to Mon 09:00-09:50 in M4-1-017.
+//   - AHUL256 G1 tutorial moved from Wed 17:00-17:50 to Tue 17:00-17:50 in M4-1-017.
+//   - ACOL331 lectures on Tue & Thu moved from 10:00-10:50 to 09:00-09:50 in M4-1-017.
+//   - ACOL351 lecture on Fri 09:00-09:50 moved to Wed 10:00-10:50 in M4-1-017.
+//   - ACOL351 tutorial moved from Wed 10:00-10:50 to Wed 15:30-16:20 in M4-0-019.
+//
 // REVISION 3: the 27 August 2026 reissue (stamped "27th August 2026 -
 // 5:30pm" in the sheet's own footer).
 //   - All computer labs (ACOL331, ACOL333) moved from M3-0-022 to M3-0-004 (Computer Lab 03).
@@ -38,9 +45,8 @@
 //     a footnote instead of holding named slots.
 //
 // Both groups are shown together. Only four entries in the week are
-// group-specific (all HUL tutorials — one Tuesday, three Wednesday);
+// group-specific (all HUL tutorials — one Monday, two Tuesday, one Wednesday);
 // those carry a G1/G2 badge and everything else applies to everyone.
-// The launch version of this comment said three and was miscounting.
 // ============================================================
 
 const COURSES = {
@@ -57,11 +63,12 @@ const COURSES = {
 //   kind:  "" lecture · "tut" tutorial · "lab" lab · "proj" project hold
 //   group: 0 everyone · 1 group 1 only · 2 group 2 only
 //
-// Times are the ones printed inside each block on the 23 Aug grid, not
+// Times are the ones printed inside each block on the grid, not
 // the column headings above it. Those are different numbers and the
 // countdown is only honest if it uses the printed ones.
 const WEEK = {
     1: [ // Monday
+        ["09:00", "09:50", "AHUL261", "M4-1-017", "tut", 1],
         ["10:00", "10:50", "ACOL331", "M4-1-017", "", 0],
         ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
         ["14:00", "15:20", "AHUL256", "M4-0-011", "", 0],
@@ -69,7 +76,7 @@ const WEEK = {
     ],
     2: [ // Tuesday
         ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],
-        ["10:00", "10:50", "ACOL331", "M4-1-017", "", 0],
+        ["09:00", "09:50", "ACOL331", "M4-1-017", "", 0],
         ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
         ["14:00", "15:20", "AHUL261", "M4-0-011", "", 0],
         ["15:30", "16:20", "AHUL256", "M4-1-017", "tut", 2],
@@ -79,24 +86,23 @@ const WEEK = {
         // exactly the 2 P-hours, and without it the credits do not
         // reconcile. Tagged from the credits, not from the caption.
         ["16:30", "18:20", "ACOL333", "M3-0-004", "lab", 0],
+        ["17:00", "17:50", "AHUL256", "M4-1-017", "tut", 1],
     ],
     3: [ // Wednesday
         ["08:00", "09:50", "ACOL331", "M3-0-004", "lab", 0],
-        ["10:00", "10:50", "ACOL351", "M4-0-019", "tut", 0],
+        ["10:00", "10:50", "ACOL351", "M4-1-017", "", 0],
         ["11:00", "11:50", "AHUL261", "M4-1-017", "tut", 2],
         ["14:00", "15:20", "AHUL256", "M4-0-011", "", 0],
-        ["15:30", "16:20", "AHUL261", "M4-1-017", "tut", 1],
-        ["17:00", "17:50", "AHUL256", "M4-1-017", "tut", 1],
+        ["15:30", "16:20", "ACOL351", "M4-0-019", "tut", 0],
     ],
     4: [ // Thursday
         ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],
-        ["10:00", "10:50", "ACOL331", "M4-1-017", "", 0],
+        ["09:00", "09:50", "ACOL331", "M4-1-017", "", 0],
         ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
         ["14:00", "15:20", "AHUL261", "M4-0-011", "", 0],
         ["15:30", "17:20", "ACOL331", "M3-0-004", "lab", 0],
     ],
     5: [ // Friday
-        ["09:00", "09:50", "ACOL351", "M4-1-017", "", 0],
         ["10:00", "11:50", "ACOD310", "M4-1-017", "proj", 0],
     ],
 };
