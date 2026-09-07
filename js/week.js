@@ -261,7 +261,6 @@ function renderWeek() {
             // which is the thing you actually look for.
             blocks += `
             <div class="wk-block c${COURSE_IX[x.code]}${live ? " wk-live" : ""}${isNarrow ? " wk-narrow" : ""}"
-                 tabindex="0"
                  style="top:${yOf(x.from)}px;height:${yOf(x.to) - yOf(x.from)}px;
                         left:${x.col * w}%;width:calc(${w}% - 12px)">
                 <div class="wk-strip">${timeStr}</div>
