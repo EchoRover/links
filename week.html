@@ -115,7 +115,8 @@
 
         /* ---- block: solid time strip, lighter body ---- */
         .wk-block { position: absolute; z-index: 2; overflow: hidden; border-radius: 8px; margin-left: 6px;
-                    background: var(--cf); display: flex; flex-direction: column; }
+                    background: var(--cf); display: flex; flex-direction: column;
+                    transition: width 0.15s ease, left 0.15s ease, box-shadow 0.15s ease; }
         /* The time strip is separated from the body by a dashed rule, as in the
            reference -- it reads as a torn ticket stub rather than two boxes. */
         .wk-strip { background: var(--cs); color: var(--ct); font-size: 0.88rem; font-weight: 500;
@@ -130,6 +131,24 @@
                   background: var(--ct); border-radius: 3px; padding: 0 4px; }
         .wk-place { font-size: 0.87rem; color: var(--tx2); }
         .wk-place.wk-soft { font-family: var(--font-mono); font-size: 0.69rem; }
+
+        /* ---- narrow / overlapping block adjustments ---- */
+        .wk-block.wk-narrow { border-radius: 6px; margin-left: 2px; }
+        .wk-block.wk-narrow .wk-strip { font-size: 0.76rem; padding: 3px 6px; letter-spacing: -0.01em; }
+        .wk-block.wk-narrow .wk-body-in { padding: 4px 6px 4px; gap: 1px; }
+        .wk-block.wk-narrow .wk-name { font-size: 0.86rem; line-height: 1.15; word-break: break-word; }
+        .wk-block.wk-narrow .wk-place { font-size: 0.76rem; line-height: 1.15; }
+        .wk-block.wk-narrow .wk-kind,
+        .wk-block.wk-narrow .wk-grp { font-size: 0.62rem; }
+
+        /* Hover & focus pop-out for overlapping blocks */
+        .wk-block.wk-narrow:hover,
+        .wk-block.wk-narrow:focus-within {
+            z-index: 30 !important;
+            width: calc(100% - 12px) !important;
+            left: 6px !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.12);
+        }
 
         /* ---- collapsed empty stretch ---- */
         .wk-gap { position: absolute; left: 0; right: 0; z-index: 1;

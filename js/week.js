@@ -28,6 +28,7 @@ const MONTH = ["January", "February", "March", "April", "May", "June",
 // width; the week stays behind the toggle. Chosen once from the viewport,
 // after which the toggle wins, so rotating does not discard a picked view.
 let VIEW = window.matchMedia("(max-width: 760px)").matches ? "day" : "week";
+let GROUP = Number(localStorage.getItem("linkcs_group") || 0);
 let CENTERED = null;   // guard so auto-centring never fights a manual scroll
 let CURSOR = new Date();   // any date inside the week being shown
 
@@ -136,6 +137,19 @@ function humanSpan(mins) {
     return h ? (m ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
 }
 
+function t12Range(s, e, compact = false) {
+    if (!compact) return `${t12(s)} – ${t12(e)}`;
+    let [h1, m1] = s.split(":").map(Number);
+    let [h2, m2] = e.split(":").map(Number);
+    const p1 = h1 < 12 ? "a" : "p";
+    const p2 = h2 < 12 ? "a" : "p";
+    let d1 = h1 % 12 || 12;
+    let d2 = h2 % 12 || 12;
+    const str1 = m1 ? `${d1}:${String(m1).padStart(2, "0")}` : `${d1}`;
+    const str2 = m2 ? `${d2}:${String(m2).padStart(2, "0")}` : `${d2}`;
+    return p1 === p2 ? `${str1}–${str2}${p2}` : `${str1}${p1}–${str2}${p2}`;
+}
+
 // Stable colour per course: index in declaration order, so the mapping does
 // not reshuffle when a block moves to another day.
 const COURSE_IX = Object.fromEntries(Object.keys(COURSES).map((c, i) => [c, i]));
@@ -230,7 +244,9 @@ function renderWeek() {
             <span class="wk-hd-num">${date.getDate()}</span>
         </div>`;
 
-        const items = (off || !inTerm) ? [] : lay(dayEntries(d).filter((x) => x.kind !== "free"));
+        const rawEntries = dayEntries(d).filter((x) => x.kind !== "free");
+        const filtered = GROUP === 0 ? rawEntries : rawEntries.filter((x) => x.grp === 0 || x.grp === GROUP);
+        const items = (off || !inTerm) ? [] : lay(filtered);
 
         let blocks = "";
         for (const x of items) {
@@ -238,14 +254,17 @@ function renderWeek() {
             const p = placeName(x.room);
             const live = isToday && nowMins >= x.from && nowMins < x.to;
             const w = 100 / x.cols;
+            const isNarrow = x.cols > 1;
+            const timeStr = t12Range(x.s, x.e, isNarrow);
             // Two-tone: a solid time strip on top, lighter body under it. The
             // strip is what makes a wall of blocks scannable by START TIME,
             // which is the thing you actually look for.
             blocks += `
-            <div class="wk-block c${COURSE_IX[x.code]}${live ? " wk-live" : ""}"
+            <div class="wk-block c${COURSE_IX[x.code]}${live ? " wk-live" : ""}${isNarrow ? " wk-narrow" : ""}"
+                 tabindex="0"
                  style="top:${yOf(x.from)}px;height:${yOf(x.to) - yOf(x.from)}px;
                         left:${x.col * w}%;width:calc(${w}% - 12px)">
-                <div class="wk-strip">${t12(x.s)} – ${t12(x.e)}</div>
+                <div class="wk-strip">${timeStr}</div>
                 <div class="wk-body-in">
                     <span class="wk-name">${c ? c.name : x.code}</span>
                     <span class="wk-meta">
@@ -311,6 +330,11 @@ function renderWeek() {
             </div>
             <div class="wk-bar-r">
                 <div class="wk-seg">
+                    <button data-g="0" class="${GROUP === 0 ? "on" : ""}">All</button>
+                    <button data-g="1" class="${GROUP === 1 ? "on" : ""}">G1</button>
+                    <button data-g="2" class="${GROUP === 2 ? "on" : ""}">G2</button>
+                </div>
+                <div class="wk-seg">
                     <button data-v="day" class="${VIEW === "day" ? "on" : ""}">Day</button>
                     <button data-v="week" class="${VIEW === "week" ? "on" : ""}">Week</button>
                 </div>
@@ -355,9 +379,16 @@ function renderWeek() {
 function onClick(e) {
     const b = e.target.closest("button");
     if (!b) return;
-    if (b.dataset.v) VIEW = b.dataset.v;
-    else if (b.dataset.step) CURSOR = addDays(CURSOR, Number(b.dataset.step) * (VIEW === "day" ? 1 : 7));
-    else if ("today" in b.dataset) CURSOR = new Date();
+    if ("g" in b.dataset) {
+        GROUP = Number(b.dataset.g);
+        localStorage.setItem("linkcs_group", GROUP);
+    } else if (b.dataset.v) {
+        VIEW = b.dataset.v;
+    } else if (b.dataset.step) {
+        CURSOR = addDays(CURSOR, Number(b.dataset.step) * (VIEW === "day" ? 1 : 7));
+    } else if ("today" in b.dataset) {
+        CURSOR = new Date();
+    }
     renderWeek();
 }
 document.getElementById("wk-bar")?.addEventListener("click", onClick);
