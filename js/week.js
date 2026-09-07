@@ -169,11 +169,12 @@ const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); r
 // ("Computer Lab 03", "Classroom 7"); falls back to the bare code when the
 // room is not in ROOMS. whereIs() already refuses to guess a name, and that
 // refusal is the behaviour worth keeping, so it passes straight through.
-function placeName(code) {
+function placeName(code, isNarrow = false) {
     const w = whereIs(code);
     if (w.none) return { name: "Room not listed", code: "", soft: true };
     if (!w.ok) return { name: w.raw, code: "", soft: true };
-    return { name: w.lab ? `Computer Lab ${w.no}` : `Classroom ${w.no}`, code: w.raw, soft: false };
+    const label = w.lab ? (isNarrow ? `Lab ${w.no}` : `Computer Lab ${w.no}`) : `Classroom ${w.no}`;
+    return { name: label, code: w.raw, soft: false };
 }
 
 // Blocks overlapping in time on the same day sit side by side, never
@@ -251,10 +252,10 @@ function renderWeek() {
         let blocks = "";
         for (const x of items) {
             const c = COURSES[x.code];
-            const p = placeName(x.room);
+            const isNarrow = x.cols > 1;
+            const p = placeName(x.room, isNarrow);
             const live = isToday && nowMins >= x.from && nowMins < x.to;
             const w = 100 / x.cols;
-            const isNarrow = x.cols > 1;
             const timeStr = t12Range(x.s, x.e, isNarrow);
             // Two-tone: a solid time strip on top, lighter body under it. The
             // strip is what makes a wall of blocks scannable by START TIME,
