@@ -135,10 +135,11 @@
         /* ---- narrow / overlapping block adjustments ---- */
         .wk-block.wk-narrow { border-radius: 6px; margin-left: 2px; }
         .wk-block.wk-narrow .wk-strip { font-size: 0.74rem; padding: 2px 5px; letter-spacing: -0.01em; }
-        .wk-block.wk-narrow .wk-body-in { padding: 3px 5px 4px; gap: 1px; }
+        .wk-block.wk-narrow .wk-body-in { padding: 3px 5px 4px; gap: 2px; justify-content: flex-start; }
         .wk-block.wk-narrow .wk-name { font-size: 0.82rem; line-height: 1.12; word-break: break-word; }
-        .wk-block.wk-narrow .wk-place { font-size: 0.74rem; }
-        .wk-block.wk-narrow .wk-kind,
+        .wk-block.wk-narrow .wk-meta { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 1px; white-space: normal; }
+        .wk-block.wk-narrow .wk-place { font-size: 0.74rem; line-height: 1.12; }
+        .wk-block.wk-narrow .wk-kind { font-size: 0.60rem; line-height: 1.1; }
         .wk-block.wk-narrow .wk-grp { font-size: 0.60rem; }
 
         /* ---- collapsed empty stretch ---- */
