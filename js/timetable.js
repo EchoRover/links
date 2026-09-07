@@ -14,7 +14,7 @@
 //
 // REVISION 4: the 7 September 2026 reissue (stamped "7th September 2026 - 5:30pm" in footer).
 //   - AHUL261 G1 tutorial moved from Wed 15:30-16:20 to Mon 09:00-09:50 in M4-1-017.
-//   - AHUL256 G1 tutorial moved from Wed 17:00-17:50 to Tue 17:00-17:50 in M4-1-017.
+//   - AHUL256 G1 tutorial moved from Wed 17:00-17:50 to Wed 17:00-17:50 in M4-1-017 (Wednesday Group 1 row).
 //   - ACOL331 lectures on Tue & Thu moved from 10:00-10:50 to 09:00-09:50 in M4-1-017.
 //   - ACOL351 lecture on Fri 09:00-09:50 moved to Wed 10:00-10:50 in M4-1-017.
 //   - ACOL351 tutorial moved from Wed 10:00-10:50 to Wed 15:30-16:20 in M4-0-019.
@@ -86,7 +86,6 @@ const WEEK = {
         // exactly the 2 P-hours, and without it the credits do not
         // reconcile. Tagged from the credits, not from the caption.
         ["16:30", "18:20", "ACOL333", "M3-0-004", "lab", 0],
-        ["17:00", "17:50", "AHUL256", "M4-1-017", "tut", 1],
     ],
     3: [ // Wednesday
         ["08:00", "09:50", "ACOL331", "M3-0-004", "lab", 0],
@@ -94,6 +93,7 @@ const WEEK = {
         ["11:00", "11:50", "AHUL261", "M4-1-017", "tut", 2],
         ["14:00", "15:20", "AHUL256", "M4-0-011", "", 0],
         ["15:30", "16:20", "ACOL351", "M4-0-019", "tut", 0],
+        ["17:00", "17:50", "AHUL256", "M4-1-017", "tut", 1],
     ],
     4: [ // Thursday
         ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],

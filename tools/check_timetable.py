@@ -167,7 +167,7 @@ def parse_sheet_blocks(pdf_path):
         # A day's band runs from its label down to the next one, and the
         # bands overlap slightly, so "first label within range" silently
         # picks the day above. Take the NEAREST label at or above instead.
-        above = [(top, d) for d, top in day_tops.items() if sp["top"] - top > -20]
+        above = [(top, d) for d, top in day_tops.items() if sp["top"] - top > -35]
         day = max(above)[1] if above else None
         blocks.append((day, hhmm(sp["start"]), hhmm(sp["end"]), course, room))
     return blocks, labels
