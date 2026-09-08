@@ -373,6 +373,7 @@ def parse(pdf_path):
             })
 
     blocks = absorb_continuations(blocks)
+    blocks = assign_labs(blocks, courses)
 
     if not blocks:
         notes.append("table found but no populated time cells — check the layout")
@@ -488,6 +489,57 @@ def absorb_continuations(blocks):
         b["ok"] = not b["flags"]
         out.append(b)
     return out
+
+
+# "M3-Computer Lab 03", "M3-Energy Lab". NOT "M4-Classroom 7" -- there is
+# no standalone "lab" token in "Classroom".
+LAB_ROOM = re.compile(r"\blab(oratory)?\b", re.I)
+
+
+def assign_labs(blocks, courses):
+    """A block in a LAB ROOM, for a course whose credits declare practical
+    hours, is that practical.
+
+    infer_kind() cannot make this call: it reads the cell in isolation, and
+    the only evidence in the cell is the ROOM NAME, which it has to strip
+    ("M3-Computer Lab 03" contains the word Lab and would otherwise mark
+    every class held in a computer lab as a practical). The credit table is
+    what makes the room name meaningful -- if a course must have practical
+    hours and one of its blocks is in a lab, that block is the practical.
+
+    This was the single biggest error in the parse. Every 3-0-2-4 course on
+    every sheet scored +2L -2P: seven courses across five sheets, all one
+    bug, all invisible until the sheets were scored against their own
+    credit tables instead of one hand-checked week being taken as typical.
+
+    Only fires when the course has NO lab block yet, so an explicit "Lab
+    1st 2hrs" in the cell always wins over this inference.
+    """
+    for code, c in courses.items():
+        ltpc = c.get("ltpc")
+        if not ltpc or not ltpc[2]:
+            continue
+        mine = [b for b in blocks if b["course"] == code]
+
+        # A course with NO lecture and NO tutorial hours is entirely
+        # practical -- ASBP1100 is 0-0-2-1, ACOD310 is 0-0-6-3. Every block
+        # it has is the practical, whatever room it is in and whether or not
+        # the cell bothers to say "Lab". No inference needed, the credits
+        # leave nothing else it could be.
+        if not ltpc[0] and not ltpc[1]:
+            for b in mine:
+                if not b.get("kind"):
+                    b["kind"] = "lab"
+                    b["kind_from"] = "the course is all practical hours"
+            continue
+
+        if any(b.get("kind") in ("lab", "proj") for b in mine):
+            continue
+        for b in mine:
+            if LAB_ROOM.search(b.get("raw") or ""):
+                b["kind"] = "lab"
+                b["kind_from"] = "in a lab room, and the credits declare practical hours"
+    return blocks
 
 
 def report(name, blocks, notes, courses):

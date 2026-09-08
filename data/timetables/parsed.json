@@ -240,8 +240,8 @@
           270.22
         ],
         "fill": "#ddf4e5",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "ACOL333 M3-0-022 M3-Computer Lab 02 16:30 - 18:20",
         "flags": [],
         "ok": true
@@ -8544,8 +8544,8 @@
           310.54
         ],
         "fill": "#b6d7a8",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "the course is all practical hours",
         "raw": "ASBP1100 M3-1-031 M3-BiologyLab 14:00 - 15:50",
         "flags": [],
         "ok": true
@@ -8901,8 +8901,8 @@
           161.58
         ],
         "fill": "#ddebf7",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "ACOL2010 M3-0-004 M3-Computer Lab 03 17:00 - 18:50",
         "flags": [],
         "ok": true
@@ -9256,8 +9256,8 @@
           293.61
         ],
         "fill": "#f2ceef",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "ACOL2015 M3-0-004 M3-Computer Lab 03 17:00 - 18:50",
         "flags": [],
         "ok": true
@@ -9954,8 +9954,8 @@
           245.59
         ],
         "fill": "#e2f0d9",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "AMEL1140 M3-1-009 M3-Energy Lab 14:00 - 15:50",
         "flags": [],
         "ok": true
@@ -10221,8 +10221,8 @@
           351.45
         ],
         "fill": "#e2f0d9",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "AMEL1140 M3-1-009 M3-Energy Lab 14:00 - 15:50",
         "flags": [],
         "ok": true
@@ -10959,8 +10959,8 @@
           270.22
         ],
         "fill": "#ddf4e5",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "ACOL333 M3-0-004 M3-Computer Lab 03 16:30 - 18:20",
         "flags": [],
         "ok": true
@@ -12669,8 +12669,8 @@
           355.61
         ],
         "fill": "#b6d7a8",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "the course is all practical hours",
         "raw": "ASBP1100 M3-1-031 M3-BiologyLab 14:00 - 15:50",
         "flags": [],
         "ok": true
@@ -13007,8 +13007,8 @@
           175.24
         ],
         "fill": "#ddebf7",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "ACOL2010 M3-0-004 M3-Computer Lab 03 17:00 - 18:50",
         "flags": [],
         "ok": true
@@ -13368,8 +13368,8 @@
           324.04
         ],
         "fill": "#f2ceef",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "ACOL2015 M3-0-004 M3-Computer Lab 03 17:00 - 18:50",
         "flags": [],
         "ok": true
@@ -14180,8 +14180,8 @@
           252.41
         ],
         "fill": "#e2f0d9",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "AMEL1140 M3-1-009 M3-Energy Lab 14:00 - 15:50",
         "flags": [],
         "ok": true
@@ -14381,8 +14381,8 @@
           361.84
         ],
         "fill": "#e2f0d9",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "AMEL1140 M3-1-009 M3-Energy Lab 14:00 - 15:50",
         "flags": [],
         "ok": true
@@ -14909,8 +14909,8 @@
           244.83
         ],
         "fill": "#ddf4e5",
-        "kind": "",
-        "kind_from": "assumed lecture",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
         "raw": "ACOL333 M3-0-004 M3-Computer Lab 03 16:30 - 18:20",
         "flags": [],
         "ok": true
