@@ -17,7 +17,7 @@ const linksData = {
     // institute page (iitdabudhabi.ac.ae/timetable) still serves an older
     // version, so linking upstream would contradict the class card.
     // Swap back to the official URL once they publish the current one.
-    TimeTable: "data/timetables/2026-09-07-year3-sem5-btech-cse.pdf",
+    TimeTable: "data/timetables/2026-09-08-year3-sem5-btech-cse.pdf",
   },
 
   // Only real, working URLs live here. A course with nothing published

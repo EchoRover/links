@@ -12,6 +12,12 @@
 // reconciles every block below against the L-T-P-C table the sheet prints,
 // which is the half of the document this file does NOT transcribe.
 //
+// REVISION 5: the 8 September 2026 reissue (stamped "8th September 2026 - 1:30pm").
+//   - ACOL351 lecture moved from Thu 08:00-08:50 to Fri 08:00-08:50, same
+//     room (M4-1-017). That is the ONLY change: 22 of 23 blocks are
+//     identical to revision 4, and no room was renamed.
+//     Thursday now starts at 09:00; Friday is no longer a one-block day.
+//
 // REVISION 4: the 7 September 2026 reissue (stamped "7th September 2026 - 5:30pm" in footer).
 //   - AHUL261 G1 tutorial moved from Wed 15:30-16:20 to Mon 09:00-09:50 in M4-1-017.
 //   - AHUL256 G1 tutorial moved from Wed 17:00-17:50 to Wed 17:00-17:50 in M4-1-017 (Wednesday Group 1 row).
@@ -96,13 +102,13 @@ const WEEK = {
         ["17:00", "17:50", "AHUL256", "M4-1-017", "tut", 1],
     ],
     4: [ // Thursday
-        ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],
         ["09:00", "09:50", "ACOL331", "M4-1-017", "", 0],
         ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
         ["14:00", "15:20", "AHUL261", "M4-0-011", "", 0],
         ["15:30", "17:20", "ACOL331", "M3-0-004", "lab", 0],
     ],
     5: [ // Friday
+        ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],
         ["10:00", "11:50", "ACOD310", "M4-1-017", "proj", 0],
     ],
 };
