@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Shuttle Board · linkCS</title>
+    <meta name="description" content="Next campus shuttle departures, both directions. Built for a wall display.">
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!--
+      SELF-CONTAINED ON PURPOSE. This page does not load css/styles.css:
+      that stylesheet carries the website's nav, cards and hover states, none
+      of which exist here, and its page-level sizing fights a display that
+      must fit one viewport exactly. The palette below is copied from the
+      site's dark tokens so the board still looks like linkCS.
+
+      The theme is HARD-CODED dark and theme-init.js is deliberately NOT
+      loaded. Departure boards are dark everywhere for a reason — high
+      contrast at distance, tolerable in a dim hall at night — and there is
+      nobody standing at the TV to press a toggle.
+    -->
+    <style>
+        :root {
+            --bg: #060814;
+            --bg-panel: #0F1729;
+            --fg: #E2E8F5;
+            --fg-soft: #94A3B8;
+            --fg-faint: #475569;
+            --rule: rgba(226, 232, 245, 0.13);
+            --accent: #60A5FA;
+            --accent-bright: #93C5FD;
+            --warn: #FBBF24;
+
+            --font-sans: 'Familjen Grotesk', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: var(--font-sans);
+            /* A wall display never scrolls. If something overflows that is a
+               bug to fix in the layout, not something to let the user drag. */
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 1.4vmin;
+            padding: 2.2vmin 2.6vmin;
+        }
+
+        /* ---------- header ---------- */
+
+        .top {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 2vmin;
+            border-bottom: 1px solid var(--rule);
+            padding-bottom: 1.4vmin;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: clamp(1rem, 2.4vmin, 2.4rem);
+            letter-spacing: -0.01em;
+        }
+
+        .brand .cs {
+            color: var(--accent);
+        }
+
+        .brand-sub {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.5vmin, 1.4rem);
+            color: var(--fg-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            margin-left: 1.2vmin;
+        }
+
+        .when {
+            display: flex;
+            align-items: baseline;
+            gap: 1.6vmin;
+        }
+
+        #dayname {
+            font-family: var(--font-mono);
+            font-size: clamp(0.75rem, 1.7vmin, 1.6rem);
+            color: var(--fg-soft);
+        }
+
+        #clock {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: clamp(1.2rem, 3.4vmin, 3.6rem);
+            font-variant-numeric: tabular-nums;
+            color: var(--fg);
+        }
+
+        /* ---------- the two directions ---------- */
+
+        #panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.2vmin;
+            min-height: 0;
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--rule);
+            border-radius: 1.6vmin;
+            padding: 2.4vmin 2.8vmin;
+            /* Flex, not a fixed grid track list: the note line is only
+               rendered when a run is actually cancelled, so a positional
+               `grid-template-rows` puts the wrong child in the growing
+               track on the ordinary day and the list collapses to the top
+               with the panel empty beneath it. Flex lets the LIST claim the
+               slack wherever it lands. */
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .panel-dir {
+            font-size: clamp(1.1rem, 3.2vmin, 3.4rem);
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            color: var(--accent-bright);
+        }
+
+        .panel-from {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.5vmin, 1.4rem);
+            color: var(--fg-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-top: 0.4vmin;
+        }
+
+        /* The headline departure. This is the only thing on the board that
+           has to be legible from the far side of a hall, so it gets the
+           whole type budget and everything else is deliberately small. */
+        .lead {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0 2vmin;
+            margin: 1.8vmin 0 0.6vmin;
+        }
+
+        .lead-time {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: clamp(2rem, 10vmin, 10rem);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.03em;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.16em;
+        }
+
+        .lead-time .mer {
+            font-size: 0.42em;
+            font-weight: 500;
+            color: var(--fg-soft);
+        }
+
+        /* Nearly as loud as the clock time. On a board where every departure
+           is within the hour, "6 min" is the number that decides whether you
+           leave the building now, so it does not get to be a footnote. */
+        .lead-eta {
+            font-size: clamp(1rem, 4.4vmin, 4.6rem);
+            font-weight: 600;
+            color: var(--accent);
+            line-height: 1.1;
+        }
+
+        /* Inside five minutes the countdown is the actionable fact — you
+           either start walking now or you wait for the next one. */
+        .lead-urgent .lead-eta {
+            color: var(--warn);
+        }
+
+        .panel-note {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1.5vmin, 1.4rem);
+            color: var(--warn);
+            margin-top: 0.4vmin;
+        }
+
+        .then {
+            list-style: none;
+            margin-top: 1.6vmin;
+            border-top: 1px solid var(--rule);
+            display: grid;
+            /* A FIXED four rows, always. A list that grows and shrinks with
+               the service makes the board jump every time a bus leaves, and
+               a jumping board reads as broken from across a hall. */
+            grid-template-rows: repeat(4, 1fr);
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        .then li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.4vmin;
+            border-bottom: 1px solid var(--rule);
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .then li:last-child {
+            border-bottom: none;
+        }
+
+        .then-time {
+            font-size: clamp(0.85rem, 3.4vmin, 3.6rem);
+            font-weight: 500;
+        }
+
+        .then-eta {
+            font-size: clamp(0.7rem, 2.4vmin, 2.6rem);
+            color: var(--fg-soft);
+        }
+
+        .then-empty {
+            color: var(--fg-faint);
+        }
+
+        .then-empty .then-time {
+            color: var(--fg-faint);
+            font-weight: 400;
+        }
+
+        .panel-service {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1.4vmin, 1.3rem);
+            color: var(--fg-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            padding-top: 1.2vmin;
+        }
+
+        /* ---------- footer ---------- */
+
+        .bottom {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 2vmin;
+            border-top: 1px solid var(--rule);
+            padding-top: 1.2vmin;
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1.5vmin, 1.4rem);
+            color: var(--fg-faint);
+        }
+
+        .bottom .url {
+            color: var(--accent);
+        }
+
+        /* ---------- portrait screens ---------- */
+        /* Plenty of campus displays are mounted vertically. Two columns at
+           9:16 gives each direction a ~40-char-wide sliver, so stack them. */
+        @media (orientation: portrait) {
+            #panels {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+
+            .lead-time {
+                font-size: clamp(2rem, 13vw, 10rem);
+            }
+
+            .panel-dir {
+                font-size: clamp(1.1rem, 5vw, 3.4rem);
+            }
+        }
+
+        /* ---------- the stale state ---------- */
+        /* Set by screen.js when the clock has not advanced for two minutes.
+           A board showing an hour-old departure with full confidence is the
+           one outcome worse than a blank screen, so say it out loud. */
+        body.stale #panels {
+            opacity: 0.32;
+            filter: grayscale(1);
+        }
+
+        body.stale .top::after {
+            content: "not updating — reload the page";
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 1.6vmin, 1.5rem);
+            color: var(--warn);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="top">
+        <div>
+            <span class="brand">link<span class="cs">CS</span></span>
+            <span class="brand-sub">shuttle</span>
+        </div>
+        <div class="when">
+            <span id="dayname"></span>
+            <span id="clock"></span>
+        </div>
+    </header>
+
+    <!-- Filled by screen.js on load and on every minute rollover. Empty in
+         the markup on purpose: a hard-coded placeholder time is exactly the
+         thing that would still be sitting on the wall if the script failed. -->
+    <main id="panels"></main>
+
+    <footer class="bottom">
+        <span>Stops: KCA 1&amp;2 · KCA 3 · Campus</span>
+        <span>Full timetable, live: <span class="url">linkcs.vercel.app/bus</span></span>
+    </footer>
+
+    <script src="js/bus-data.js" defer></script>
+    <script src="js/screen.js" defer></script>
+</body>
+
+</html>
