@@ -16164,5 +16164,769 @@
       "h": 841.92,
       "scale": 1.9444444444444444
     }
+  },
+  "2026-09-08-year3-sem5-btech-cse.pdf": {
+    "blocks": [
+      {
+        "day": "Monday",
+        "group": 0,
+        "start": "08:00",
+        "end": "09:00",
+        "course": null,
+        "room": null,
+        "cols": 2,
+        "time_from": "column ruler",
+        "bbox": [
+          77.28,
+          104.76,
+          121.97,
+          158.33
+        ],
+        "fill": null,
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "May be used for additional classes",
+        "flags": [
+          "no course code \u2014 free text, needs a human",
+          "no room code"
+        ],
+        "ok": false
+      },
+      {
+        "day": "Monday",
+        "group": 1,
+        "start": "09:00",
+        "end": "09:50",
+        "course": "AHUL261",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          121.97,
+          104.76,
+          166.62,
+          158.33
+        ],
+        "fill": "#fbe1c5",
+        "kind": "tut",
+        "kind_from": "the cell says so",
+        "raw": "AHUL261 M4-1-017 M4-Classroom 7 9:00 - 9:50 Applicable if registered Tutorial",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Monday",
+        "group": 0,
+        "start": "10:00",
+        "end": "10:50",
+        "course": "ACOL331",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          166.62,
+          104.76,
+          214.48,
+          158.33
+        ],
+        "fill": "#d9eef7",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL331 M4-1-017 M4-Classroom 7 10:00 - 10:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Monday",
+        "group": 0,
+        "start": "11:00",
+        "end": "11:50",
+        "course": "ACOL333",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          214.48,
+          104.76,
+          265.65,
+          158.33
+        ],
+        "fill": "#ddf4e5",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL333 M4-1-017 M4-Classroom 7 11:00 - 11:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Monday",
+        "group": 0,
+        "start": "12:00",
+        "end": "14:00",
+        "course": null,
+        "room": null,
+        "cols": 1,
+        "time_from": "column ruler",
+        "bbox": [
+          265.65,
+          104.76,
+          291.12,
+          492.77
+        ],
+        "fill": null,
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "hcnuL",
+        "flags": [
+          "no course code \u2014 free text, needs a human",
+          "no room code"
+        ],
+        "ok": false
+      },
+      {
+        "day": "Monday",
+        "group": 0,
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL256",
+        "room": "M4-0-011",
+        "cols": 3,
+        "time_from": "printed in the cell",
+        "bbox": [
+          291.12,
+          104.76,
+          367.87,
+          158.33
+        ],
+        "fill": "#e1e4f5",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "AHUL256 M4-0-011 M4-Classroom 3 14:00 - 15:20 Applicable if registered",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Monday",
+        "group": 0,
+        "start": "16:00",
+        "end": "18:50",
+        "course": "AGRL130",
+        "room": "M4-0-011",
+        "cols": 6,
+        "time_from": "printed in the cell",
+        "bbox": [
+          393.36,
+          104.76,
+          546.81,
+          158.33
+        ],
+        "fill": "#edf3cf",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "AGRL130 M4-0-011 M4-Classroom 3 16:00 - 18:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Monday",
+        "group": 0,
+        "start": "08:00",
+        "end": "10:00",
+        "course": null,
+        "room": null,
+        "cols": 4,
+        "time_from": "column ruler",
+        "bbox": [
+          77.28,
+          158.33,
+          166.62,
+          193.36
+        ],
+        "fill": null,
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "May be used for additional classes",
+        "flags": [
+          "no course code \u2014 free text, needs a human",
+          "no room code"
+        ],
+        "ok": false
+      },
+      {
+        "day": "Tuesday",
+        "group": 0,
+        "start": "08:00",
+        "end": "08:50",
+        "course": "ACOL351",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          77.28,
+          193.36,
+          121.97,
+          237.87
+        ],
+        "fill": "#fff2c2",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL351 M4-1-017 M4-Classroom 7 8:00 - 8:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Tuesday",
+        "group": 0,
+        "start": "09:00",
+        "end": "09:50",
+        "course": "ACOL331",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          121.97,
+          193.36,
+          166.62,
+          237.87
+        ],
+        "fill": "#d9eef7",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL331 M4-1-017 M4-Classroom 7 9:00 - 9:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Tuesday",
+        "group": 0,
+        "start": "11:00",
+        "end": "11:50",
+        "course": "ACOL333",
+        "room": "M4-1-017",
+        "cols": 3,
+        "time_from": "printed in the cell",
+        "bbox": [
+          214.48,
+          193.36,
+          265.65,
+          237.87
+        ],
+        "fill": "#ddf4e5",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL333 M4-1-017 M4-Classroom 7 11:00 - 11:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Tuesday",
+        "group": 0,
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL261",
+        "room": "M4-0-011",
+        "cols": 3,
+        "time_from": "printed in the cell",
+        "bbox": [
+          291.12,
+          193.36,
+          367.87,
+          237.87
+        ],
+        "fill": "#fbe1c5",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "AHUL261 M4-0-011 M4-Classroom 3 14:00 - 15:20 Applicable if registered",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Tuesday",
+        "group": 0,
+        "start": "16:30",
+        "end": "18:20",
+        "course": "ACOL333",
+        "room": "M3-0-004",
+        "cols": 4,
+        "time_from": "printed in the cell",
+        "bbox": [
+          418.96,
+          193.36,
+          521.2,
+          237.87
+        ],
+        "fill": "#ddf4e5",
+        "kind": "lab",
+        "kind_from": "in a lab room, and the credits declare practical hours",
+        "raw": "ACOL333 M3-0-004 M3-Computer Lab 03 16:30 - 18:20",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Tuesday",
+        "group": 2,
+        "start": "15:30",
+        "end": "16:20",
+        "course": "AHUL256",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          367.87,
+          237.87,
+          418.96,
+          298.13
+        ],
+        "fill": "#e1e4f5",
+        "kind": "tut",
+        "kind_from": "the cell says so",
+        "raw": "AHUL256 M4-1-017 M4-Classroom 7 15:30 - 16:20 Applicable if registered Tutorial",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Wednesday",
+        "group": 0,
+        "start": "08:00",
+        "end": "09:50",
+        "course": "ACOL331",
+        "room": "M3-0-004",
+        "cols": 4,
+        "time_from": "printed in the cell",
+        "bbox": [
+          77.28,
+          298.13,
+          166.62,
+          414.41
+        ],
+        "fill": "#d9eef7",
+        "kind": "lab",
+        "kind_from": "the cell says so",
+        "raw": "ACOL331 M3-0-004 M3-Computer Lab 03 8:00 - 9:50 Lab 1st 2hrs",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Wednesday",
+        "group": 0,
+        "start": "10:00",
+        "end": "10:50",
+        "course": "ACOL351",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          166.62,
+          298.13,
+          214.48,
+          414.41
+        ],
+        "fill": "#fff2c2",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL351 M4-1-017 M4-Classroom 7 10:00 - 10:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Wednesday",
+        "group": 0,
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL256",
+        "room": "M4-0-011",
+        "cols": 3,
+        "time_from": "printed in the cell",
+        "bbox": [
+          291.12,
+          298.13,
+          367.87,
+          414.41
+        ],
+        "fill": "#e1e4f5",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "AHUL256 M4-0-011 M4-Classroom 3 14:00 - 15:20 Applicable if registered",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Wednesday",
+        "group": 0,
+        "start": "15:30",
+        "end": "16:20",
+        "course": "ACOL351",
+        "room": "M4-0-019",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          367.87,
+          298.13,
+          418.96,
+          414.41
+        ],
+        "fill": "#fff2c2",
+        "kind": "tut",
+        "kind_from": "the cell says so",
+        "raw": "ACOL351 M4-0-019 M4-Classroom 3 15:30 - 16:20 Tutorial",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Wednesday",
+        "group": 1,
+        "start": "17:00",
+        "end": "17:50",
+        "course": "AHUL256",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          444.48,
+          298.13,
+          495.62,
+          358.36
+        ],
+        "fill": "#e1e4f5",
+        "kind": "tut",
+        "kind_from": "the cell says so",
+        "raw": "AHUL256 M4-1-017 M4-Classroom 7 17:00 - 17:50 Applicable if registered Tutorial",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Wednesday",
+        "group": 0,
+        "start": "18:00",
+        "end": "19:00",
+        "course": null,
+        "room": null,
+        "cols": 2,
+        "time_from": "column ruler",
+        "bbox": [
+          495.62,
+          298.13,
+          546.81,
+          414.41
+        ],
+        "fill": null,
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "May be used for additional classes",
+        "flags": [
+          "no course code \u2014 free text, needs a human",
+          "no room code"
+        ],
+        "ok": false
+      },
+      {
+        "day": "Wednesday",
+        "group": 2,
+        "start": "11:00",
+        "end": "11:50",
+        "course": "AHUL261",
+        "room": "M4-1-017",
+        "cols": 3,
+        "time_from": "printed in the cell",
+        "bbox": [
+          214.48,
+          358.36,
+          265.65,
+          414.41
+        ],
+        "fill": "#fbe1c5",
+        "kind": "tut",
+        "kind_from": "the cell says so",
+        "raw": "AHUL261 M4-1-017 M4-Classroom 7 11:00 - 11:50 Applicable if registered Tutorial",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Wednesday",
+        "group": 0,
+        "start": "16:30",
+        "end": "19:00",
+        "course": null,
+        "room": null,
+        "cols": 5,
+        "time_from": "column ruler",
+        "bbox": [
+          418.96,
+          358.36,
+          495.62,
+          414.41
+        ],
+        "fill": null,
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "May be used for additional classes",
+        "flags": [
+          "no course code \u2014 free text, needs a human",
+          "no room code"
+        ],
+        "ok": false
+      },
+      {
+        "day": "Thursday",
+        "group": 0,
+        "start": "08:00",
+        "end": "09:00",
+        "course": null,
+        "room": null,
+        "cols": 2,
+        "time_from": "column ruler",
+        "bbox": [
+          77.28,
+          414.41,
+          121.97,
+          492.77
+        ],
+        "fill": null,
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "May be used for additional classes",
+        "flags": [
+          "no course code \u2014 free text, needs a human",
+          "no room code"
+        ],
+        "ok": false
+      },
+      {
+        "day": "Thursday",
+        "group": 0,
+        "start": "17:30",
+        "end": "19:00",
+        "course": null,
+        "room": null,
+        "cols": 3,
+        "time_from": "column ruler",
+        "bbox": [
+          470.1,
+          414.41,
+          546.81,
+          492.77
+        ],
+        "fill": null,
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "May be used for additional classes",
+        "flags": [
+          "no course code \u2014 free text, needs a human",
+          "no room code"
+        ],
+        "ok": false
+      },
+      {
+        "day": "Thursday",
+        "group": 0,
+        "start": "09:00",
+        "end": "09:50",
+        "course": "ACOL331",
+        "room": "M4-1-017",
+        "cols": 4,
+        "time_from": "printed in the cell",
+        "bbox": [
+          121.97,
+          436.62,
+          166.62,
+          457.72
+        ],
+        "fill": "#d9eef7",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL331 M4-1-017 M4-Classroom 7 9:00 - 9:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Thursday",
+        "group": 0,
+        "start": "11:00",
+        "end": "11:50",
+        "course": "ACOL333",
+        "room": "M4-1-017",
+        "cols": 3,
+        "time_from": "printed in the cell",
+        "bbox": [
+          214.48,
+          436.62,
+          265.65,
+          457.72
+        ],
+        "fill": "#ddf4e5",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL333 M4-1-017 M4-Classroom 7 11:00 - 11:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Thursday",
+        "group": 0,
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL261",
+        "room": "M4-0-011",
+        "cols": 3,
+        "time_from": "printed in the cell",
+        "bbox": [
+          291.12,
+          436.62,
+          367.87,
+          457.72
+        ],
+        "fill": "#fbe1c5",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "AHUL261 M4-0-011 M4-Classroom 3 14:00 - 15:20 Applicable if registered",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Thursday",
+        "group": 0,
+        "start": "15:30",
+        "end": "17:20",
+        "course": "ACOL331",
+        "room": "M3-0-004",
+        "cols": 7,
+        "time_from": "printed in the cell",
+        "bbox": [
+          367.87,
+          436.62,
+          470.1,
+          457.72
+        ],
+        "fill": "#d9eef7",
+        "kind": "lab",
+        "kind_from": "the cell says so",
+        "raw": "ACOL331 M3-0-004 M3-Computer Lab 03 15:30 - 17:20 Lab 2nd 2hrs",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Friday",
+        "group": 0,
+        "start": "08:00",
+        "end": "08:50",
+        "course": "ACOL351",
+        "room": "M4-1-017",
+        "cols": 2,
+        "time_from": "printed in the cell",
+        "bbox": [
+          77.28,
+          492.77,
+          121.97,
+          562.87
+        ],
+        "fill": "#fff2c2",
+        "kind": "",
+        "kind_from": "assumed lecture",
+        "raw": "ACOL351 M4-1-017 M4-Classroom 7 8:00 - 8:50",
+        "flags": [],
+        "ok": true
+      },
+      {
+        "day": "Friday",
+        "group": 0,
+        "start": "10:00",
+        "end": "11:50",
+        "course": "ACOD310",
+        "room": "M4-1-017",
+        "cols": 4,
+        "time_from": "printed in the cell",
+        "bbox": [
+          166.62,
+          492.77,
+          265.65,
+          562.87
+        ],
+        "fill": "#fadde3",
+        "kind": "proj",
+        "kind_from": "the cell says so",
+        "raw": "Reserved for ACOD310 M4-1-017 M4-Classroom 7 10:00 - 11:50",
+        "flags": [],
+        "ok": true
+      }
+    ],
+    "notes": [],
+    "courses": {
+      "ACOL333": {
+        "title": "Principles of Artificial Intelligence",
+        "faculty": "Prof. Sumeet Agarwal",
+        "ltpc": [
+          3,
+          0,
+          2,
+          4
+        ]
+      },
+      "ACOL331": {
+        "title": "Operating System",
+        "faculty": "Prof. Abhilash Jindal",
+        "ltpc": [
+          3,
+          0,
+          4,
+          5
+        ]
+      },
+      "ACOL351": {
+        "title": "Analysis and Design of Algorithms",
+        "faculty": "Prof. Nikhil Balaji C R",
+        "ltpc": [
+          3,
+          1,
+          0,
+          4
+        ]
+      },
+      "AGRL130": {
+        "title": "Innovation, Entrepreneurship, and Sustainability",
+        "faculty": "Prof. Joby Joseph, Prof. Ashu Verma",
+        "ltpc": [
+          3,
+          0,
+          0,
+          3
+        ]
+      },
+      "AHUL256": {
+        "title": "Critical Thinking",
+        "faculty": "Prof. Arjun Ghosh",
+        "ltpc": [
+          3,
+          1,
+          0,
+          4
+        ]
+      },
+      "AHUL261": {
+        "title": "Introduction to Psychology",
+        "faculty": "Prof. Yashpal Ashokrao Jogdand",
+        "ltpc": [
+          3,
+          1,
+          0,
+          4
+        ]
+      },
+      "ACOD310": {
+        "title": "Mini Project",
+        "faculty": "Prof. Kaushal Kumar Maurya Prof. Alap Kshirsagar",
+        "ltpc": [
+          0,
+          0,
+          6,
+          3
+        ]
+      }
+    },
+    "page": {
+      "img": "data/timetables/img/2026-09-08-year3-sem5-btech-cse.png",
+      "w": 595.32,
+      "h": 841.92,
+      "scale": 1.9444444444444444
+    }
   }
 }
