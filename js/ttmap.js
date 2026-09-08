@@ -34,6 +34,7 @@ let sheet = null;
 let zoom = 1;
 let sel = null;
 let onlyFlagged = false;
+let focusCourse = null;      // review one course at a time
 let drawing = null;          // "grid" | "courses" while arming a region
 
 // ---------- state ----------
@@ -108,10 +109,15 @@ function render() {
         if (!r.bbox) return;                    // coordinate-read sheets have none
         const flagged = !!r.flags.length;
         if (onlyFlagged && !flagged) return;
+        // Focus mode keeps the other courses on screen but faded, rather
+        // than hiding them. You still need to see that the slot next door
+        // is taken -- a course reviewed in a vacuum is how a clash gets
+        // through -- but only one course is live to click and step through.
+        const off = focusCourse && r.course !== focusCourse;
 
         const b = document.createElement("div");
         b.className = "bx" + (flagged ? " flag" : "") + (r._done ? " done" : "")
-            + (sel === i ? " sel" : "");
+            + (sel === i ? " sel" : "") + (off ? " off" : "");
         b.style.left = px(r.bbox[0]) + "px";
         b.style.top = px(r.bbox[1]) + "px";
         b.style.width = px(r.bbox[2] - r.bbox[0]) + "px";
@@ -176,7 +182,9 @@ function renderLegend() {
         const { c, rows, gap } = reconcile(code);
         const bad = gap && (gap.L || gap.T || gap.P);
         const el = document.createElement("span");
-        el.className = "lg" + (bad ? " bad" : "");
+        el.className = "lg" + (bad ? " bad" : "")
+            + (focusCourse === code ? " on" : "")
+            + (focusCourse && focusCourse !== code ? " dim" : "");
         const sw = document.createElement("span");
         sw.className = "sw";
         sw.style.background = (rows.find(({ r }) => r.fill) || { r: {} }).r.fill || "#ccc";
@@ -191,14 +199,9 @@ function renderLegend() {
                 : "· ok");
         el.appendChild(txt);
         el.title = c.title || "";
-        // Clicking a course jumps to its first block on the page.
-        el.addEventListener("click", () => {
-            const first = rows[0];
-            if (!first) return;
-            select(first.i);
-            document.querySelector(".bx.sel")
-                ?.scrollIntoView({ behavior: "smooth", block: "center" });
-        });
+        // Clicking a course focuses it: the review goes course by course,
+        // which is the order the credit table can actually check.
+        el.addEventListener("click", () => focus(code === focusCourse ? null : code));
         wrap.appendChild(el);
     });
 }
@@ -369,6 +372,126 @@ function setDrawing(role) {
     $("#drawCourses").classList.toggle("on", role === "courses");
 }
 
+function focus(code) {
+    focusCourse = code;
+    sel = null;
+    render();
+    if (!code) return;
+    const first = ordered().find(({ r }) => r.course === code);
+    if (first) {
+        select(first.i);
+        document.querySelector(".bx.sel")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+}
+
+// Courses in the order the legend shows them, so [ and ] walk the same
+// list you are looking at.
+function courseList() {
+    const declared = Object.keys(DATA[sheet].courses || {});
+    const seen = [...new Set(live().map(({ r }) => r.course).filter(Boolean))];
+    return declared.concat(seen.filter((c) => !declared.includes(c)));
+}
+
+function stepCourse(delta) {
+    const list = courseList();
+    if (!list.length) return;
+    const at = list.indexOf(focusCourse);
+    focus(list[(at + delta + list.length) % list.length]);
+}
+
+// ---------- keyboard ----------
+//
+// The review is a sweep, not a form. Every action that moves it forward is
+// one key with a hand resting on the keyboard: step to the next block that
+// needs a decision, say what it is, move on. Reaching for the mouse per
+// field is what made the last version unusable.
+
+// Blocks in reading order, which is the order you check them in.
+function ordered() {
+    return live()
+        .filter(({ r }) => r.bbox && (!focusCourse || r.course === focusCourse))
+        .sort((a, b) => (a.r.bbox[1] - b.r.bbox[1]) || (a.r.bbox[0] - b.r.bbox[0]));
+}
+
+function step(delta, flaggedOnly) {
+    let list = ordered();
+    if (flaggedOnly) {
+        const need = list.filter(({ r }) => r.flags.length && !r._done);
+        if (need.length) list = need;
+    }
+    if (!list.length) return;
+    const at = list.findIndex(({ i }) => i === sel);
+    const next = at < 0 ? (delta > 0 ? 0 : list.length - 1)
+        : (at + delta + list.length) % list.length;
+    select(list[next].i);
+    document.querySelector(".bx.sel")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function checkAll() {
+    const list = live();
+    if (!confirm(`Mark all ${list.length} blocks on this sheet as checked?`)) return;
+    list.forEach(({ i }) => setField(i, "_done", true));
+    render();
+}
+
+function keys(e) {
+    // e.target is the document itself when nothing is focused, and
+    // Document has no .matches -- checking it directly threw on every
+    // keypress and killed the shortcuts silently.
+    const el = e.target instanceof Element ? e.target : null;
+    if (el && el.matches("input, select, textarea")) {
+        if (e.key === "Escape") el.blur();
+        return;
+    }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    const k = e.key;
+    const nav = {
+        j: 1, ArrowDown: 1, ArrowRight: 1,
+        k: -1, ArrowUp: -1, ArrowLeft: -1,
+    };
+    if (k in nav) { e.preventDefault(); step(nav[k], false); return; }
+    if (k === "n") { e.preventDefault(); step(1, true); return; }
+    if (k === "N") { e.preventDefault(); step(-1, true); return; }
+    if (k === "Escape") { sel = null; setDrawing(null); render(); return; }
+    if (k === "A") { e.preventDefault(); checkAll(); return; }
+    if (k === "E") { e.preventDefault(); exportWeek(); return; }
+    if (k === "?") { $("#keys").hidden = !$("#keys").hidden; return; }
+    if (k === "]") { e.preventDefault(); stepCourse(1); return; }
+    if (k === "[") { e.preventDefault(); stepCourse(-1); return; }
+    if (k === "a") { e.preventDefault(); focus(null); return; }
+    if (k === "C" && focusCourse) {
+        e.preventDefault();
+        ordered().forEach(({ i }) => setField(i, "_done", true));
+        render();
+        return;
+    }
+    if (k === "f") {
+        onlyFlagged = !onlyFlagged;
+        $("#hideOk").classList.toggle("on", onlyFlagged);
+        render();
+        return;
+    }
+
+    if (sel == null) return;
+    e.preventDefault();
+    const r = rowOf(sel);
+
+    // Check-and-advance: the sweep should not need two keys per block.
+    if (k === "c" || k === "Enter" || k === " ") {
+        setField(sel, "_done", !r._done);
+        render();
+        step(1, onlyFlagged);
+        return;
+    }
+    if (k === "x") { setField(sel, "_cut", true); sel = null; render(); step(1, onlyFlagged); return; }
+    const kind = { e: "", t: "tut", l: "lab", p: "proj" };
+    if (k in kind) { setField(sel, "kind", kind[k]); render(); return; }
+    if ("0123".includes(k)) { setField(sel, "group", Number(k)); render(); return; }
+    if (k === "s") { $("#insp input")?.focus(); return; }
+}
+
 // ---------- export ----------
 
 function exportWeek() {
@@ -378,8 +501,10 @@ function exportWeek() {
     rows.forEach((r) => (byDay[r.day] = byDay[r.day] || []).push(r));
 
     let out = `// ${sheet}\n// ${rows.length} blocks\n`;
+    // Checking is a bookkeeping aid for a long sweep, never a gate. Export
+    // always emits everything; the count is a note, not a blocker.
     const un = live().filter(({ r }) => !r._done).length;
-    if (un) out += `// ${un} block(s) NOT yet checked against the sheet\n`;
+    if (un) out += `// ${un} block(s) not ticked as checked (exported anyway)\n`;
     out += "const WEEK = {\n";
     DAYS.forEach((d) => {
         const list = (byDay[d] || []).sort((a, b) => a.start.localeCompare(b.start));
@@ -456,10 +581,9 @@ async function boot() {
     });
     $("#export").addEventListener("click", exportWeek);
 
-    document.addEventListener("keydown", (e) => {
-        if (e.target.matches("input, select, textarea")) return;
-        if (e.key === "Escape") { sel = null; setDrawing(null); render(); }
-    });
+    $("#checkAll").addEventListener("click", checkAll);
+    $("#help").addEventListener("click", () => $("#keys").hidden = !$("#keys").hidden);
+    document.addEventListener("keydown", keys);
 
     bindRegionDrawing();
     pick(s.value);

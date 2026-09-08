@@ -71,6 +71,20 @@
             color: var(--fg-faint);
         }
 
+        .mp-keys {
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--rule);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--fg-soft);
+            line-height: 1.8;
+        }
+
+        .mp-keys b {
+            color: var(--coral);
+            font-weight: 600;
+        }
+
         /* ---------- course legend ---------- */
 
         .mp-legend {
@@ -107,7 +121,14 @@
         }
 
         .lg.dim {
-            opacity: 0.32;
+            opacity: 0.34;
+        }
+
+        .lg.on {
+            border-color: var(--coral);
+            border-width: 2px;
+            padding: 1px 8px 1px 2px;
+            background: var(--coral-soft, rgba(30, 64, 175, .1));
         }
 
         .lg b {
@@ -172,6 +193,18 @@
         }
 
         .bx.hide {
+            display: none;
+        }
+
+        /* Focus mode: other courses stay visible so you can still see a
+           clash, but drop out of the way and out of the click order. */
+        .bx.off {
+            opacity: 0.16;
+            pointer-events: none;
+        }
+
+        .bx.off .bx-tag,
+        .bx.off .bx-t {
             display: none;
         }
 
@@ -383,8 +416,17 @@
         <button id="drawCourses" type="button" title="Drag a box round the course/L-T-P-C table">mark course table</button>
         <button id="hideOk" type="button" title="Show only the blocks the parser flagged">only flagged</button>
         <button id="zero" type="button">groups → 0</button>
-        <button id="export" type="button">export WEEK</button>
+        <button id="checkAll" type="button" title="Mark every block checked (A)">check all</button>
+        <button id="export" type="button" title="E">export WEEK</button>
+        <button id="help" type="button" title="?">keys</button>
         <span class="sp" id="count"></span>
+    </div>
+
+    <div class="mp-keys" id="keys" hidden>
+        <b>j / k</b> next · prev block &nbsp; <b>n</b> next flagged &nbsp; <b>c</b> or <b>space</b> check &amp; advance
+        &nbsp; <b>x</b> not a class &nbsp; <b>e t l p</b> lecture · tutorial · lab · project
+        &nbsp; <b>0 1 2</b> group &nbsp; <b>[ ]</b> prev · next course &nbsp; <b>a</b> all courses &nbsp; <b>C</b> check this course &nbsp; <b>f</b> only-flagged &nbsp; <b>A</b> check all
+        &nbsp; <b>E</b> export &nbsp; <b>s</b> edit fields &nbsp; <b>Esc</b> deselect
     </div>
 
     <div class="mp-legend" id="legend"></div>

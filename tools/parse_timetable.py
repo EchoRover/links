@@ -372,6 +372,8 @@ def parse(pdf_path):
                 "ok": not flags,
             })
 
+    blocks = absorb_continuations(blocks)
+
     if not blocks:
         notes.append("table found but no populated time cells — check the layout")
     if not courses:
@@ -408,6 +410,84 @@ def parse_by_coordinates(pdf_path):
             "flags": flags, "ok": not flags,
         })
     return blocks, ["no column ruler — read by word coordinate instead"]
+
+
+def absorb_continuations(blocks):
+    """Fold a cell into the one directly above it when it is that block's
+    continuation rather than a block of its own.
+
+    A block is drawn as TWO STACKED CELLS on these sheets: the upper names
+    the course and room, the lower prints the real span ("8:00 - 9:50 Lab
+    1st 2hrs") and any note. Read apart they are a block with no end time
+    and a mystery cell with no course.
+
+    This runs on GEOMETRY, not row indices. An earlier version matched
+    grid[r] against grid[r+1] and silently missed every Wednesday block,
+    because a day's two group bands are not always adjacent rows in
+    pdfplumber's model. Same edges, touching vertically, no course code of
+    its own: that is a continuation, wherever it lands in the row list.
+
+    Merging also settles GROUP. A cell pair that covers both group bands is
+    one class for everyone, so the merged block is group 0. Emitting the
+    upper cell's row number instead is what split whole-cohort lectures
+    into a phantom g1 and g2.
+    """
+    out, eaten = [], set()
+    for i, a in enumerate(blocks):
+        if i in eaten or not a["bbox"] or not a["course"]:
+            continue
+        for j, b in enumerate(blocks):
+            if j == i or j in eaten or b["course"] or not b["bbox"]:
+                continue
+            same_cols = (abs(b["bbox"][0] - a["bbox"][0]) < 2
+                         and abs(b["bbox"][2] - a["bbox"][2]) < 2)
+            touching = abs(b["bbox"][1] - a["bbox"][3]) < 3
+            if not (same_cols and touching):
+                continue
+            eaten.add(j)
+            a["raw"] = (a["raw"] + " " + b["raw"]).strip()
+            a["bbox"] = [a["bbox"][0], a["bbox"][1], a["bbox"][2], b["bbox"][3]]
+            # It covers both group bands, so it is not group-specific.
+            a["group"] = 0
+            own = CELL_SPAN.search(a["raw"])
+            if own:
+                a["start"] = hhmm(*own.group(1, 2))
+                a["end"] = hhmm(*own.group(3, 4))
+                a["time_from"] = "printed in the cell"
+            kind, kind_from = infer_kind(a["raw"])
+            if kind:
+                a["kind"], a["kind_from"] = kind, kind_from
+            rooms = ROOM_TOK.findall(a["raw"])
+            if not a["room"] and len(rooms) == 1:
+                a["room"] = rooms[0].replace(".", "-")
+            break
+
+    for i, b in enumerate(blocks):
+        if i in eaten:
+            continue
+        b["flags"] = [f for f in b["flags"]
+                      if not (b["course"] and f.startswith(("no room", "span runs")))
+                      or not b["room"]]
+        if b["course"]:
+            b["flags"] = [f for f in b["flags"] if "no course code" not in f]
+            if b["room"]:
+                b["flags"] = [f for f in b["flags"] if not f.startswith("no room")]
+            if b["time_from"] == "column ruler":
+                b["flags"].append("end time is a column edge, the cell printed none")
+                b["flags"] = list(dict.fromkeys(b["flags"]))
+        # GROUP, defaulted honestly. The sheet draws a whole-cohort class
+        # inside the group 1 band, so its row number is not evidence the
+        # class is group-specific -- taking it at face value split every
+        # lecture into a phantom g1 and g2. What DOES split in practice is
+        # tutorials, which is why the sheet has group bands at all. So:
+        # everything is group 0 unless it is a tutorial, and the tutorials
+        # keep the band they were drawn in. Wrong cases are visible on the
+        # map and are one keystroke to fix.
+        if b["kind"] != "tut":
+            b["group"] = 0
+        b["ok"] = not b["flags"]
+        out.append(b)
+    return out
 
 
 def report(name, blocks, notes, courses):
