@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Timetable Editor · linkCS</title>
+    <link rel="icon" type="image/webp" href="assets/hacker.webp">
+    <script src="js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!--
+      THE PDF IS ON SCREEN ON PURPOSE, and it is half the width.
+
+      The failure this tool exists to prevent is not slow typing, it is
+      confident wrong transcription: re-reading a grid does not catch your
+      mistakes because you re-read it the same wrong way. What catches them
+      is checking against a DIFFERENT rendering of the source. So the sheet
+      sits next to the rows, and the row you are editing is the row you are
+      looking at. Never collapse this to a full-width table.
+    -->
+    <style>
+        .ed-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            height: calc(100vh - 62px);
+        }
+
+        .ed-pdf {
+            border-right: 1px solid var(--rule);
+            background: var(--bg-card);
+        }
+
+        .ed-pdf embed,
+        .ed-pdf iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .ed-side {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        /* ---------- control bar ---------- */
+
+        .ed-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--rule);
+            background: var(--bg-card);
+        }
+
+        .ed-bar select,
+        .ed-bar button {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            padding: 5px 10px;
+            border: 1px solid var(--rule);
+            border-radius: 7px;
+            background: var(--bg);
+            color: var(--fg);
+            cursor: pointer;
+        }
+
+        .ed-bar select {
+            max-width: 300px;
+        }
+
+        .ed-bar button:hover {
+            border-color: var(--coral);
+            color: var(--coral);
+        }
+
+        .ed-bar button.on {
+            background: var(--coral);
+            border-color: var(--coral);
+            color: var(--bg-card);
+        }
+
+        .ed-count {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--fg-faint);
+            margin-left: auto;
+        }
+
+        .ed-count b {
+            color: var(--coral);
+        }
+
+        /* ---------- the rows ---------- */
+
+        .ed-rows {
+            flex: 1;
+            overflow: auto;
+            padding: 0 0 120px;
+        }
+
+        table.ed {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+        }
+
+        table.ed thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--rule);
+            text-align: left;
+            padding: 7px 6px;
+            font-size: 0.66rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--fg-faint);
+            font-weight: 500;
+        }
+
+        table.ed td {
+            border-bottom: 1px solid var(--rule-faint, rgba(128, 128, 128, 0.15));
+            padding: 0;
+            vertical-align: middle;
+        }
+
+        table.ed input,
+        table.ed select {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            font: inherit;
+            color: var(--fg);
+            padding: 6px 6px;
+            border-radius: 0;
+        }
+
+        table.ed input:focus,
+        table.ed select:focus {
+            outline: 2px solid var(--coral);
+            outline-offset: -2px;
+            background: var(--bg-card);
+        }
+
+        /* A row the parser was not sure about. The tool measured itself as
+           right about course/day/start on every block it flagged clean, so
+           the honest default is: look at THESE, trust the rest. */
+        tr.flag td:first-child {
+            box-shadow: inset 3px 0 0 var(--warn, #D97706);
+        }
+
+        tr.done {
+            opacity: 0.42;
+        }
+
+        tr.done:focus-within {
+            opacity: 1;
+        }
+
+        .cell-why {
+            font-size: 0.62rem;
+            color: var(--warn, #D97706);
+            padding: 0 6px 5px;
+            line-height: 1.35;
+        }
+
+        /* The PDF's own words for this block, never editable. It is the
+           evidence, so it must be impossible to overwrite by accident. */
+        .cell-raw {
+            font-size: 0.64rem;
+            color: var(--fg-faint);
+            padding: 0 6px 5px;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        td.tick {
+            width: 26px;
+            text-align: center;
+        }
+
+        td.tick input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        td.del button {
+            border: 0;
+            background: none;
+            color: var(--fg-faint);
+            cursor: pointer;
+            padding: 4px 7px;
+            font-size: 0.85rem;
+        }
+
+        td.del button:hover {
+            color: #DC2626;
+        }
+
+        .w-day {
+            width: 112px;
+        }
+
+        .w-t {
+            width: 62px;
+        }
+
+        .w-g {
+            width: 40px;
+        }
+
+        .w-c {
+            width: 88px;
+        }
+
+        .w-r {
+            width: 96px;
+        }
+
+        .w-k {
+            width: 62px;
+        }
+
+        /* ---------- export ---------- */
+
+        .ed-out {
+            border-top: 1px solid var(--rule);
+            background: var(--bg-card);
+            padding: 10px 14px;
+        }
+
+        .ed-out textarea {
+            width: 100%;
+            height: 150px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            line-height: 1.5;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--fg);
+            padding: 9px;
+            resize: vertical;
+        }
+
+        .ed-hint {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--fg-faint);
+            padding: 8px 14px 0;
+            line-height: 1.5;
+        }
+
+        .ed-hint kbd {
+            border: 1px solid var(--rule);
+            border-radius: 4px;
+            padding: 0 4px;
+            color: var(--fg-soft);
+        }
+
+        @media (max-width: 900px) {
+            .ed-wrap {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .ed-pdf {
+                height: 60vh;
+                border-right: 0;
+                border-bottom: 1px solid var(--rule);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-name">
+                <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+            </span>
+            <span class="brand-meta">timetable editor</span>
+        </div>
+        <div class="topbar-utils">
+            <a href="./" class="pill"><span class="pill-name">← Home</span></a>
+            <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+        </div>
+    </header>
+
+    <div class="ed-wrap">
+        <div class="ed-pdf"><iframe id="pdf" title="Official timetable sheet"></iframe></div>
+
+        <div class="ed-side">
+            <div class="ed-bar">
+                <select id="sheet"></select>
+                <button id="only" type="button">only flagged</button>
+                <button id="zero" type="button" title="Set every group to 0 (applies to everyone)">groups → 0</button>
+                <button id="export" type="button">export WEEK</button>
+                <button id="reset" type="button">discard edits</button>
+                <span class="ed-count" id="count"></span>
+            </div>
+
+            <p class="ed-hint">
+                <kbd>Tab</kbd> next field · <kbd>Enter</kbd> same field, next row ·
+                <kbd>⌘↵</kbd> mark row checked. Edits save as you type.<br>
+                <b>Group is the sheet's ROW, not a claim the class is group-specific</b> — on the Y3 sheet only the HUL tutorials really are. Hit “groups → 0”, then set those few back.
+            </p>
+
+            <div class="ed-rows">
+                <table class="ed">
+                    <thead>
+                        <tr>
+                            <th class="tick" title="checked against the sheet">✓</th>
+                            <th class="w-day">Day</th>
+                            <th class="w-g">Grp</th>
+                            <th class="w-t">Start</th>
+                            <th class="w-t">End</th>
+                            <th class="w-c">Course</th>
+                            <th class="w-r">Room</th>
+                            <th class="w-k">Kind</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="rows"></tbody>
+                </table>
+            </div>
+
+            <div class="ed-out">
+                <textarea id="out" spellcheck="false"
+                    placeholder="Press “export WEEK” for a block you can paste into js/timetable.js."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/ttedit.js" defer></script>
+</body>
+
+</html>
