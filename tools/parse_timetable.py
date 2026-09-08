@@ -60,6 +60,14 @@ except ImportError:
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SHEETS = ROOT / "data" / "timetables"
+IMGS = SHEETS / "img"
+
+# 72pt = 1in, so this is the pt -> px factor the editor multiplies every
+# bbox by to lay its overlay on the rendered page. It MUST match what the
+# PNG was rendered at or the boxes drift, so it is written into the JSON
+# rather than agreed by convention in two files.
+DPI = 140
+SCALE = DPI / 72
 
 DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
         "Saturday", "Sunday")
@@ -122,14 +130,125 @@ def span_of(cells, i):
     return n
 
 
+# The sheet's OTHER half. The week grid is what gets transcribed; the
+# course table is not, which is exactly what makes it usable as a check on
+# the grid rather than a second reading of it. L-T-P-C says, per course and
+# independently of the drawing, how many lecture / tutorial / practical
+# hours must exist. That is what says whether a course HAS a lab at all.
+LTPC = re.compile(r"^\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)\s*$")
+
+
+# The sheets label a block's KIND in words inside the cell -- "Tutorial",
+# "Lab 1st 2hrs", "Reserved for ACOD310". Read it rather than inferring it
+# from duration, which is how an unlabelled 110-minute lab reads as a
+# lecture, confidently, every time.
+#
+# The room NAME is stripped first: "M3-Computer Lab 03" contains the word
+# Lab and is not evidence of anything. That false positive would mark every
+# class held in a computer lab as a practical.
+ROOM_LABEL = re.compile(r"M\d-(?:Computer\s+Lab|Classroom|Energy\s+Lab)\s*\d*", re.I)
+
+
+def infer_kind(text):
+    body = ROOM_LABEL.sub(" ", text)
+    if re.search(r"\btut(orial)?\b", body, re.I):
+        return "tut", "the cell says so"
+    if re.search(r"\blab\b|\bpractical\b", body, re.I):
+        return "lab", "the cell says so"
+    if re.search(r"\breserved for\b|\bproject\b", body, re.I):
+        return "proj", "the cell says so"
+    return "", "assumed lecture"
+
+
+def parse_courses(page):
+    """{code: {title, ltpc, faculty}} from the sheet's own course table.
+
+    Returns {} when the sheet does not carry one -- the Year 1 sheets do
+    not. Missing is reported, never faked: a course list invented from the
+    grid would agree with the grid by construction and check nothing.
+    """
+    for table in page.find_tables():
+        rows = table.extract()
+        if not rows or not any("L-T-P-C" in (c or "") for c in rows[0]):
+            continue
+        head = [(c or "").strip().lower() for c in rows[0]]
+        col = {name: head.index(name) for name in
+               ("course", "title", "l-t-p-c", "faculty") if name in head}
+        out = {}
+        for row in rows[1:]:
+            code = (row[col["course"]] or "").strip() if "course" in col else ""
+            if not COURSE_TOK.fullmatch(code):
+                continue
+            m = LTPC.match((row[col["l-t-p-c"]] or "")) if "l-t-p-c" in col else None
+            out[code] = {
+                "title": " ".join((row[col["title"]] or "").split()) if "title" in col else "",
+                "faculty": " ".join((row[col["faculty"]] or "").split()) if "faculty" in col else "",
+                "ltpc": [int(x) for x in m.groups()] if m else None,
+            }
+        if out:
+            return out
+    return {}
+
+
+def hexcolor(c):
+    """pdfplumber gives fills as 0-1 floats: a scalar for grey, a 3-tuple
+    for RGB, a 4-tuple for CMYK. The sheet colour-codes each course, so
+    this is what lets the overlay use the SHEET's own colours instead of a
+    palette I invent -- the box is then obviously the same block as the
+    cell under it."""
+    if c is None:
+        return None
+    if isinstance(c, (int, float)):
+        c = (c, c, c)
+    c = tuple(c)
+    if len(c) == 4:
+        k = c[3]
+        c = tuple((1 - x) * (1 - k) for x in c[:3])
+    if len(c) == 1:
+        c = c * 3
+    if len(c) != 3:
+        return None
+    return "#" + "".join(f"{max(0, min(255, round(x * 255))):02x}" for x in c)
+
+
+def fill_at(rects, bbox):
+    """Fill colour of the smallest filled rect covering this cell's centre."""
+    cx, cy = (bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2
+    best = None
+    for r in rects:
+        if r["x0"] <= cx <= r["x1"] and r["top"] <= cy <= r["bottom"]:
+            area = (r["x1"] - r["x0"]) * (r["bottom"] - r["top"])
+            if best is None or area < best[0]:
+                best = (area, r)
+    return hexcolor(best[1].get("non_stroking_color")) if best else None
+
+
+def render_page(pdf_path, page):
+    """Write the page as a PNG the editor draws its overlay on top of.
+
+    The whole point of the overlay is that a wrong block is VISIBLE: a box
+    that does not sit on the cell it claims to describe is obviously wrong,
+    where the same error in a table of times is invisible.
+    """
+    IMGS.mkdir(exist_ok=True)
+    out = IMGS / (pdf_path.stem + ".png")
+    page.to_image(resolution=DPI).save(str(out))
+    return f"data/timetables/img/{out.name}"
+
+
 def parse(pdf_path):
     blocks, notes = [], []
 
     with pdfplumber.open(pdf_path) as pdf:
         page = pdf.pages[0]
+        courses = parse_courses(page)
+        img = render_page(pdf_path, page)
+        page_meta = {"img": img, "w": float(page.width), "h": float(page.height),
+                     "scale": SCALE}
+        fills = [r for r in page.rects if r.get("non_stroking_color") is not None]
         tables = page.find_tables()
         if not tables:
-            return [], ["no ruled table found on page 1 — unsupported layout"]
+            return [], ["no ruled table found on page 1 — unsupported layout"], courses, page_meta
         # Pick the week grid by ITS HEADER, not by its size. On the M.Tech
         # sheets the biggest table is the Course/Title/L-T-P-C list, so
         # "largest table" silently analysed the credit table and reported an
@@ -146,7 +265,8 @@ def parse(pdf_path):
         # No time-ruler grid on this sheet. That is the OTHER layout, where
         # each block prints its own span and there is no ruler at all, so
         # hand it to the word-coordinate reader that was written for it.
-        return parse_by_coordinates(pdf_path)
+        blocks, notes = parse_by_coordinates(pdf_path)
+        return blocks, notes, courses, page_meta
 
     time_cols = [i for i, r in enumerate(ruler) if r]
     label_cols = [i for i in range(len(ruler)) if i < min(time_cols)]
@@ -200,6 +320,7 @@ def parse(pdf_path):
             if not text:
                 continue
 
+            box = cells[i]
             n = span_of(cells, i)
             last = i + n - 1
             start = ruler[i][0]
@@ -211,7 +332,8 @@ def parse(pdf_path):
                 start, end = hhmm(*own.group(1, 2)), hhmm(*own.group(3, 4))
                 source = "printed in the cell"
 
-            courses = COURSE_TOK.findall(text)
+            kind, kind_from = infer_kind(text)
+            codes = COURSE_TOK.findall(text)
             rooms = ROOM_TOK.findall(text)
 
             flags = []
@@ -219,14 +341,14 @@ def parse(pdf_path):
                 flags.append("no day — nothing above this row named one")
             if end is None:
                 flags.append("span runs past the last ruler column")
-            if not courses:
+            if not codes:
                 # Real and common: "May be used for additional classes",
                 # "Lecture Hall", free-text notes. Kept rather than dropped,
                 # because a slot the sheet reserves is information even when
                 # it names no course.
                 flags.append("no course code — free text, needs a human")
-            if len(courses) > 1:
-                flags.append(f"{len(courses)} course codes in one cell")
+            if len(codes) > 1:
+                flags.append(f"{len(codes)} course codes in one cell")
             if not rooms:
                 flags.append("no room code")
 
@@ -235,10 +357,16 @@ def parse(pdf_path):
                 "group": group,
                 "start": start,
                 "end": end,
-                "course": courses[0] if len(courses) == 1 else None,
+                "course": codes[0] if len(codes) == 1 else None,
                 "room": rooms[0].replace(".", "-") if len(rooms) == 1 else None,
                 "cols": n,
                 "time_from": source,
+                # Page coordinates in points, exactly as the cell is drawn.
+                # The editor scales these by page.scale to position its box.
+                "bbox": [round(v, 2) for v in box] if box else None,
+                "fill": fill_at(fills, box) if box else None,
+                "kind": kind,
+                "kind_from": kind_from,
                 "raw": " ".join(text.split()),
                 "flags": flags,
                 "ok": not flags,
@@ -246,7 +374,10 @@ def parse(pdf_path):
 
     if not blocks:
         notes.append("table found but no populated time cells — check the layout")
-    return blocks, notes
+    if not courses:
+        notes.append("no L-T-P-C course table on this sheet — "
+                     "nothing to reconcile the grid against")
+    return blocks, notes, courses, page_meta
 
 
 def parse_by_coordinates(pdf_path):
@@ -271,19 +402,22 @@ def parse_by_coordinates(pdf_path):
         blocks.append({
             "day": day, "group": None, "start": start, "end": end,
             "course": course, "room": (room or "").replace(".", "-") or None,
-            "cols": None, "time_from": "printed in the cell",
+            "cols": None, "time_from": "printed in the cell", "bbox": None, "fill": None,
+            "kind": "", "kind_from": "assumed lecture",
             "raw": f"{course} {room or ''}".strip(),
             "flags": flags, "ok": not flags,
         })
     return blocks, ["no column ruler — read by word coordinate instead"]
 
 
-def report(name, blocks, notes):
+def report(name, blocks, notes, courses):
     clean = sum(1 for b in blocks if b["ok"])
     flagged = len(blocks) - clean
     status = "EMPTY " if not blocks else "      "
+    creds = sum(1 for c in courses.values() if c["ltpc"])
     print(f"{status}{name:44s} {len(blocks):3d} blocks  "
-          f"{clean:3d} clean  {flagged:3d} need review", file=sys.stderr)
+          f"{clean:3d} clean  {flagged:3d} need review  "
+          f"{creds:2d} courses w/ L-T-P-C", file=sys.stderr)
     for n in notes:
         print(f"        ! {n}", file=sys.stderr)
 
@@ -301,9 +435,10 @@ def main():
 
     result, empty = {}, 0
     for pdf in sheets:
-        blocks, notes = parse(pdf)
-        report(pdf.name, blocks, notes)
-        result[pdf.name] = {"blocks": blocks, "notes": notes}
+        blocks, notes, courses, page_meta = parse(pdf)
+        report(pdf.name, blocks, notes, courses)
+        result[pdf.name] = {"blocks": blocks, "notes": notes,
+                            "courses": courses, "page": page_meta}
         if not blocks:
             empty += 1
 

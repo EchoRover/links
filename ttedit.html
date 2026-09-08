@@ -24,16 +24,29 @@
       looking at. Never collapse this to a full-width table.
     -->
     <style>
+        /* THE PAGE SCROLLS. Normally, like every other page on this site.
+           Two earlier versions made this a fixed-height app shell with its
+           own inner scroll container, and both broke: the first hardcoded
+           the header at 62px (it is 77), so the panes ran past the bottom
+           of the viewport and their scrollbars started below the fold. The
+           lesson is not "measure the header better", it is that a nested
+           scroll container is a thing that can trap the wheel, and there is
+           no reason to have one here. The PDF is pinned with `sticky`
+           instead, which gets the same side-by-side reading without taking
+           the scroll away from the document. */
         .ed-wrap {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 0;
-            height: calc(100vh - 62px);
+            align-items: start;
         }
 
         .ed-pdf {
             border-right: 1px solid var(--rule);
             background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            height: 100dvh;
         }
 
         .ed-pdf embed,
@@ -44,15 +57,17 @@
         }
 
         .ed-side {
-            display: flex;
-            flex-direction: column;
             min-width: 0;
-            min-height: 0;
         }
 
         /* ---------- control bar ---------- */
 
+        /* Sticky so the sheet picker and export stay reachable however far
+           down the cards you are. */
         .ed-bar {
+            position: sticky;
+            top: 0;
+            z-index: 3;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -103,9 +118,7 @@
         /* ---------- the rows ---------- */
 
         .ed-rows {
-            flex: 1;
-            overflow: auto;
-            padding: 0 0 120px;
+            padding: 0 0 40px;
         }
 
         table.ed {
@@ -233,17 +246,240 @@
             width: 62px;
         }
 
+        /* ---------- course cards ---------- */
+
+        #courses {
+            padding: 12px 14px 0;
+        }
+
+        .cc {
+            border: 1px solid var(--rule);
+            border-radius: 11px;
+            background: var(--bg-card);
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+
+        /* A course whose hours do not add up to what the sheet's own credit
+           table demands. This is the one thing worth scanning for. */
+        .cc-bad {
+            border-color: var(--warn, #D97706);
+        }
+
+        .cc-head {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .cc-code {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--fg);
+        }
+
+        .cc-ltpc {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            color: var(--coral);
+            border: 1px solid var(--rule);
+            border-radius: 5px;
+            padding: 1px 6px;
+        }
+
+        .cc-title {
+            font-size: 0.82rem;
+            color: var(--fg-soft);
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .cc-verdict {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+
+        .cc-verdict.good {
+            color: #15803D;
+            background: rgba(21, 128, 61, 0.12);
+        }
+
+        .cc-verdict.bad {
+            color: var(--warn, #D97706);
+            background: rgba(217, 119, 6, 0.14);
+        }
+
+        .cc-fac {
+            font-size: 0.74rem;
+            color: var(--fg-faint);
+            margin: 3px 0 0;
+        }
+
+        .cc-bar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 9px 0 4px;
+        }
+
+        .chip {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            border: 1px solid var(--rule);
+            color: var(--fg-soft);
+        }
+
+        .chip-good {
+            color: #15803D;
+            border-color: rgba(21, 128, 61, 0.4);
+        }
+
+        .chip-bad {
+            color: var(--warn, #D97706);
+            border-color: rgba(217, 119, 6, 0.5);
+        }
+
+        .chip-info {
+            color: var(--coral);
+            border-color: var(--coral);
+        }
+
+        .cc-rows {
+            margin-top: 6px;
+        }
+
+        .bl {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+            padding: 5px 0 0;
+            border-top: 1px solid var(--rule-faint, rgba(128, 128, 128, 0.14));
+        }
+
+        .bl input,
+        .bl select {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            padding: 3px 5px;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            background: var(--bg);
+            color: var(--fg);
+        }
+
+        .bl input:hover,
+        .bl select:hover {
+            border-color: var(--rule);
+        }
+
+        .bl input:focus,
+        .bl select:focus {
+            outline: 2px solid var(--coral);
+            outline-offset: -1px;
+        }
+
+        .bl .f-t {
+            width: 56px;
+        }
+
+        .bl .f-r {
+            width: 84px;
+        }
+
+        .bl .f-g {
+            width: 34px;
+        }
+
+        .bl .f-c {
+            width: 78px;
+        }
+
+        .bl-dur {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--fg-faint);
+            margin-left: auto;
+        }
+
+        .bl-del {
+            border: 0;
+            background: none;
+            color: var(--fg-faint);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 5px;
+        }
+
+        .bl-del:hover {
+            color: #DC2626;
+        }
+
+        .bl-evi {
+            flex-basis: 100%;
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            color: var(--fg-faint);
+            margin: 0 0 4px;
+            line-height: 1.4;
+        }
+
+        .bl-flag .bl-evi {
+            color: var(--warn, #D97706);
+        }
+
+        .bl-done {
+            opacity: 0.45;
+        }
+
+        .bl-done:focus-within {
+            opacity: 1;
+        }
+
+        .ed-warn {
+            font-size: 0.75rem;
+            color: var(--warn, #D97706);
+            line-height: 1.5;
+            margin: 6px 0;
+        }
+
         /* ---------- export ---------- */
 
+        /* Collapsed by default. It was standing 190px tall doing nothing
+           on a pane whose whole job is showing course cards. Pinned to the
+           bottom so export output is reachable without scrolling to find it. */
         .ed-out {
+            position: sticky;
+            bottom: 0;
+            z-index: 3;
             border-top: 1px solid var(--rule);
             background: var(--bg-card);
-            padding: 10px 14px;
+            padding: 8px 14px;
+        }
+
+        .ed-out summary {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--fg-faint);
+            cursor: pointer;
+            padding: 2px 0;
+        }
+
+        .ed-out[open] summary {
+            margin-bottom: 7px;
         }
 
         .ed-out textarea {
             width: 100%;
-            height: 150px;
+            height: min(190px, 30dvh);
             font-family: var(--font-mono);
             font-size: 0.7rem;
             line-height: 1.5;
@@ -273,11 +509,11 @@
         @media (max-width: 900px) {
             .ed-wrap {
                 grid-template-columns: 1fr;
-                height: auto;
             }
 
             .ed-pdf {
-                height: 60vh;
+                position: static;
+                height: 60dvh;
                 border-right: 0;
                 border-bottom: 1px solid var(--rule);
             }
@@ -305,8 +541,12 @@
         <div class="ed-side">
             <div class="ed-bar">
                 <select id="sheet"></select>
+                <button id="tabCourses" type="button" class="on">courses</button>
+                <button id="tabRows" type="button">all rows</button>
                 <button id="only" type="button">only flagged</button>
                 <button id="zero" type="button" title="Set every group to 0 (applies to everyone)">groups → 0</button>
+                <button id="prompt" type="button" title="Copy a prompt to paste with a screenshot into any model">copy AI prompt</button>
+                <button id="ingest" type="button" title="Replace this sheet's blocks with JSON pasted below">ingest JSON</button>
                 <button id="export" type="button">export WEEK</button>
                 <button id="reset" type="button">discard edits</button>
                 <span class="ed-count" id="count"></span>
@@ -315,10 +555,13 @@
             <p class="ed-hint">
                 <kbd>Tab</kbd> next field · <kbd>Enter</kbd> same field, next row ·
                 <kbd>⌘↵</kbd> mark row checked. Edits save as you type.<br>
-                <b>Group is the sheet's ROW, not a claim the class is group-specific</b> — on the Y3 sheet only the HUL tutorials really are. Hit “groups → 0”, then set those few back.
+                Cards come from the sheet's own <b>L-T-P-C</b> table, which the grid was not transcribed from, so a mismatch is real evidence. <b>Group is the sheet's ROW</b>, not a claim the class is group-specific — hit “groups → 0”, then set the real ones back.
             </p>
 
             <div class="ed-rows">
+                <div id="courses"></div>
+
+                <div id="rowsWrap" hidden>
                 <table class="ed">
                     <thead>
                         <tr>
@@ -335,11 +578,13 @@
                     </thead>
                     <tbody id="rows"></tbody>
                 </table>
+                </div>
             </div>
 
-            <div class="ed-out">
+            <details class="ed-out" id="outBox">
+                <summary>JSON in / out — export lands here, paste a model's array here</summary>
                 <textarea id="out" spellcheck="false"
-                    placeholder="Press “export WEEK” for a block you can paste into js/timetable.js."></textarea>
+                    placeholder="export WEEK writes here. Or paste a model&#39;s JSON array here and press “ingest JSON”."></textarea>
             </div>
         </div>
     </div>
