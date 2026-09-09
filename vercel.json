@@ -1,0 +1,19 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/bus", "destination": "/pages/bus.html" },
+    { "source": "/bus.html", "destination": "/pages/bus.html" },
+    { "source": "/week", "destination": "/pages/week.html" },
+    { "source": "/week.html", "destination": "/pages/week.html" },
+    { "source": "/rooms", "destination": "/pages/rooms.html" },
+    { "source": "/rooms.html", "destination": "/pages/rooms.html" },
+    { "source": "/common", "destination": "/pages/common.html" },
+    { "source": "/common.html", "destination": "/pages/common.html" },
+    { "source": "/campus", "destination": "/pages/campus.html" },
+    { "source": "/campus.html", "destination": "/pages/campus.html" },
+    { "source": "/campustools", "destination": "/pages/campustools.html" },
+    { "source": "/campustools.html", "destination": "/pages/campustools.html" },
+    { "source": "/timetables", "destination": "/pages/timetables.html" },
+    { "source": "/timetables.html", "destination": "/pages/timetables.html" }
+  ]
+}

@@ -10,7 +10,7 @@ const linksData = {
     Blackboard: "https://iida.blackboard.com/ultra/course",
     Website: "https://iitdabudhabi.ac.ae/",
     Faculty: "https://iitdabudhabi.ac.ae/faculty",
-    Bus: "bus.html",
+    Bus: "/pages/bus.html",
     "Acd Cal": "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-2026-27Sem1.pdf",
     // The 7 Sep 2026 revision, served from this repo (every sheet lives
     // in data/timetables/, named by the date in its own footer). The
@@ -108,7 +108,7 @@ const linksDataSem4 = {
     "AHUL213 (Macro Econ)": {
       Notes:
         "https://drive.google.com/drive/folders/1VYl6McAKfkJDZSQdlb_vN-aDjYnfkAPy",
-      "Topics for Minor": "./extras/topics-ahul.html",
+      "Topics for Minor": "/extras/topics-ahul.html",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_110_1/outline",
       "Course Page":
         "https://jayanjthomas.wordpress.com/teaching/macroeconomics-for-undergraduates/",
@@ -410,7 +410,8 @@ addUpdate("quizzes", "ACOL331: OS C lab exam 2, 16/09/2026", "2026-09-16");
 
 addUpdate("quizzes", "AHUL261: Psychology quiz, 08/09/2026", "2026-09-08");
 
-// ACOL351 runs a quiz in EVERY tutorial (Wed 10:00-10:50, M4-0-019).
+// ACOL351 runs a quiz in EVERY tutorial (Wed 15:30-16:20, M4-0-019 --
+// moved there in the 7 Sep revision; it was Wed 10:00-10:50 before).
 // No list of dates was ever published, only the pattern, so posting a
 // whole semester of guesses would be inventing dates. Post exactly one:
 // the next tutorial. It stays up through that Wednesday and the day
