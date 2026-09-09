@@ -86,6 +86,24 @@ function bigTime(hhmm) {
     return `<span class="hh">${clock}</span><span class="mer">${mer}</span>`;
 }
 
+// "en route" on its own is a dead end: the bus left, and then what? Standing
+// at the stop you want the next fact, which is where it is going and when it
+// gets there. Only ONE leg has ever been timed - KCA 1&2 -> KCA 3 on the
+// outbound run, and only as a 3-7 minute window (see KCA3_LEG in bus-data.js).
+// The Campus -> KCA 1&2 -> KCA 3 leg has NOT been timed, so that panel names
+// the next stop and gives no number rather than inventing one.
+function enRouteLine(dir, head, now) {
+    const gone = now - head.mins;
+    const ago = gone < 1 ? `just left ${dir.from}` : `left ${dir.from} ${gone} min ago`;
+
+    if (dir.id === "toCampus") {
+        const lo = to12h(addMins(head.time, KCA3_LEG.lo)).split(" ")[0];
+        const hi = to12h(addMins(head.time, KCA3_LEG.hi));
+        return `${ago} · KCA 3 about ${lo}–${hi}`;
+    }
+    return `${ago} · next stop ${dir.stops[1]}`;
+}
+
 function renderPanel(dirId, now) {
     const { sched, dir, head, rest, tomorrow, note } = board(dirId, now);
     const enRoute = !tomorrow && head.mins < now;
@@ -106,6 +124,7 @@ function renderPanel(dirId, now) {
             <span class="lead-eta">${eta}</span>
         </div>
 
+        ${enRoute ? `<p class="panel-enroute">${enRouteLine(dir, head, now)}</p>` : ""}
         ${note ? `<p class="panel-note">${note}</p>` : ""}
 
         <ul class="then">
@@ -143,8 +162,11 @@ function tick(force) {
     if (!force && now === lastMinute) return;
     lastMinute = now;
 
+    // The board hangs in a campus hall, so the reader is standing ON campus:
+    // the bus they need is the one leaving here. Campus -> dorms goes first
+    // (left on a wide screen, top on a vertical one).
     document.getElementById("panels").innerHTML =
-        renderPanel("toCampus", now) + renderPanel("toDorms", now);
+        renderPanel("toDorms", now) + renderPanel("toCampus", now);
     document.body.classList.remove("stale");
 }
 

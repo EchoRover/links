@@ -24,6 +24,19 @@
       contrast at distance, tolerable in a dim hall at night — and there is
       nobody standing at the TV to press a toggle.
     -->
+    <!-- Brightness picker, temporary. Three INVISIBLE zones along the bottom
+         edge (night / mid / bright) and an invisible fullscreen toggle in the
+         top-right corner. Nothing is stored: no cookie, no localStorage, no
+         preference to go stale. A reload lands back on the palette below,
+         which is the one that ships. ?t=night|mid|bright also works. -->
+    <script>
+        (function () {
+            var t = new URLSearchParams(location.search).get("t");
+            if (["night", "mid", "bright"].indexOf(t) >= 0)
+                document.documentElement.setAttribute("data-t", t);
+        })();
+    </script>
+
     <style>
         :root {
             --bg: #060814;
@@ -38,6 +51,57 @@
 
             --font-sans: 'Familjen Grotesk', system-ui, -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+        }
+
+        /* ---------- brightness options (temporary) ----------
+           Three steps of the same board, dimmest to brightest. Only colour
+           tokens change; nothing moves. Picking one is a paste into :root
+           above, and this block plus the two pickers come back out.
+
+           The screen this hangs on is DIM, so brighter is not a taste call
+           here: on a weak panel the light comes from the background, and a
+           dark board emits almost nothing. */
+
+        /* NIGHT — the deployed board, unchanged. For a dark hall or a panel
+           with real output. */
+        :root[data-t="night"] {
+            --bg: #060814;
+            --bg-panel: #0F1729;
+            --fg: #E2E8F5;
+            --fg-soft: #94A3B8;
+            --fg-faint: #475569;
+            --rule: rgba(226, 232, 245, 0.13);
+            --accent: #60A5FA;
+            --accent-bright: #93C5FD;
+            --warn: #FBBF24;
+        }
+
+        /* MID — the middle ground: a light slate board, not white. Brighter
+           than night by a long way, easier on the eyes at 11pm than bright. */
+        :root[data-t="mid"] {
+            --bg: #DCE3EE;
+            --bg-panel: #F2F5FA;
+            --fg: #10182A;
+            --fg-soft: #46536B;
+            --fg-faint: #8B97AC;
+            --rule: rgba(16, 24, 42, 0.16);
+            --accent: #1D4ED8;
+            --accent-bright: #1E3A8A;
+            --warn: #9A3412;
+        }
+
+        /* BRIGHT — maximum light output: pure white ground, black text, blue
+           only on the countdown. The one that survives a bad screen. */
+        :root[data-t="bright"] {
+            --bg: #FFFFFF;
+            --bg-panel: #FFFFFF;
+            --fg: #000000;
+            --fg-soft: #3F4A5A;
+            --fg-faint: #8A94A6;
+            --rule: rgba(0, 0, 0, 0.22);
+            --accent: #1245D6;
+            --accent-bright: #0B2E9E;
+            --warn: #A03400;
         }
 
         * {
@@ -200,6 +264,15 @@
             color: var(--warn);
         }
 
+        /* The en-route follow-on. Same size as the note but not a warning:
+           nothing is wrong, the bus is simply already moving. */
+        .panel-enroute {
+            font-family: var(--font-mono);
+            font-size: clamp(0.65rem, 1.5vmin, 1.4rem);
+            color: var(--fg-soft);
+            margin-top: 0.4vmin;
+        }
+
         .panel-note {
             font-family: var(--font-mono);
             font-size: clamp(0.65rem, 1.5vmin, 1.4rem);
@@ -298,6 +371,61 @@
             }
         }
 
+        /* ---------- the invisible palette taps (temporary) ----------
+           Four zones across the bottom edge, left to right: punch, day, daymax,
+           back to the deployed palette. Fully transparent and unlabelled on
+           purpose - this is a wall display, and a visible control is a thing
+           a passer-by presses. Nothing here paints, so it cannot change how
+           any palette looks. Goes out with the picker. */
+        #picker {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 12vh;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            z-index: 99;
+        }
+
+        #picker button {
+            appearance: none;
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: transparent;
+            cursor: default;
+            font-size: 0;
+        }
+
+        #picker button:focus {
+            outline: none;
+        }
+
+        /* Invisible fullscreen toggle, top-right corner. Same reasoning as
+           the palette taps: a wall display gets no visible chrome. Fullscreen
+           must be triggered by a real click, so this is a button, not a
+           keyboard shortcut fired on load. */
+        #fs {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 14vmin;
+            height: 14vmin;
+            appearance: none;
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: transparent;
+            font-size: 0;
+            cursor: default;
+            z-index: 99;
+        }
+
+        #fs:focus {
+            outline: none;
+        }
+
         /* ---------- the stale state ---------- */
         /* Set by screen.js when the clock has not advanced for two minutes.
            A board showing an hour-old departure with full confidence is the
@@ -337,6 +465,27 @@
         <span>Stops: KCA 1&amp;2 · KCA 3 · Campus</span>
         <span>Full timetable, live: <span class="url">linkcs.vercel.app/bus</span></span>
     </footer>
+
+    <!-- Invisible fullscreen toggle, top-right corner. -->
+    <button id="fs"></button>
+
+    <!-- Invisible, dimmest to brightest: night · mid · bright. -->
+    <div id="picker">
+        <button data-set="night"></button>
+        <button data-set="mid"></button>
+        <button data-set="bright"></button>
+    </div>
+    <script>
+        document.getElementById("fs").addEventListener("click", function () {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else document.documentElement.requestFullscreen().catch(function () { });
+        });
+
+        document.getElementById("picker").addEventListener("click", function (e) {
+            var b = e.target.closest("button");
+            if (b) document.documentElement.setAttribute("data-t", b.dataset.set);
+        });
+    </script>
 
     <script src="js/bus-data.js" defer></script>
     <script src="js/screen.js" defer></script>
