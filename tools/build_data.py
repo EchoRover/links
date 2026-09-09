@@ -40,6 +40,52 @@ def strip_notes(o):
     return o
 
 
+def sync_campus_tools(tt, courses):
+    """Rewrite the y3cse rows inside data/campus-tools-data.js from the JSON.
+
+    That file carries all eleven cohorts and was produced by a generator that
+    no longer exists, so it cannot be rebuilt wholesale. But one cohort in it
+    is OURS, and it had drifted two revisions behind the sheet: ACOL351's
+    tutorial still at Wednesday 10:00, AHUL261's G1 tutorial still at
+    Wednesday 15:30, ACOL351's Friday lecture still at 09:00. Campus Tools
+    reads this file, so it was answering "who is in this room" with a
+    timetable nobody has used since 7 September.
+
+    The other ten cohorts are left exactly as they are: nothing here knows
+    anything about them, and rewriting data you cannot verify is worse than
+    leaving it stale and saying so.
+    """
+    path = ROOT / "data" / "campus-tools-data.js"
+    src = path.read_text()
+    day_name = tt["days"]
+    kind_word = {"lecture": "lecture", "tut": "tutorial", "lab": "lab", "proj": "res"}
+
+    rows = []
+    for d, blocks in tt["week"].items():
+        for b in blocks:
+            rows.append({
+                "day": day_name[d], "start": b["start"], "end": b["end"],
+                "course": b["course"], "room": b["room"], "cohort": "y3cse",
+                "group": "all" if b["group"] == 0 else f"G{b['group']}",
+                "kind": kind_word[b["kind"]],
+            })
+
+    keep = [l for l in src.splitlines(keepends=True) if '"cohort": "y3cse"' not in l]
+    marker = '  classes: ['
+    out, inserted = [], False
+    for line in keep:
+        out.append(line)
+        if not inserted and line.startswith(marker):
+            for r in rows:
+                out.append("  " + json.dumps(r, ensure_ascii=False) + ",\n")
+            inserted = True
+    if not inserted:
+        raise SystemExit("campus-tools-data.js: could not find the classes array")
+    path.write_text("".join(out))
+    print(f"data/campus-tools-data.js  <-  {len(rows)} y3cse rows resynced "
+          f"(other cohorts untouched)")
+
+
 def main():
     courses = load("data/linkcs/courses.json")["courses"]
     tt = load("data/linkcs/timetable.json")
@@ -109,6 +155,8 @@ const ROOMS = {json.dumps(legacy_rooms, indent=2)};
 const TERM = {json.dumps({"start": cal["term"]["start"], "end": cal["term"]["end"]})};
 const NO_CLASS = {json.dumps(cal["noClass"], indent=2, ensure_ascii=False)};
 """
+    sync_campus_tools(tt, courses)
+
     GEN.parent.mkdir(parents=True, exist_ok=True)
     GEN.write_text(body)
     n = sum(len(v) for v in legacy_week.values())
