@@ -51,9 +51,24 @@ function floorOf(code) {
     return `M${m[1]} · ${m[2] === "0" ? "G" : m[2] + "F"}`;
 }
 
+const MY_PROG = "y3cse";
+
 function badge(w) {
     const g = w.group === "all" ? "" : ` ${w.group}`;
-    return `<span class="prog-badge">${PROGRAMS[w.prog] || w.prog}${g}</span>`;
+    const mine = w.prog === MY_PROG ? " mine" : "";
+    return `<span class="prog-badge${mine}">${PROGRAMS[w.prog] || w.prog}${g}</span>`;
+}
+
+// A lab shared by four Year-1 groups spent four lines on chips. Ours always
+// shows; the rest collapse to a count that opens with the card.
+function badges(who) {
+    const mine = who.filter(w => w.prog === MY_PROG);
+    const rest = who.filter(w => w.prog !== MY_PROG);
+    if (!rest.length) return mine.map(badge).join("");
+    const shown = mine.length ? mine : rest.slice(0, 1);
+    const hidden = who.length - shown.length;
+    return shown.map(badge).join("") +
+        (hidden ? `<span class="prog-badge more">+${hidden}</span>` : "");
 }
 
 function slotLabel(x) {
@@ -106,7 +121,7 @@ function statusHTML(room, now) {
     if (cur) {
         const then = nxt && nxt.from <= cur.to + 10
             ? ` · then ${nxt.code} at ${t12(nxt.s)}` : "";
-        return `${slotLabel(cur)}<br>${cur.who.map(badge).join("")}` +
+        return `${slotLabel(cur)}<br>${badges(cur.who)}` +
             `<span class="st-when">ends in <b>${left(cur.to - mins)}</b> (${t12(cur.e)})${then}</span>`;
     }
     if (nxt) {
@@ -118,6 +133,16 @@ function statusHTML(room, now) {
 }
 
 // ---------- render ----------
+
+// The building is already the heading and the floor is already the
+// sub-heading, so a card that ALSO prints "M4 · G" next to a code that starts
+// M4-0- is saying the same thing three times. The card carries the floor only
+// when it is the odd one out, which it never is inside a floor group.
+function floorLabel(code) {
+    const m = code.match(/^M(\d)-(\d)-/);
+    if (!m) return "";
+    return m[2] === "0" ? "Ground" : `Level ${m[2]}`;
+}
 
 function renderRooms() {
     const now = new Date();
@@ -132,44 +157,71 @@ function renderRooms() {
 
     const mins = now.getHours() * 60 + now.getMinutes();
     const today = ymd(now);
-    const isToday = now.getDay() === viewDay && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end;
+    const dow = now.getDay();
+    const teaching = dow >= 1 && dow <= 5 && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end;
+    const isToday = dow === viewDay && teaching;
 
-    const byBldg = {};
-    for (const r of ALL_ROOMS) (byBldg[r.slice(0, 2)] ??= []).push(r);
+    // building -> floor -> rooms, so neither is ever repeated on a card
+    const tree = {};
+    for (const r of ALL_ROOMS) {
+        ((tree[r.slice(0, 2)] ??= {})[floorLabel(r)] ??= []).push(r);
+    }
 
     let html = "";
-    for (const bldg of Object.keys(byBldg).sort((a, b) => rankBldg(a) - rankBldg(b) || a.localeCompare(b))) {
-        html += `<h2 class="bldg-title">Building ${bldg}</h2><div class="rooms-grid">`;
-        for (const room of byBldg[bldg]) {
-            const dow = now.getDay();
-            const teaching = dow >= 1 && dow <= 5 && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end;
-            const busy = teaching && roomSlots(room, dow).some(x => mins >= x.from && mins < x.to);
+    for (const bldg of Object.keys(tree).sort((a, b) => rankBldg(a) - rankBldg(b) || a.localeCompare(b))) {
+        html += `<h2 class="bldg-title">${bldg}</h2>`;
+        for (const floor of Object.keys(tree[bldg]).sort()) {
+            const rooms = tree[bldg][floor];
+            const busyRooms = [], freeRooms = [];
+            for (const room of rooms) {
+                (teaching && roomSlots(room, dow).some(x => mins >= x.from && mins < x.to)
+                    ? busyRooms : freeRooms).push(room);
+            }
 
-            const daySlots = roomSlots(room, viewDay);
-            let dayHTML = daySlots.length ? "" : `<div class="slot-empty">nothing scheduled ${DAY_NAME[viewDay]}</div>`;
-            for (const x of daySlots) {
-                const state = !isToday ? "" : mins >= x.to ? " past" : (mins >= x.from ? " live" : "");
-                dayHTML += `
+            html += `<h3 class="floor-title">${floor}</h3>`;
+
+            // The page is called Free Rooms, so the free ones are the answer
+            // and they get to be one dense line instead of ten cards that each
+            // spend two lines saying "free" and "done for today".
+            if (freeRooms.length) {
+                html += `<div class="free-strip">` + freeRooms.map(room =>
+                    `<button class="free-chip" data-room="${room}">` +
+                    `<span class="free-chip-name">${ROOM_NAMES[room] || "Room " + room.slice(-3)}</span>` +
+                    `<span class="free-chip-code">${room}</span></button>`).join("") + `</div>`;
+            }
+
+            if (busyRooms.length) html += `<div class="rooms-grid">`;
+            for (const room of busyRooms) {
+                const daySlots = roomSlots(room, viewDay);
+                let dayHTML = daySlots.length ? "" : `<div class="slot-empty">nothing scheduled ${DAY_NAME[viewDay]}</div>`;
+                for (const x of daySlots) {
+                    const state = !isToday ? "" : mins >= x.to ? " past" : (mins >= x.from ? " live" : "");
+                    dayHTML += `
                 <div class="slot-row${state}">
                     <span class="slot-time">${t12(x.s)} – ${t12(x.e)}</span>
                     <div class="slot-main">${slotLabel(x)}
                         <div class="slot-progs">${x.who.map(badge).join("")}</div>
                     </div>
                 </div>`;
-            }
+                }
 
-            html += `
-            <article class="room-card${busy ? " busy" : ""}${open.has(room) ? " open" : ""}" data-room="${room}">
+                html += `
+            <article class="room-card busy${open.has(room) ? " open" : ""}" data-room="${room}">
                 <div class="room-head">
                     <span class="room-name">${ROOM_NAMES[room] || "Room " + room.slice(-3)}</span>
-                    <span class="room-floor">${floorOf(room)}</span>
                     <span class="room-code">${room}</span>
                 </div>
                 <div class="room-status">${statusHTML(room, now)}</div>
                 <div class="room-day">${dayHTML}</div>
             </article>`;
+            }
+
+            if (busyRooms.length) html += `</div>`;
+
+            if (!busyRooms.length && !freeRooms.length) {
+                html += `<div class="slot-empty">no rooms</div>`;
+            }
         }
-        html += `</div>`;
     }
     body.innerHTML = html;
 }
@@ -574,6 +626,36 @@ document.addEventListener("click", (e) => {
 
     const card = e.target.closest(".room-card");
     if (card) card.classList.toggle("open");
+
+    // A free room is a chip, not a card, but the hero still promises "tap a
+    // room for its full day". Tapping one expands it in place into the same
+    // day timeline a card shows, so the promise holds for every room.
+    const chip = e.target.closest(".free-chip");
+    if (chip) {
+        const room = chip.dataset.room;
+        const existing = document.querySelector(`.free-day[data-room="${room}"]`);
+        if (existing) { existing.remove(); chip.classList.remove("on"); return; }
+        document.querySelectorAll(".free-day").forEach(n => n.remove());
+        document.querySelectorAll(".free-chip.on").forEach(n => n.classList.remove("on"));
+        chip.classList.add("on");
+
+        const slots = roomSlots(room, viewDay);
+        const rows = slots.length
+            ? slots.map(x => `
+                <div class="slot-row">
+                    <span class="slot-time">${t12(x.s)} – ${t12(x.e)}</span>
+                    <div class="slot-main">${slotLabel(x)}
+                        <div class="slot-progs">${badges(x.who)}</div>
+                    </div>
+                </div>`).join("")
+            : `<div class="slot-empty">nothing scheduled ${DAY_NAME[viewDay]}</div>`;
+
+        const box = document.createElement("div");
+        box.className = "free-day";
+        box.dataset.room = room;
+        box.innerHTML = `<div class="free-day-head">${ROOM_NAMES[room] || room} <span class="room-code">${room}</span></div>${rows}`;
+        chip.closest(".free-strip").after(box);
+    }
 });
 
 // A tapped room is a button, so it answers the keyboard too.

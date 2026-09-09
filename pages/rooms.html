@@ -36,7 +36,32 @@
         /* Room card */
         .room-card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 10px; padding: 9px 11px; cursor: pointer; box-shadow: var(--shadow-sm); transition: border-color 0.15s; }
         .room-card:hover { border-color: var(--coral); }
-        .room-card.busy { border-left: 3px solid var(--coral); }
+        /* No .busy accent any more. Free rooms are chips and busy rooms are
+           cards, so the FORM already says which is which; a coloured border on
+           every single card was emphasis that distinguished nothing. The one
+           live signal left is the countdown, which is the number people
+           actually read. */
+
+        /* Floor sub-heading. The building heading + this pair mean a card
+           never has to repeat either one. */
+        .floor-title { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-faint); margin: 10px 0 6px; opacity: 0.8; }
+
+        /* Free rooms are the answer this page is named for, so they are one
+           dense strip instead of ten cards each spending two lines on "free"
+           and "done for today". Tap one for its day, same as a card. */
+        .free-strip { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 9px; }
+        .free-chip { display: inline-flex; align-items: baseline; gap: 6px; font: inherit; cursor: pointer;
+                     background: var(--bg-card); border: 1px solid var(--rule); border-radius: 999px; padding: 4px 11px; }
+        .free-chip:hover { border-color: var(--cyan); }
+        .free-chip-name { font-size: 0.82rem; color: var(--fg); }
+        .free-chip-code { font-family: var(--font-mono); font-size: 0.66rem; color: var(--fg-faint); }
+
+        .free-chip.on { border-color: var(--cyan); background: var(--bg-card); }
+        .free-day { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 10px; padding: 9px 11px; margin-bottom: 9px; }
+        .free-day-head { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+
+        .prog-badge.more { background: transparent; border: 1px solid var(--rule); color: var(--fg-faint); }
+        .prog-badge.mine { outline: 1px solid var(--coral); }
         .room-head { display: flex; align-items: baseline; gap: 7px; }
         .room-name { font-family: var(--font-serif); font-style: italic; font-size: 1rem; color: var(--fg); }
         .room-code { font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-faint); margin-left: auto; }
@@ -126,8 +151,11 @@
            short cards puts a whole building on one screen. An OPEN card breaks
            out to full width, because the day timeline needs the room. */
         @media (max-width: 560px) {
-            .rooms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
-            .rooms-grid .room-card.open { grid-column: 1 / -1; }
+            /* ONE column. Two columns at 390px gives each card about 150px,
+               which wraps "Intro to Material Science" onto three lines and
+               makes every card a different height. The free strip is what
+               keeps the page short now, not a second column. */
+            .rooms-grid { grid-template-columns: 1fr; gap: 7px; }
             .rooms-hero { margin-top: 16px; }
             .room-name { font-size: 0.92rem; }
             .room-head { flex-wrap: wrap; gap: 5px; }
