@@ -1,0 +1,19 @@
+{
+  "_note": "From AcademicCalendar-2026-27Sem1.pdf. Showing a class on a day it cannot happen is worse than showing nothing, so term bounds and no-class days are encoded rather than assumed.",
+  "term": { "id": "2026-27-sem1", "label": "Sem 5", "start": "2026-08-20", "end": "2026-12-16" },
+  "noClass": {
+    "2026-08-28": "Prophet's Birthday",
+    "2026-10-02": "Gandhi Jayanti",
+    "2026-10-17": "Mid-sem break",
+    "2026-10-18": "Mid-sem break",
+    "2026-10-19": "Mid-sem break",
+    "2026-10-20": "Mid-sem break",
+    "2026-10-21": "Mid-sem break",
+    "2026-10-26": "Mid-sem exams",
+    "2026-10-27": "Mid-sem exams",
+    "2026-10-28": "Mid-sem exams",
+    "2026-10-29": "Mid-sem exams",
+    "2026-10-30": "Mid-sem exams"
+  },
+  "_noClassNote": "The calendar printed 26/08 with a star ('government may move it'). It moved: confirmed 2026-08-24 that the holiday is Friday the 28th."
+}

@@ -213,7 +213,7 @@
                 <span class="brand-meta">timetable · sem 5</span>
             </div>
             <div class="topbar-utils">
-                <a href="./" class="pill">
+                <a href="/" class="pill">
                     <span class="pill-name">← Home</span>
                 </a>
                 <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
@@ -238,6 +238,10 @@
         </div>
     </main>
 
+    <!-- Generated from data/ by tools/build_data.py. Must load first:
+         it defines the course, room, timetable and calendar data the
+         scripts below read. -->
+    <script src="/js/gen/data.js"></script>
     <script src="/js/timetable.js"></script>
     <script src="/js/week.js"></script>
 </body>

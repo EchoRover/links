@@ -1,0 +1,223 @@
+{
+  "_note": "Week grid for Sem 5. Blocks reference a course by CODE and a room by CODE, never by name, which is why a revision can move a block to a new day, time or room without anything else in the repo changing. Times are the ones printed INSIDE each block on the grid, not the column headings above it: those are different numbers and the countdown is only honest if it uses the printed ones.",
+  "source": {
+    "sheet": "data/timetables/2026-09-08-year3-sem5-btech-cse.pdf",
+    "revision": "2026-09-08",
+    "stamp": "8th September 2026 - 1:30pm"
+  },
+  "kinds": {
+    "lecture": "everyone",
+    "tut": "tutorial",
+    "lab": "lab",
+    "proj": "project hold"
+  },
+  "groups": {
+    "0": "everyone",
+    "1": "group 1 only",
+    "2": "group 2 only"
+  },
+  "days": {
+    "1": "Monday",
+    "2": "Tuesday",
+    "3": "Wednesday",
+    "4": "Thursday",
+    "5": "Friday"
+  },
+  "week": {
+    "1": [
+      {
+        "start": "09:00",
+        "end": "09:50",
+        "course": "AHUL261",
+        "room": "M4-1-017",
+        "kind": "tut",
+        "group": 1
+      },
+      {
+        "start": "10:00",
+        "end": "10:50",
+        "course": "ACOL331",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "11:00",
+        "end": "11:50",
+        "course": "ACOL333",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL256",
+        "room": "M4-0-011",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "16:00",
+        "end": "18:50",
+        "course": "AGRL130",
+        "room": "M4-0-011",
+        "kind": "lecture",
+        "group": 0
+      }
+    ],
+    "2": [
+      {
+        "start": "08:00",
+        "end": "08:50",
+        "course": "ACOL351",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "09:00",
+        "end": "09:50",
+        "course": "ACOL331",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "11:00",
+        "end": "11:50",
+        "course": "ACOL333",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL261",
+        "room": "M4-0-011",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "15:30",
+        "end": "16:20",
+        "course": "AHUL256",
+        "room": "M4-1-017",
+        "kind": "tut",
+        "group": 2
+      },
+      {
+        "start": "16:30",
+        "end": "18:20",
+        "course": "ACOL333",
+        "room": "M3-0-004",
+        "kind": "lab",
+        "group": 0,
+        "_note": "The sheet does NOT print 'Lab' on this block the way it does on ACOL331's. ACOL333 is 3-0-2-4 and this is its only practical block: 110 min in M3-Computer Lab 03 is exactly the 2 P-hours, and without it the credits do not reconcile. Tagged from the credits, not from the caption."
+      }
+    ],
+    "3": [
+      {
+        "start": "08:00",
+        "end": "09:50",
+        "course": "ACOL331",
+        "room": "M3-0-004",
+        "kind": "lab",
+        "group": 0
+      },
+      {
+        "start": "10:00",
+        "end": "10:50",
+        "course": "ACOL351",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "11:00",
+        "end": "11:50",
+        "course": "AHUL261",
+        "room": "M4-1-017",
+        "kind": "tut",
+        "group": 2
+      },
+      {
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL256",
+        "room": "M4-0-011",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "15:30",
+        "end": "16:20",
+        "course": "ACOL351",
+        "room": "M4-0-019",
+        "kind": "tut",
+        "group": 0
+      },
+      {
+        "start": "17:00",
+        "end": "17:50",
+        "course": "AHUL256",
+        "room": "M4-1-017",
+        "kind": "tut",
+        "group": 1
+      }
+    ],
+    "4": [
+      {
+        "start": "09:00",
+        "end": "09:50",
+        "course": "ACOL331",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "11:00",
+        "end": "11:50",
+        "course": "ACOL333",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "14:00",
+        "end": "15:20",
+        "course": "AHUL261",
+        "room": "M4-0-011",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "15:30",
+        "end": "17:20",
+        "course": "ACOL331",
+        "room": "M3-0-004",
+        "kind": "lab",
+        "group": 0
+      }
+    ],
+    "5": [
+      {
+        "start": "08:00",
+        "end": "08:50",
+        "course": "ACOL351",
+        "room": "M4-1-017",
+        "kind": "lecture",
+        "group": 0
+      },
+      {
+        "start": "10:00",
+        "end": "11:50",
+        "course": "ACOD310",
+        "room": "M4-1-017",
+        "kind": "proj",
+        "group": 0
+      }
+    ]
+  }
+}

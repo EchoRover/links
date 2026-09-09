@@ -1,0 +1,13 @@
+{
+  "_note": "Room registry. The CODE is the identity and never changes. Names are fields, not identity, because the paperwork disagrees with the doors: see M4-0-019, where the Year3-CSE sheet says Classroom 3, the MTech-ETS sheet says Classroom 4, and the door plate and fire-evacuation board say Classroom 5. We print the plate, because a room label exists to get someone to the right door, not to match a PDF. Anything without a confirmed plate must render its raw code rather than a guessed number.",
+  "rooms": {
+    "M4-1-017": { "building": "M4", "floor": "1F", "plate": "Classroom 7", "confirmed": true },
+    "M4-0-011": { "building": "M4", "floor": "G",  "plate": "Classroom 3", "confirmed": true },
+    "M4-0-019": { "building": "M4", "floor": "G",  "plate": "Classroom 5", "confirmed": true,
+                  "sheetSays": "Classroom 3",
+                  "_note": "Plate and fire board say 5. The Y3-CSE sheet says 3 (it said 5 on the 23 Aug issue), the Y2 MTech-ETS sheet says 4. Disagreement kept visible on purpose.",
+                  "aliases": ["M4.0.019"] },
+    "M3-0-022": { "building": "M3", "floor": "G",  "plate": "Computer Lab 02", "confirmed": true, "lab": true },
+    "M3-0-004": { "building": "M3", "floor": "G",  "plate": "Computer Lab 03", "confirmed": true, "lab": true }
+  }
+}

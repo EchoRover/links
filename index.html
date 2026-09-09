@@ -184,9 +184,6 @@
             <a href="/pages/campustools.html" class="pill" title="Free time, free rooms and faculty timetables across all 11 programs">
                 <span class="pill-name">Campus Tools</span>
             </a>
-            <a href="/pages/timetables.html" class="pill" title="List of all timetables across all programs">
-                <span class="pill-name">All Timetables</span>
-            </a>
             <a href="https://teams.microsoft.com/" target="_blank" rel="noopener" class="pill">
                 <span class="pill-name">Teams</span>
             </a>
@@ -233,6 +230,10 @@
     </main>
 
     <script src="/js/ui.js"></script>
+    <!-- Generated from data/ by tools/build_data.py. Must load first:
+         it defines the course, room, timetable and calendar data the
+         scripts below read. -->
+    <script src="/js/gen/data.js"></script>
     <script src="/js/scripts.js"></script>
     <script src="/js/timetable.js" defer></script>
 </body>

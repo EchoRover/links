@@ -20,43 +20,17 @@ const linksData = {
     TimeTable: "/data/timetables/2026-09-08-year3-sem5-btech-cse.pdf",
   },
 
-  // Only real, working URLs live here. A course with nothing published
-  // yet shows just its Blackboard link rather than a row of dead ones.
-  courses: {
-    "ACOL333 (AI)": {
-      // class root, not the /post/1 permalink Evan pasted — that would
-      // drop everyone on one thread instead of the feed
-      Piazza: "https://piazza.com/class/mszz8gz1dn16yo",
-      "Course Page":
-        "https://docs.google.com/document/d/18RPlGs-hLt2yOPu9Z7A5d4DK2JYJnXqAEEbuhu0zeic/edit",
-      Blackboard: "https://iida.blackboard.com/ultra/courses/_158_1/outline",
-    },
-    "ACOL331 (Operating Systems)": {
-      "Course Page": "https://abhilash-jindal.com/teaching/2026-1-acol-331/",
-      Blackboard: "https://iida.blackboard.com/ultra/courses/_157_1/outline",
-    },
-    "ACOL351 (Algos)": {
-      Gradescope: "https://www.gradescope.com/courses/1366330",
-      // The Delhi campus section of the SAME course (COL351, Rohit Vaish),
-      // not ours -- ours is Nikhil Balaji and the tutorials differ. It is
-      // here for the reading list: lecture-by-lecture links to Erickson's
-      // book and Roughgarden's notes. Sent by Krishna, 9 Sep 2026.
-      "COL351 Delhi": "https://rohitvaish.in/Teaching/2026-Fall/",
-      Blackboard: "https://iida.blackboard.com/ultra/courses/_159_1/outline",
-    },
-    "ACOD310 (Mini Project)": {
-      Blackboard: "https://iida.blackboard.com/ultra/courses/_197_1/outline",
-    },
-    "AGRL130 (Entrepren)": {
-      Blackboard: "https://iida.blackboard.com/ultra/courses/_179_1/outline",
-    },
-    "AHUL256 (Crit Think)": {
-      Blackboard: "https://iida.blackboard.com/ultra/courses/_182_1/outline",
-    },
-    "AHUL261 (Psych)": {
-      Blackboard: "https://iida.blackboard.com/ultra/courses/_183_1/outline",
-    },
-  },
+  // Built from data/linkcs/courses.json via js/gen/data.js. The pill label
+  // is COMPUTED as "CODE (short)", so renaming a course is a one-word edit in
+  // the JSON and the timetable, the class cards and these pills all follow.
+  // A course with nothing published yet shows just its Blackboard link rather
+  // than a row of dead ones, which is a property of the data, not of this file.
+  courses: Object.fromEntries(
+    Object.entries(window.DATA.courses).map(([code, c]) => [
+      window.courseLabel(code),
+      c.links,
+    ])
+  ),
 };
 
 // ============================================================
@@ -127,50 +101,11 @@ const linksDataSem4 = {
 
 // Per-course metadata. Each course gets editorial treatment:
 // title (short display), subtitle (descriptive tagline), dept, credits, LTP.
-const COURSE_META = {
-  ACOD310: {
-    title: "Mini Project",
-    subtitle: "A Supervised Build, Start To Finish",
-    dept: "COMP. SCI.",
-    credits: 3, ltp: "0-0-6",
-  },
-  ACOL333: {
-    title: "Artificial Intelligence",
-    subtitle: "A Study Of Inference, Search & Learning",
-    dept: "COMP. SCI.",
-    credits: 4, ltp: "3-0-2",
-  },
-  ACOL334: {
-    title: "Computer Networks",
-    subtitle: "Protocols, Routing & The Modern Internet",
-    dept: "COMP. SCI.",
-    credits: 4, ltp: "3-0-2",
-  },
-  ACOL351: {
-    title: "Algorithms",
-    subtitle: "Design, Analysis & The Cost Of Computation",
-    dept: "COMP. SCI.",
-    credits: 4, ltp: "3-1-0",
-  },
-  AGRL130: {
-    title: "Innovation, Entrepreneurship & Sustainability",
-    subtitle: "Innovation, Ventures & Sustainable Practice",
-    dept: "GEN. ELEC.",
-    credits: 3, ltp: "3-0-0",
-  },
-  AHUL256: {
-    title: "Critical Thinking",
-    subtitle: "Arguments, Reasoning & Sound Inference",
-    dept: "HUMANITIES",
-    credits: 4, ltp: "3-1-0",
-  },
-  AHUL261: {
-    title: "Psychology",
-    subtitle: "Cognition, Behavior & The Mind",
-    dept: "HUMANITIES",
-    credits: 4, ltp: "3-1-0",
-  },
-};
+// COURSE_META comes from data/linkcs/courses.json via js/gen/data.js.
+// It used to live here as a third, independent list of course names, which
+// is how ACOL333 ended up called "Principles of AI" in one file and
+// "Artificial Intelligence" in another, and how ACOL331 ended up missing
+// from it entirely and rendering a card with no credits.
 
 function renderLinks1(thing, data) {
   const container = document.querySelector(thing);

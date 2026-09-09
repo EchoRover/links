@@ -55,80 +55,17 @@
 // those carry a G1/G2 badge and everything else applies to everyone.
 // ============================================================
 
-const COURSES = {
-    ACOL331: { name: "Operating Systems", prof: "Abhilash Jindal" },
-    ACOL333: { name: "Principles of AI", prof: "Sumeet Agarwal" },
-    ACOL351: { name: "Algorithms", prof: "Nikhil Balaji C R" },
-    ACOD310: { name: "Mini Project", prof: "Kaushal Kumar Maurya · Alap Kshirsagar" },
-    AGRL130: { name: "Entrepreneurship", prof: "Joby Joseph · Ashu Verma" },
-    AHUL256: { name: "Critical Thinking", prof: "Arjun Ghosh" },
-    AHUL261: { name: "Psychology", prof: "Yashpal Jogdand" },
-};
-
-// [start, end, code, room, kind, group]
-//   kind:  "" lecture · "tut" tutorial · "lab" lab · "proj" project hold
-//   group: 0 everyone · 1 group 1 only · 2 group 2 only
+// COURSES and WEEK now come from js/gen/data.js, generated out of
+// data/linkcs/courses.json and data/linkcs/timetable.json. A block names
+// its course and room by CODE, which is why a revision can move it to a new
+// day, time or room and nothing outside the JSON changes.
 //
-// Times are the ones printed inside each block on the grid, not
-// the column headings above it. Those are different numbers and the
-// countdown is only honest if it uses the printed ones.
-const WEEK = {
-    1: [ // Monday
-        ["09:00", "09:50", "AHUL261", "M4-1-017", "tut", 1],
-        ["10:00", "10:50", "ACOL331", "M4-1-017", "", 0],
-        ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
-        ["14:00", "15:20", "AHUL256", "M4-0-011", "", 0],
-        ["16:00", "18:50", "AGRL130", "M4-0-011", "", 0],
-    ],
-    2: [ // Tuesday
-        ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],
-        ["09:00", "09:50", "ACOL331", "M4-1-017", "", 0],
-        ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
-        ["14:00", "15:20", "AHUL261", "M4-0-011", "", 0],
-        ["15:30", "16:20", "AHUL256", "M4-1-017", "tut", 2],
-        // The AI lab. The sheet does NOT print "Lab" on this block the
-        // way it does on ACOL331's, but ACOL333 is 3-0-2-4 and this is
-        // its only practical block: 110 min in M3-Computer Lab 03 is
-        // exactly the 2 P-hours, and without it the credits do not
-        // reconcile. Tagged from the credits, not from the caption.
-        ["16:30", "18:20", "ACOL333", "M3-0-004", "lab", 0],
-    ],
-    3: [ // Wednesday
-        ["08:00", "09:50", "ACOL331", "M3-0-004", "lab", 0],
-        ["10:00", "10:50", "ACOL351", "M4-1-017", "", 0],
-        ["11:00", "11:50", "AHUL261", "M4-1-017", "tut", 2],
-        ["14:00", "15:20", "AHUL256", "M4-0-011", "", 0],
-        ["15:30", "16:20", "ACOL351", "M4-0-019", "tut", 0],
-        ["17:00", "17:50", "AHUL256", "M4-1-017", "tut", 1],
-    ],
-    4: [ // Thursday
-        ["09:00", "09:50", "ACOL331", "M4-1-017", "", 0],
-        ["11:00", "11:50", "ACOL333", "M4-1-017", "", 0],
-        ["14:00", "15:20", "AHUL261", "M4-0-011", "", 0],
-        ["15:30", "17:20", "ACOL331", "M3-0-004", "lab", 0],
-    ],
-    5: [ // Friday
-        ["08:00", "08:50", "ACOL351", "M4-1-017", "", 0],
-        ["10:00", "11:50", "ACOD310", "M4-1-017", "proj", 0],
-    ],
-};
-
 // From AcademicCalendar-2026-27Sem1.pdf. Showing a class on a day it
 // cannot happen is worse than showing nothing, so the term bounds and
 // the no-class days are encoded rather than assumed.
-const TERM = { start: "2026-08-20", end: "2026-12-16" };
-const NO_CLASS = {
-    // The calendar printed 26/08 with a star ("government may move it").
-    // It moved: Evan confirmed 2026-08-24 that the holiday is Friday 28th.
-    "2026-08-28": "Prophet's Birthday",
-    "2026-10-02": "Gandhi Jayanti",
-    "2026-10-17": "Mid-sem break", "2026-10-18": "Mid-sem break",
-    "2026-10-19": "Mid-sem break", "2026-10-20": "Mid-sem break",
-    "2026-10-21": "Mid-sem break",
-    "2026-10-26": "Mid-sem exams", "2026-10-27": "Mid-sem exams",
-    "2026-10-28": "Mid-sem exams", "2026-10-29": "Mid-sem exams",
-    "2026-10-30": "Mid-sem exams",
-};
+// TERM and NO_CLASS come from data/institute/calendar.json via
+// js/gen/data.js. Showing a class on a day it cannot happen is worse than
+// showing nothing, so both are encoded rather than assumed.
 
 const DAY_NAME = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -147,36 +84,17 @@ function ymd(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-// Room codes -> what people actually call the room.
+// ROOMS comes from data/institute/rooms.json via js/gen/data.js.
 //
-// These do NOT decode arithmetically and it is not close: M4-1-017 is
-// "classroom 7" and M4-0-011 is "classroom 3". No string rule produces
-// both. So this is a lookup, and anything not in it is NOT guessed —
-// an unconfirmed room shows its raw code under a "room code" label
-// instead of a friendly number that might send you to the wrong door.
+// The names do NOT decode arithmetically and it is not close: M4-1-017 is
+// "classroom 7" and M4-0-011 is "classroom 3". No string rule produces both,
+// so it is a lookup, and anything unconfirmed shows its raw code rather than
+// a guessed number that might send you to the wrong door.
 //
-// As of the 23 Aug grid all four are named on the sheet itself, so
-// nothing here is inferred any more. The two labs are called "Computer
-// Lab 02", not a classroom number, so they carry their own label.
-const ROOMS = {
-    "M4-1-017": { bldg: "M4", floor: "1F", no: "7", ok: true },
-    "M4-0-011": { bldg: "M4", floor: "G", no: "3", ok: true },
-    "M3-0-022": { bldg: "M3", floor: "G", no: "02", ok: true, lab: true },
-    "M3-0-004": { bldg: "M3", floor: "G", no: "03", ok: true, lab: true },
-    // M4-0-019 is the one room the paperwork cannot agree on: the Y3-CSE
-    // sheet calls it Classroom 3 (Classroom 5 on the 23 Aug issue), the Y2
-    // MTech-ETS sheet Classroom 4, and the M4 fire-evacuation board
-    // Classroom 5. The code never changed, so a diff of courses, times and
-    // codes read the 27 Aug revision as a no-op and shipped the wrong name.
-    //
-    // WE PRINT WHAT THE DOOR SAYS. The physical sign is Classroom 5, and a
-    // room plate exists to get Evan to the right door, not to match a PDF.
-    // check_timetable.py still reads every label off the sheet; this one
-    // room is a declared override there (DOOR_SIGN) so the disagreement
-    // stays visible instead of being quietly absorbed.
-    "M4-0-019": { bldg: "M4", floor: "G", no: "5", ok: true },
-    "M4.0.019": { bldg: "M4", floor: "G", no: "5", ok: true },  // spelling used on the earlier sheet
-};
+// M4-0-019 is the room the paperwork cannot agree on, and rooms.json keeps
+// both readings: `plate` (what the door and the fire board say, which is what
+// we print) and `sheetSays` (what the PDF claims). WE PRINT WHAT THE DOOR
+// SAYS. A room plate exists to get you to the right door, not to match a PDF.
 
 // Two room codes can carry the same printed name (see M4-0-011 vs
 // M4-0-019). When that happens the plate alone is ambiguous, so the code

@@ -1,0 +1,104 @@
+{
+  "_note": "THE course registry, and the only place a course is described. The CODE is the identity; everything else references it and nothing else. A course legitimately has SEVERAL names and each is its own field with its own job: 'name' the everyday one the timetable and class cards print, 'short' the pill suffix, 'title'/'subtitle' the card headline in Evan's wording, 'officialTitle' exactly what the institute's sheet says. The pill label is COMPUTED as \"CODE (short)\", never stored. officialTitle and ltpc are read off the 2026-09-08 sheet's own Title / L-T-P-C / Faculty table, which is the half of the document the week grid is NOT transcribed from, so it doubles as the check tools/check_timetable.py runs. This file replaces three earlier sources that disagreed: COURSES in js/timetable.js, linksData.courses and COURSE_META in js/scripts.js. Key order is display order.",
+  "courses": {
+    "ACOL333": {
+      "name": "Principles of AI",
+      "short": "AI",
+      "title": "Artificial Intelligence",
+      "subtitle": "A Study Of Inference, Search & Learning",
+      "dept": "COMP. SCI.",
+      "ltpc": "3-0-2-4",
+      "officialTitle": "Principles of Artificial Intelligence",
+      "prof": "Sumeet Agarwal",
+      "links": {
+        "Piazza": "https://piazza.com/class/mszz8gz1dn16yo",
+        "Course Page": "https://docs.google.com/document/d/18RPlGs-hLt2yOPu9Z7A5d4DK2JYJnXqAEEbuhu0zeic/edit",
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_158_1/outline"
+      },
+      "_note": "Piazza is the class root, not the /post/1 permalink, which would drop everyone on one thread instead of the feed."
+    },
+    "ACOL331": {
+      "name": "Operating Systems",
+      "short": "Operating Systems",
+      "title": "Operating Systems",
+      "subtitle": "",
+      "dept": "COMP. SCI.",
+      "ltpc": "3-0-4-5",
+      "officialTitle": "Operating System",
+      "prof": "Abhilash Jindal",
+      "links": {
+        "Course Page": "https://abhilash-jindal.com/teaching/2026-1-acol-331/",
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_157_1/outline"
+      },
+      "_note": "ACOL331 was MISSING from COURSE_META entirely, so its card rendered with no credits and no strapline. Its 3-0-4-5 is off the sheet. The subtitle is left empty on purpose: every other one is Evan's own phrasing and inventing a seventh would be putting words in his mouth."
+    },
+    "ACOL351": {
+      "name": "Algorithms",
+      "short": "Algos",
+      "title": "Algorithms",
+      "subtitle": "Design, Analysis & The Cost Of Computation",
+      "dept": "COMP. SCI.",
+      "ltpc": "3-1-0-4",
+      "officialTitle": "Analysis and Design of Algorithms",
+      "prof": "Nikhil Balaji C R",
+      "links": {
+        "Gradescope": "https://www.gradescope.com/courses/1366330",
+        "COL351 Delhi": "https://rohitvaish.in/Teaching/2026-Fall/",
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_159_1/outline"
+      },
+      "_note": "COL351 Delhi is the SAME course at the Delhi campus (Rohit Vaish), not our section (Nikhil Balaji), and the tutorials differ. Kept for its lecture-by-lecture reading list. Sent by Krishna, 9 Sep 2026."
+    },
+    "ACOD310": {
+      "name": "Mini Project",
+      "short": "Mini Project",
+      "title": "Mini Project",
+      "subtitle": "A Supervised Build, Start To Finish",
+      "dept": "COMP. SCI.",
+      "ltpc": "0-0-6-3",
+      "officialTitle": "Mini Project",
+      "prof": "Kaushal Kumar Maurya · Alap Kshirsagar",
+      "links": {
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_197_1/outline"
+      }
+    },
+    "AGRL130": {
+      "name": "Entrepreneurship",
+      "short": "Entrepren",
+      "title": "Innovation, Entrepreneurship & Sustainability",
+      "subtitle": "Innovation, Ventures & Sustainable Practice",
+      "dept": "GEN. ELEC.",
+      "ltpc": "3-0-0-3",
+      "officialTitle": "Innovation, Entrepreneurship, and Sustainability",
+      "prof": "Joby Joseph · Ashu Verma",
+      "links": {
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_179_1/outline"
+      }
+    },
+    "AHUL256": {
+      "name": "Critical Thinking",
+      "short": "Crit Think",
+      "title": "Critical Thinking",
+      "subtitle": "Arguments, Reasoning & Sound Inference",
+      "dept": "HUMANITIES",
+      "ltpc": "3-1-0-4",
+      "officialTitle": "Critical Thinking",
+      "prof": "Arjun Ghosh",
+      "links": {
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_182_1/outline"
+      }
+    },
+    "AHUL261": {
+      "name": "Psychology",
+      "short": "Psych",
+      "title": "Psychology",
+      "subtitle": "Cognition, Behavior & The Mind",
+      "dept": "HUMANITIES",
+      "ltpc": "3-1-0-4",
+      "officialTitle": "Introduction to Psychology",
+      "prof": "Yashpal Jogdand",
+      "links": {
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_183_1/outline"
+      }
+    }
+  }
+}
