@@ -17,7 +17,7 @@ const linksData = {
     // institute page (iitdabudhabi.ac.ae/timetable) still serves an older
     // version, so linking upstream would contradict the class card.
     // Swap back to the official URL once they publish the current one.
-    TimeTable: "data/timetables/2026-09-08-year3-sem5-btech-cse.pdf",
+    TimeTable: "/data/timetables/2026-09-08-year3-sem5-btech-cse.pdf",
   },
 
   // Only real, working URLs live here. A course with nothing published
@@ -37,6 +37,11 @@ const linksData = {
     },
     "ACOL351 (Algos)": {
       Gradescope: "https://www.gradescope.com/courses/1366330",
+      // The Delhi campus section of the SAME course (COL351, Rohit Vaish),
+      // not ours -- ours is Nikhil Balaji and the tutorials differ. It is
+      // here for the reading list: lecture-by-lecture links to Erickson's
+      // book and Roughgarden's notes. Sent by Krishna, 9 Sep 2026.
+      "COL351 Delhi": "https://rohitvaish.in/Teaching/2026-Fall/",
       Blackboard: "https://iida.blackboard.com/ultra/courses/_159_1/outline",
     },
     "ACOD310 (Mini Project)": {
