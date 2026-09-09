@@ -26,14 +26,6 @@
       "destination": "/pages/rooms.html"
     },
     {
-      "source": "/common",
-      "destination": "/pages/common.html"
-    },
-    {
-      "source": "/common.html",
-      "destination": "/pages/common.html"
-    },
-    {
       "source": "/campus",
       "destination": "/pages/campus.html"
     },
@@ -42,12 +34,32 @@
       "destination": "/pages/campus.html"
     },
     {
-      "source": "/campustools",
-      "destination": "/pages/campustools.html"
+      "source": "/3d",
+      "destination": "/pages/both.html"
     },
     {
-      "source": "/campustools.html",
-      "destination": "/pages/campustools.html"
+      "source": "/both",
+      "destination": "/pages/both.html"
+    },
+    {
+      "source": "/both.html",
+      "destination": "/pages/both.html"
+    },
+    {
+      "source": "/m3",
+      "destination": "/pages/m3.html"
+    },
+    {
+      "source": "/m3.html",
+      "destination": "/pages/m3.html"
+    },
+    {
+      "source": "/m4",
+      "destination": "/pages/m4.html"
+    },
+    {
+      "source": "/m4.html",
+      "destination": "/pages/m4.html"
     }
   ]
 }

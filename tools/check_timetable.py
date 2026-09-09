@@ -38,6 +38,7 @@ Exit code is 1 on any mismatch, so this is CI-able.
 """
 import re
 import sys
+import json
 import pathlib
 
 try:
@@ -46,7 +47,12 @@ except ImportError:
     sys.exit("needs pdfplumber:  pip install pdfplumber")
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TT_JS = ROOT / "js" / "timetable.js"
+# The week and the rooms now live in the data layer, not in a JS literal.
+# Checking the SOURCE rather than the generated js/gen/data.js is deliberate:
+# a generator bug would otherwise be invisible to the one check that reads the
+# official sheet.
+TT_JSON = ROOT / "data" / "linkcs" / "timetable.json"
+ROOMS_JSON = ROOT / "data" / "institute" / "rooms.json"
 SHEETS = ROOT / "data" / "timetables"
 
 # A ":50" slot is one nominal contact hour, so minutes convert at 60/50.
@@ -69,19 +75,16 @@ PARTIALLY_SCHEDULED = {"ACOD310"}
 DOOR_SIGN = {"M4-0-019": ("M4-Classroom 3", "M4-Classroom 5")}
 
 
-def parse_week(js_text):
-    """Pull WEEK out of timetable.js. Returns [(course, kind, minutes, group)]."""
-    block = re.search(r"const WEEK = \{(.*?)\n\};", js_text, re.S)
-    if not block:
-        sys.exit("could not find `const WEEK = {` in timetable.js")
+def parse_week():
+    """data/linkcs/timetable.json -> [(course, kind, minutes, group)]."""
+    tt = json.loads(TT_JSON.read_text())
     rows = []
-    entry = re.compile(
-        r'\["(\d\d:\d\d)",\s*"(\d\d:\d\d)",\s*"([A-Z]+\d+)",\s*"([^"]*)",\s*"([^"]*)",\s*(\d)\]'
-    )
-    for start, end, course, _room, kind, group in entry.findall(block.group(1)):
-        h1, m1 = map(int, start.split(":"))
-        h2, m2 = map(int, end.split(":"))
-        rows.append((course, kind or "lec", (h2 * 60 + m2) - (h1 * 60 + m1), int(group)))
+    for blocks in tt["week"].values():
+        for b in blocks:
+            sh, sm = map(int, b["start"].split(":"))
+            eh, em = map(int, b["end"].split(":"))
+            kind = "" if b["kind"] == "lecture" else b["kind"]
+            rows.append((b["course"], kind, (eh * 60 + em) - (sh * 60 + sm), b["group"]))
     return rows
 
 
@@ -178,43 +181,27 @@ def hhmm(t):
     return f"{int(h):02d}:{m}"
 
 
-def parse_rooms(js_text):
-    """{code: printed name} as ROOMS in timetable.js believes it."""
-    block = re.search(r"const ROOMS = \{(.*?)\n\};", js_text, re.S)
-    if not block:
-        sys.exit("could not find `const ROOMS = {` in timetable.js")
-    out, conflicts = {}, []
-    for code, bldg, no, lab in re.findall(
-        r'"([^"]+)":\s*\{\s*bldg:\s*"([^"]+)",\s*floor:\s*"[^"]*",\s*no:\s*"([^"]+)"(.*?)\}',
-        block.group(1),
-    ):
-        kind = "Computer Lab" if "lab: true" in lab else "Classroom"
-        key, name = code.replace(".", "-"), f"{bldg}-{kind} {no}"
-        # M4.0.019 and M4-0-019 are the same room spelled two ways. If they
-        # ever disagree, the later one used to silently overwrite the
-        # earlier and this check passed while the page was wrong -- which
-        # is exactly how the Classroom 5 regression survived its own test.
-        if key in out and out[key] != name:
-            conflicts.append(f"     {key}: ROOMS spells it two ways that disagree "
-                             f"('{out[key]}' vs '{name}') - fix both")
-        out[key] = name
-    return out, conflicts
+def parse_rooms():
+    """{code: printed name} as data/institute/rooms.json believes it.
+
+    Aliases (M4.0.019 vs M4-0-019 are the same room spelled two ways) are
+    folded onto the canonical code, so the two spellings can no longer carry
+    different names -- which is exactly how a Classroom 5 regression once
+    survived its own test.
+    """
+    data = json.loads(ROOMS_JSON.read_text())["rooms"]
+    out = {}
+    for code, r in data.items():
+        out[code.replace(".", "-")] = f"{r['building']}-{r['plate']}"
+    return out, []
 
 
-def parse_week_blocks(js_text):
-    """WEEK as (day, start, end, course, room), for the block-level diff."""
-    block = re.search(r"const WEEK = \{(.*?)\n\};", js_text, re.S)
-    out = []
-    day_of = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"}
-    current = None
-    for line in block.group(1).splitlines():
-        m = re.match(r"\s*(\d):\s*\[", line)
-        if m:
-            current = day_of[int(m.group(1))]
-        e = re.search(r'\["(\d\d:\d\d)",\s*"(\d\d:\d\d)",\s*"([A-Z]+\d+)",\s*"([^"]*)"', line)
-        if e:
-            out.append((current, e.group(1), e.group(2), e.group(3), e.group(4) or None))
-    return out
+def parse_week_blocks():
+    """The week as (day, start, end, course, room), for the block-level diff."""
+    tt = json.loads(TT_JSON.read_text())
+    days = tt["days"]
+    return [(days[d], b["start"], b["end"], b["course"], b["room"] or None)
+            for d, blocks in tt["week"].items() for b in blocks]
 
 
 def main():
@@ -223,10 +210,10 @@ def main():
         if len(sys.argv) > 1
         else sorted(SHEETS.glob("*year3-sem5-btech-cse.pdf"))[-1]
     )
-    print(f"grid  <- {TT_JS.relative_to(ROOT)}")
+    print(f"grid  <- {TT_JSON.relative_to(ROOT)}")
     print(f"check <- {sheet.name}\n")
 
-    week = parse_week(TT_JS.read_text())
+    week = parse_week()
     credits = parse_credits(sheet)
 
     # Group 2's week is the same as group 1's apart from the HUL tutorials,
@@ -262,7 +249,7 @@ def main():
 
     # --- block-level diff: the sheet rebuilt by coordinate vs WEEK ---
     sheet_blocks, sheet_labels = parse_sheet_blocks(sheet)
-    js_blocks = parse_week_blocks(TT_JS.read_text())
+    js_blocks = parse_week_blocks()
     only_sheet = sorted(set(sheet_blocks) - set(js_blocks))
     only_js = sorted(set(js_blocks) - set(sheet_blocks))
     for b in only_sheet:
@@ -270,7 +257,7 @@ def main():
     for b in only_js:
         failures.append(f"     in WEEK but not on the sheet: {b}")
 
-    rooms, room_conflicts = parse_rooms(TT_JS.read_text())
+    rooms, room_conflicts = parse_rooms()
     failures.extend(room_conflicts)
 
     # --- the same room name lives in three files; they drifted once ---
@@ -279,7 +266,6 @@ def main():
     # sheet said "Classroom 3", because fixing one never touched the others.
     for rel, pattern in (
         ("data/rooms-data.js", r'"([^"]+)":\s*"((?:Classroom|Computer Lab|Lecture Hall)[^"]*)"'),
-        ("data/campus-tools-data.js", r'"([^"]+)":\s*"((?:Classroom|Computer Lab|Lecture Hall)[^"]*)"'),
     ):
         path = ROOT / rel
         if not path.exists():
@@ -292,7 +278,7 @@ def main():
             short = ours.split("-", 1)[1] if "-" in ours else ours
             if short.split() != name.split():
                 failures.append(
-                    f"     {code}: {rel} says '{name}', timetable.js ROOMS says '{short}'"
+                    f"     {code}: {rel} says '{name}', rooms.json says '{short}'"
                 )
 
     # --- room NAMES: a rename does not touch the room code ---

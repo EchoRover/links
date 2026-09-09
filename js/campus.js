@@ -411,7 +411,9 @@ function renderSide() {
                  `<span class="n">${ROOM_NAMES[r] || ""}${what ? " · " + what : ""}</span></div>`;
         }
         h += `</div>`;
-        if (b.code === "M4") h += `<p style="margin:10px 0 0"><a href="plan.html" class="cmp-btn" style="display:inline-block;text-decoration:none">open M4 floor plan →</a></p>`;
+        // The "open M4 floor plan" button pointed at plan.html, which has never
+        // existed in this repo, and the floor-plan pages it meant (m3/m4/both)
+        // are gone. A button that opens nothing is worse than no button.
     }
 
     if (labelling) {
