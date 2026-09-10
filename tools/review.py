@@ -96,7 +96,7 @@ def section(path):
     forced = sum(1 for b in blocks if b.get("resolved") == "forced")
     note = (f'<p class="ok">all {len(blocks)} blocks determined by arithmetic alone</p>'
             if not unresolved else
-            '<p class="bad">' + "<br>".join(
+            '<p class="warn">unproven, not wrong: the arithmetic leaves more than one reading of these courses, so the values shown are a best fit rather than a forced one<br>' + "<br>".join(
                 f'{html.escape(u["course"])}: {html.escape(u["why"])}' for u in unresolved)
             + '</p>')
 
@@ -113,13 +113,14 @@ def section(path):
 
 CSS = """
 :root { color-scheme: dark; --bg:#0e1116; --fg:#e9ecf2; --dim:#8b94a7; --line:#232a36;
-        --card:#161b24; --ok:#3fd18b; --bad:#ff7a7a; }
+        --card:#161b24; --ok:#3fd18b; --bad:#ff7a7a; --warn:#e0a53f; }
 *{box-sizing:border-box} body{margin:0;padding:22px;background:var(--bg);color:var(--fg);
   font:13px/1.45 -apple-system,system-ui,sans-serif}
 h1{font-size:1.1rem;margin:0 0 16px} h2{font-size:.9rem;margin:26px 0 2px;
   font-family:ui-monospace,Menlo,monospace}
 .sub{color:var(--dim);margin:2px 0 6px} .ok{color:var(--ok);margin:2px 0 10px}
 .bad{color:var(--bad);margin:2px 0 10px}
+.warn{color:var(--warn);margin:2px 0 10px}
 .grid{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:8px 10px}
 .row{display:flex;align-items:stretch;border-top:1px solid var(--line)}
 .row:first-child{border-top:0}
@@ -139,7 +140,8 @@ h1{font-size:1.1rem;margin:0 0 16px} h2{font-size:.9rem;margin:26px 0 2px;
 .b s{text-decoration:none;background:#3a2b46;color:#d9a8ff;border-radius:2px;padding:0 4px;font-size:9px;flex:none}
 .k-lab{border-left:3px solid #3fae7d} .k-tut{border-left:3px solid #c08a3e}
 .k-proj{border-left:3px solid #8a6bc0}
-.b.un{outline:1px dashed var(--bad);outline-offset:-1px}
+.b.un{outline:1px dashed var(--warn);outline-offset:-1px}
+.b.un::after{content:'?';color:var(--warn);font-family:ui-monospace,Menlo,monospace;font-size:10px;margin-left:auto;padding-left:4px;flex:none}
 details{margin-top:8px} summary{color:var(--dim);cursor:pointer;font-size:12px}
 img{width:100%;margin-top:8px;border:1px solid var(--line);border-radius:6px;background:#fff}
 """.replace("LANEH", str(LANE_H))
@@ -159,7 +161,8 @@ def main():
 <style>{CSS}</style>
 <h1>Parsed sheets, laid out like the sheets</h1>
 <p class="sub">Days down the side, time across the top, same as the published grid.
-A dashed red outline means the credit table could not determine that course.
+A dashed amber box with a ? marks a course the arithmetic could not pin to a single
+reading. It does NOT mean the block is wrong, only that nothing forces it.
 Open "the published sheet" under any grid to compare.</p>
 {"".join(section(p) for p in paths)}""")
     print(f"wrote {OUT}  ({len(paths)} sheets)")
