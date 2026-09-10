@@ -202,6 +202,14 @@ def minutes(t):
 
 def kind_of(flat):
     low = flat.lower()
+    # A help session is optional attendance, not scheduled contact time, so it
+    # must not be counted against the credits. Found on EEN's AENL226: with the
+    # help session counted the course has 4.2 lecture hours against a 3-1-0-4
+    # that allows 3 and NOTHING reconciles; without it, 3.2 -> 3 lectures plus
+    # one tutorial, exactly. The sheet says "Help Session if required" in the
+    # cell, so this is read, not inferred.
+    if "help session" in low:
+        return "help"
     if "tutorial" in low:
         return "tut"
     if "lab" in low or "Computer Lab" in flat:
@@ -278,7 +286,9 @@ def reconciles(blocks, credits):
         for b in blocks:
             if b["group"] not in (0, group):
                 continue
-            bucket = {"tut": "T", "lab": "P", "proj": "P"}.get(b["kind"], "L")
+            bucket = BUCKET.get(b["kind"], "L")
+            if bucket is None:
+                continue
             got.setdefault(b["course"], {"L": 0, "T": 0, "P": 0})[bucket] += \
                 minutes(b["end"]) - minutes(b["start"])
         for course, (wl, wt, wp) in credits.items():
@@ -294,13 +304,14 @@ def reconciles(blocks, credits):
 
 
 KINDS = ["lecture", "tut", "lab"]
-BUCKET = {"lecture": "L", "tut": "T", "lab": "P", "proj": "P"}
+# "help" is never a candidate: a block is a help session only if the sheet says so.
+BUCKET = {"lecture": "L", "tut": "T", "lab": "P", "proj": "P", "help": None}
 
 
 def captioned(block):
     """Did the sheet actually SAY what this block is?"""
     t = block["text"].lower()
-    return ("tutorial" in t) or ("lab" in t) or ("reserved for" in t)
+    return ("tutorial" in t) or ("lab" in t) or ("reserved for" in t) or ("help session" in t)
 
 
 def solve_course(blocks, want):
@@ -330,7 +341,7 @@ def solve_course(blocks, want):
             for group in (1, 2):
                 tot = {"L": 0, "T": 0, "P": 0}
                 for blk, g, k in zip(blocks, gs, ks):
-                    if g in (0, group):
+                    if g in (0, group) and BUCKET[k] is not None:
                         tot[BUCKET[k]] += minutes(blk["end"]) - minutes(blk["start"])
                 for bucket, wnt in (("L", wl), ("T", wt), ("P", wp)):
                     have = round(tot[bucket] / MIN_PER_HOUR)
