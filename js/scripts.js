@@ -148,10 +148,15 @@ function renderLinks1(thing, data) {
 
     const linksGrid = document.createElement("div");
     linksGrid.className = "course-links";
-    for (const [n, url] of Object.entries(resources)) {
+    for (const [n, val] of Object.entries(resources)) {
+      // A link is either a plain URL, or {url, hidden} for one that should
+      // work but not be advertised. A hidden link keeps its slot in the row,
+      // so the tap target stays exactly where it is.
+      const url = typeof val === "string" ? val : val.url;
       const link = document.createElement("a");
       link.href = url;
       link.target = "_blank";
+      if (typeof val === "object" && val.hidden) link.className = "link-hidden";
       link.innerHTML = `<span class="link-bullet"></span><span class="link-label">${n}</span><svg class="link-arrow" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
       linksGrid.appendChild(link);
     }

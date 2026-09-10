@@ -918,6 +918,18 @@ a:focus-visible, button:focus-visible {
     min-width: 0;
     border-top: 1px solid var(--rule);
 }
+/* A link that works but is not advertised. It keeps its slot in the grid
+   rather than collapsing, so its tap target stays exactly where it is instead
+   of the row reflowing around it. aria-hidden is deliberately NOT set: a
+   keyboard or screen reader still reaches it. Unadvertised, not secret. */
+.course-links a.link-hidden {
+    opacity: 0;
+}
+
+.course-links a.link-hidden:focus-visible {
+    opacity: 1;
+}
+
 .course-list .box a {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;

@@ -47,7 +47,10 @@ window.DATA = {
       "prof": "Nikhil Balaji C R",
       "links": {
         "Gradescope": "https://www.gradescope.com/courses/1366330",
-        "COL351 Delhi": "https://rohitvaish.in/Teaching/2026-Fall/",
+        "COL351 Delhi": {
+          "url": "https://rohitvaish.in/Teaching/2026-Fall/",
+          "hidden": true
+        },
         "Blackboard": "https://iida.blackboard.com/ultra/courses/_159_1/outline"
       }
     },

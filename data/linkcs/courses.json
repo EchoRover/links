@@ -43,10 +43,13 @@
       "prof": "Nikhil Balaji C R",
       "links": {
         "Gradescope": "https://www.gradescope.com/courses/1366330",
-        "COL351 Delhi": "https://rohitvaish.in/Teaching/2026-Fall/",
+        "COL351 Delhi": {
+          "url": "https://rohitvaish.in/Teaching/2026-Fall/",
+          "hidden": true
+        },
         "Blackboard": "https://iida.blackboard.com/ultra/courses/_159_1/outline"
       },
-      "_note": "COL351 Delhi is the SAME course at the Delhi campus (Rohit Vaish), not our section (Nikhil Balaji), and the tutorials differ. Kept for its lecture-by-lecture reading list. Sent by Krishna, 9 Sep 2026."
+      "_note": "COL351 Delhi is the SAME course at the Delhi campus (Rohit Vaish), not our section (Nikhil Balaji), and the tutorials differ. Kept for its lecture-by-lecture reading list. Sent by Krishna, 9 Sep 2026. Marked HIDDEN at Evan's request: it renders in the card and opens normally, but is invisible, so it is there for whoever knows where to tap rather than advertised to the cohort."
     },
     "ACOD310": {
       "name": "Mini Project",
@@ -100,5 +103,6 @@
         "Blackboard": "https://iida.blackboard.com/ultra/courses/_183_1/outline"
       }
     }
-  }
+  },
+  "_linkNote": "A link value is either a plain URL string, or {url, hidden} when it should be present and working but not visible. Hidden links keep their slot in the row, so the tap target stays where it is."
 }
