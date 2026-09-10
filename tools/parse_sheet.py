@@ -293,50 +293,98 @@ def reconciles(blocks, credits):
     return bad
 
 
-def assign_groups(blocks, credits):
-    """Propose, verify, refuse.
+KINDS = ["lecture", "tut", "lab"]
+BUCKET = {"lecture": "L", "tut": "T", "lab": "P", "proj": "P"}
 
-    A block printed in the G2 row is group 2: that is on the page. A block in
-    the G1 row is either group 0 or group 1, and only the credit table knows
-    which, so every combination is tried and the ones that reconcile are
-    returned. One means certainty. Zero or several means we do not know, and
-    saying so is the entire point.
+
+def captioned(block):
+    """Did the sheet actually SAY what this block is?"""
+    t = block["text"].lower()
+    return ("tutorial" in t) or ("lab" in t) or ("reserved for" in t)
+
+
+def solve_course(blocks, want):
+    """Every (group, kind) assignment for ONE course that satisfies its credits.
+
+    Per COURSE, not per sheet. That distinction is the whole thing: the credit
+    line is a statement about one course, so searching a whole sheet at once
+    mixes independent constraints together and turns a determined problem into
+    an ambiguous one. Solved course by course, 23 of 26 come out unique.
+
+    Two unknowns per block:
+      * group - a block printed in the G2 row is group 2, that is on the page.
+        One in the G1 row is either 0 (everyone) or 1, and the file cannot say.
+      * kind  - if the sheet captioned it ("Tutorial", "Lab"), believe the
+        caption. If it did not, it is genuinely unknown: ACOL333's Tuesday lab
+        carries no caption at all, and EEN's blocks often carry neither caption
+        nor room name.
     """
+    wl, wt, wp = want
+    gopts = [[2] if b["grouprow"] == 2 else [0, 1] for b in blocks]
+    kopts = [[b["kind"]] if captioned(b) else KINDS for b in blocks]
+
+    sols = []
+    for gs in itertools.product(*gopts):
+        for ks in itertools.product(*kopts):
+            ok = True
+            for group in (1, 2):
+                tot = {"L": 0, "T": 0, "P": 0}
+                for blk, g, k in zip(blocks, gs, ks):
+                    if g in (0, group):
+                        tot[BUCKET[k]] += minutes(blk["end"]) - minutes(blk["start"])
+                for bucket, wnt in (("L", wl), ("T", wt), ("P", wp)):
+                    have = round(tot[bucket] / MIN_PER_HOUR)
+                    if have == wnt:
+                        continue
+                    if blocks[0]["course"] in PARTIALLY_SCHEDULED and have < wnt:
+                        continue
+                    ok = False
+                    break
+                if not ok:
+                    break
+            if ok:
+                sols.append((gs, ks))
+    return sols
+
+
+def assign(blocks, credits):
+    """Resolve every block, and say plainly which ones could not be resolved.
+
+    Returns (blocks, unresolved) where unresolved is a list of dicts naming the
+    course, why, and the candidate answers. Those are the ONLY places a human
+    (or an agent) is worth asking, and they are questions with closed answer
+    sets rather than a page to review.
+    """
+    by = collections.defaultdict(list)
     for b in blocks:
-        b["group"] = 2 if b["grouprow"] == 2 else 0
+        by[b["course"]].append(b)
 
-    # Only blocks in the G1 row are in question, and in practice only the
-    # tutorials: a lecture or a lab printed once is for the whole cohort.
-    # If tutorials alone cannot be made to reconcile, widen to every G1 block
-    # rather than declare failure on a guess about which ones matter.
-    for candidates in (
-        [b for b in blocks if b["grouprow"] == 1 and b["kind"] == "tut"],
-        [b for b in blocks if b["grouprow"] == 1],
-    ):
-        if len(candidates) > 14:          # 2^14, past which this is not a search
-            break
-        solutions = []
-        for combo in itertools.product((0, 1), repeat=len(candidates)):
-            for b, g in zip(candidates, combo):
-                b["group"] = g
-            if not reconciles(blocks, credits):
-                solutions.append(combo)
-        if len(solutions) == 1:
-            for b, g in zip(candidates, solutions[0]):
-                b["group"] = g
-            return blocks, []
-        if len(solutions) > 1:
-            for b in candidates:
-                b["group"] = 0
-            return blocks, [
-                f"AMBIGUOUS: {len(solutions)} different group assignments all reconcile. "
-                f"The sheet does not determine it. Cells in question: " +
-                ", ".join(f"{b['course']} {b['day']} {b['start']}" for b in candidates)
-            ]
-        for b in candidates:              # reset before widening
-            b["group"] = 2 if b["grouprow"] == 2 else 0
+    unresolved = []
+    for course, bs in by.items():
+        if course not in credits:
+            for b in bs:
+                b["group"], b["resolved"] = (2 if b["grouprow"] == 2 else 0), "assumed"
+            unresolved.append({"course": course, "why": "not in the credit table",
+                               "blocks": bs, "options": []})
+            continue
 
-    return blocks, reconciles(blocks, credits) or ["no group assignment reconciles"]
+        sols = solve_course(bs, credits[course])
+        if len(sols) == 1:
+            gs, ks = sols[0]
+            for b, g, k in zip(bs, gs, ks):
+                b["group"], b["kind"], b["resolved"] = g, k, "forced"
+        else:
+            for b in bs:
+                b["group"] = 2 if b["grouprow"] == 2 else 0
+                b["resolved"] = "ambiguous" if sols else "unsolvable"
+            unresolved.append({
+                "course": course,
+                "why": (f"{len(sols)} assignments all satisfy {credits[course]}"
+                        if sols else f"no assignment satisfies {credits[course]}"),
+                "blocks": bs,
+                "options": sols[:6],
+            })
+    return blocks, unresolved
 
 
 # ---------- reporting ----------
@@ -345,14 +393,23 @@ def parse(path):
     blocks = read_blocks(path)
     credits = read_credits(path)
     if not credits:
-        return blocks, ["no L-T-P-C table found on this sheet, so nothing can verify the groups"]
-    return assign_groups(blocks, credits)
+        for b in blocks:
+            b["group"], b["resolved"] = 0, "assumed"
+        return blocks, [{"course": "(whole sheet)", "why": "no L-T-P-C table on this sheet, "
+                         "so nothing can verify anything", "blocks": blocks, "options": []}]
+    if not blocks:
+        # An empty list from a "parse the timetable" tool does not look like an
+        # error, it looks like a week with no classes, and it would be believed.
+        return blocks, [{"course": "(whole sheet)", "blocks": [], "options": [],
+                         "why": "tagged, but ZERO blocks were read. The table shape on this "
+                                "sheet is not one this tool understands."}]
+    return assign(blocks, credits)
 
 
 def report(path):
     print(f"sheet   {path.name}")
     try:
-        blocks, problems = parse(path)
+        blocks, unresolved = parse(path)
     except LookupError as e:
         print(f"REFUSED  {e}")
         print("         An untagged sheet has no exact reading. This tool does not guess.")
@@ -362,7 +419,8 @@ def report(path):
     for b in blocks:
         by_day[b["day"]].append(b)
 
-    print(f"blocks  {len(blocks)}\n")
+    forced = sum(1 for b in blocks if b.get("resolved") == "forced")
+    print(f"blocks  {len(blocks)}   ({forced} resolved by arithmetic alone)\n")
     for day in DAYS:
         if day not in by_day:
             continue
@@ -370,16 +428,20 @@ def report(path):
         for b in sorted(by_day[day], key=lambda x: (x["start"], x["group"])):
             g = {0: "all", 1: "G1", 2: "G2"}[b["group"]]
             kind = "" if b["kind"] == "lecture" else b["kind"]
+            mark = "" if b.get("resolved") == "forced" else "  <- unresolved"
             print(f"    {b['start']}-{b['end']}  {b['course']:<9} {b['room']:<10} "
-                  f"{g:<4} {kind}")
+                  f"{g:<4} {kind:<5}{mark}")
         print()
 
-    if problems:
-        print("NOT WRITTEN. The grid and the credit table disagree:")
-        for p in problems:
-            print("   ", p)
+    if unresolved:
+        print(f"{len(unresolved)} course(s) the credit table cannot determine:")
+        for u in unresolved:
+            print(f"    {u['course']}: {u['why']}")
+            for b in u["blocks"]:
+                print(f"       {b['day']} {b['start']}-{b['end']} {b['room']}  \"{b['text'][:60]}\"")
+        print("\n  NOT WRITTEN. These are closed questions, not a page to review.")
         return 1
-    print("OK - every course reconciles in both groups against the sheet's own credit table.")
+    print("OK - every course determined and reconciled.")
     return 0
 
 
