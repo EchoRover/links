@@ -1,16 +1,18 @@
 # Timetable sheets
 
-Every official timetable PDF the college has issued this semester, kept
-here because two things on the site are derived from them and neither is
-reproducible without the source:
+The CURRENT revision of every cohort's timetable, one file each. Superseded
+revisions are not kept: they were being read as if they were current, and git
+holds them anyway if a revision history is ever needed.
 
-* `js/timetable.js` — the Sem 5 CSE grid behind the home page's
-  current/next class card.
-* `data/campus-tools-data.js` — the course/faculty legend from all
-  eleven sheets, behind Campus Tools.
+The site links the Sem 5 CSE sheet directly (`js/scripts.js`, `pages/week.html`),
+so these are served, not just archived. `data/linkcs/timetable.json` is derived
+from the Sem 5 CSE sheet and checked back against it by
+`tools/check_timetable.py`.
 
-The site links the current Sem 5 CSE sheet directly (`index.html`,
-`js/scripts.js`), so these are served, not just archived.
+Two sheets carry NO footer stamp (both MTech ETS), so those two are dated by
+the server's Last-Modified header instead. That is a weaker fact than a stamp
+and it is why they slipped through a staleness check that only compared
+stamps: we held 27 August copies while 9 September ones were published.
 
 ## Naming: files are named by REVISION date, not by mail date
 
