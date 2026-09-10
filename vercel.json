@@ -2,64 +2,36 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/bus",
-      "destination": "/pages/bus.html"
+      "source": "/3d",
+      "destination": "/pages/both"
     },
     {
-      "source": "/bus.html",
-      "destination": "/pages/bus.html"
+      "source": "/bus",
+      "destination": "/pages/bus"
     },
     {
       "source": "/week",
-      "destination": "/pages/week.html"
-    },
-    {
-      "source": "/week.html",
-      "destination": "/pages/week.html"
+      "destination": "/pages/week"
     },
     {
       "source": "/rooms",
-      "destination": "/pages/rooms.html"
-    },
-    {
-      "source": "/rooms.html",
-      "destination": "/pages/rooms.html"
+      "destination": "/pages/rooms"
     },
     {
       "source": "/campus",
-      "destination": "/pages/campus.html"
-    },
-    {
-      "source": "/campus.html",
-      "destination": "/pages/campus.html"
-    },
-    {
-      "source": "/3d",
-      "destination": "/pages/both.html"
-    },
-    {
-      "source": "/both",
-      "destination": "/pages/both.html"
-    },
-    {
-      "source": "/both.html",
-      "destination": "/pages/both.html"
+      "destination": "/pages/campus"
     },
     {
       "source": "/m3",
-      "destination": "/pages/m3.html"
-    },
-    {
-      "source": "/m3.html",
-      "destination": "/pages/m3.html"
+      "destination": "/pages/m3"
     },
     {
       "source": "/m4",
-      "destination": "/pages/m4.html"
+      "destination": "/pages/m4"
     },
     {
-      "source": "/m4.html",
-      "destination": "/pages/m4.html"
+      "source": "/both",
+      "destination": "/pages/both"
     }
   ]
 }
