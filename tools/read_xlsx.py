@@ -149,7 +149,10 @@ def read_book(path):
 
 def all_cohorts():
     out = {}
+    # skip our own output and the lock files Excel leaves while a file is open
     for f in sorted(BOOKS.glob("*.xlsx")):
+        if f.name.startswith("~$") or f.name == "room-wise-schedule.xlsx":
+            continue
         for name, blocks in read_book(f).items():
             if blocks:
                 out[name] = {"source": f.name, "blocks": blocks}

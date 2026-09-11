@@ -62,16 +62,29 @@ def collect():
 
 def merge_shared(rows):
     """One class taught to several cohorts is ONE booking, not several."""
+    # NOT keyed on kind. The same class is captioned "Tutorial" on one cohort's
+    # sheet and left bare on another's - AHUL261 Monday 09:00 in M4-1-017 is
+    # captioned by Y3 CSE and not by Y3 EEN - and keying on kind split one
+    # booking into two rows that looked like a room booked against itself.
     by = collections.defaultdict(list)
     for r in rows:
-        by[(r["room"], r["day"], r["start"], r["end"], r["course"], r["kind"])].append(r)
-    out = []
-    for (room, day, start, end, course, kind), group in by.items():
+        by[(r["room"], r["day"], r["start"], r["end"], r["course"])].append(r)
+
+    out, disputed = [], []
+    for (room, day, start, end, course), group in by.items():
         cohorts = sorted({g["cohort"] + ("" if g["group"] == 0 else f" G{g['group']}")
                           for g in group})
+        kinds = {g["kind"] for g in group}
+        # a caption beats no caption: if any sheet says Tutorial, it is one
+        named = kinds - {"lecture"}
+        kind = sorted(named)[0] if named else "lecture"
+        if len(named) > 1:
+            disputed.append((room, day, start, course, sorted(kinds)))
         out.append({"room": room, "day": day, "start": start, "end": end,
-                    "course": course, "kind": kind, "cohorts": cohorts})
-    return sorted(out, key=lambda r: (r["room"], DAYS.index(r["day"]), mins(r["start"])))
+                    "course": course, "kind": kind, "cohorts": cohorts,
+                    "kind_disputed": sorted(kinds) if len(kinds) > 1 else None})
+    out.sort(key=lambda r: (r["room"], DAYS.index(r["day"]), mins(r["start"])))
+    return out
 
 
 def name_conflicts(rows):
@@ -96,6 +109,11 @@ def name_conflicts(rows):
     return {code: sorted(v.values()) for code, v in seen.items() if len(v) > 1}
 
 
+def impossible(rows):
+    """Blocks whose end is not after their start. A typo, but a silent one."""
+    return [r for r in rows if mins(r["end"]) <= mins(r["start"])]
+
+
 def clashes(bookings):
     bad = []
     for a, b in itertools.combinations(bookings, 2):
@@ -118,6 +136,7 @@ def main():
     bookings = merge_shared(rows)
     bad = clashes(bookings)
     naming = name_conflicts(rows)
+    broken = impossible(rows)
 
     wb = openpyxl.Workbook()
     ws = wb.active
@@ -174,6 +193,10 @@ def main():
     print(f"{out}")
     print(f"  {len(bookings)} bookings across {rooms} rooms, "
           f"from {len(collect())} cohort entries (shared classes merged)")
+    print(f"  blocks whose end time is not after their start: {len(broken)}")
+    for r in broken:
+        print(f"    {r['cohort']} {r['day']} {r['course']} in {r['room']}: "
+              f"\"{r['text'].split(' / ')[-2] if ' / ' in r['text'] else r['text']}\"")
     print(f"  rooms whose CODE and NAME disagree between sheets: {len(naming)}")
     for code, names in naming.items():
         print(f"    {code} is called: " + " / ".join(f'"{n}"' for n in names))
