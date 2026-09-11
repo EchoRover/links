@@ -467,6 +467,138 @@ the honest version of the Free Rooms page that exists today.
 
 ---
 
+### 6.6 Booking, second by second
+
+Every other flow in this document is described from the system's side. This one is
+described from the user's, because the gap between them is where a booking system
+is actually judged.
+
+```
+ 0s   room day view. Free time is empty, outlined, and the only
+      clickable thing on the row. Nothing else invites a click.
+ 1s   drag across 14:00-15:30. The range fills as it is dragged and
+      shows "1h 30m" while dragging, not after.
+ 2s   a panel opens, already carrying room, date and time. The only
+      empty fields are purpose and headcount.
+      The submit button says "Request room" - never "Submit".
+ 4s   submit. The slot immediately shows as PENDING, hatched, with
+      your name on it.
+```
+
+**The slot does not turn green.** It has not been approved. An interface that
+shows a request as though it were a booking teaches people to turn up to rooms
+they do not have.
+
+**And the race, which §8.4 handles in the database and the interface must handle
+too.** Between the page loading and the request submitting, someone else can take
+the slot. Then:
+
+> *That 14:00 slot was approved for someone else two minutes ago. Your request
+> was not lost — here it is, and these three rooms are free at the same time.*
+
+The request is retained and re-targetable. Making the user retype a form they
+already filled is how a system earns the reputation the email thread had.
+
+**The approver's side is a queue, not a calendar.** Oldest first, each row
+carrying who, what for, how many people, the room, and the time — and, critically,
+**what else is in that room that day**, so approving does not require opening
+another view. Two buttons. A refusal opens a reason field, because §8.3 makes the
+reason mandatory.
+
+### 6.7 When there is nothing to show, or the wrong thing
+
+Part 8 gives the system ten failure modes. Drafts 1 to 4 gave the interface none.
+Every screen needs these seven states specified, or they get invented under
+deadline:
+
+| State | When | What it says |
+|---|---|---|
+| **Loading** | First paint, data not back | Skeleton of the actual grid, never a spinner on blank. The shape should not jump when data lands. |
+| **Empty** | Term exists, nothing scheduled | "No classes published for Sem 5 yet." A scheduler also sees a link to upload. Never an empty grid, which reads as a free week. |
+| **Unknown** | No data for this room at all | "No schedule held for M2-2-031." **Not "free".** The difference between "nothing is booked" and "we do not know" is the difference between a correct answer and a wrong one. |
+| **Stale** | Last successful fetch is old | The view greys and says how old it is. On a wall display this matters more than anywhere: a frozen board looks authoritative and lies. |
+| **Offline** | Request failed, device has no network | Last known data stays on screen, marked with its age, and writes are refused with "you are offline" rather than queued silently. |
+| **Denied** | Authenticated, not permitted | Say which role is needed and who grants it. "Forbidden" tells a person nothing they can act on. |
+| **Error** | Anything else | What failed, what to try, and a reference to quote. No apology, no "something went wrong". |
+
+\begin{keybox}
+\textbf{The stale state already exists and is already right.} The campus wall
+board in LinkCS greys itself and prints \emph{"not updating - reload the page"}
+if its clock has not advanced for two minutes, on the reasoning that a board
+showing an hour-old departure with full confidence is worse than a blank one.
+That rule transfers directly, and it is the single most important state on this
+list, because the wall display is the one screen nobody is watching.
+\end{keybox}
+
+**Bad signal is the normal case, not the edge case.** M3's labs are interior
+rooms. The phone view must render from cache and say how old the cache is, and it
+must never let someone submit a booking it cannot confirm.
+
+### 6.8 Accessibility, specified
+
+The institution has already committed to this physically — every door plate
+carries Braille. A digital system that does not match that is a step backwards,
+so this section is requirements, not aspiration.
+
+**A timetable grid is one of the hardest things to make accessible**, because a
+two-dimensional arrangement of absolutely-positioned blocks is close to
+meaningless to a screen reader. Position on a grid is not information a reader can
+convey.
+
+- **Every grid ships with a list view of the same data**, reachable by a control
+  and by keyboard, ordered by day then time. Not a lesser fallback — the same
+  content, and for many people the better one.
+- **The grid is keyboard-operable**: arrow between blocks, Enter to open, Escape
+  to close. A booking must be completable without a pointer, since dragging a
+  time range is exactly the interaction a pointer-free user cannot perform. The
+  panel therefore also takes typed start and end times.
+- **Colour is never the sole carrier of status.** Already stated in §6.1 and
+  §6.4; the practical test is that the five states in §6.4 must be
+  distinguishable in greyscale, which is also the photocopier test and the
+  cheap-projector test.
+- **Contrast** meets WCAG 2.2 AA: 4.5:1 for text, 3:1 for the boundary of any
+  block whose fill carries meaning. Measured, not assumed — see the table below.
+- **Focus is always visible**, and never removed for looking untidy.
+- **Motion respects `prefers-reduced-motion`.** Nothing in a timetable needs to
+  move.
+- **Arabic is right-to-left.** Room labels are bilingual per §6.5, and if an
+  Arabic interface is ever offered, the grid's time axis reverses with it. Worth
+  deciding now whether that is in scope, because retrofitting direction is
+  expensive and bolting it on late is how it gets done badly.
+- **Touch targets are at least 44px.** The door and phone cases are one-handed,
+  often while walking.
+
+#### Measured contrast
+
+Every pair the interface actually uses, computed rather than eyeballed:
+
+| Foreground | Background | Ratio | Verdict |
+|---|---|---:|---|
+| Ink `#191919` | White | 17.58:1 | passes |
+| Muted `#475569` | White | 7.58:1 | passes |
+| Muted `#475569` | Ground `#F7F7F7` | 7.07:1 | passes |
+| Crimson `#A41E22` | White | 7.53:1 | passes |
+| Crimson `#A41E22` | Ground | 7.03:1 | passes |
+| Crimson `#A41E22` | Tint `#FCE6E6` | 6.31:1 | passes |
+| Deep `#690F12` | Tint | 10.49:1 | passes |
+| OK `#2E7D5B` | White | 5.00:1 | passes |
+| Critical `#B3261E` | White | 6.54:1 | passes |
+| Warning `#96650C` | White | 5.04:1 | passes |
+
+\begin{keybox}
+\textbf{This table changed the palette, which is the point of measuring.} Draft 4
+specified warning as \texttt{\#B4770F}, an amber that reads fine and scores
+\textbf{3.76:1} on white — below AA for normal text. It is now
+\texttt{\#96650C}. Draft 4 also asserted that crimson fails as small text on the
+tint; it does not, it scores 6.31:1. One claim was a real defect and the other was
+confident and wrong, and only arithmetic told them apart.
+\end{keybox}
+
+**Times are 24-hour throughout.** The sheets are 24-hour, the institution is
+bilingual, and `15:30` is unambiguous in every language. The existing student site
+uses 12-hour, and that inconsistency should be settled deliberately rather than
+inherited.
+
 ### 6.5 Theming
 
 The institution's own palette, taken from `iitdabudhabi.ac.ae`:
@@ -488,7 +620,7 @@ competes with brand:
 
 ```
 OK        #2E7D5B
-Warning   #B4770F
+Warning   #96650C
 Critical  #B3261E     (distinct from brand crimson, used only for real errors)
 ```
 
