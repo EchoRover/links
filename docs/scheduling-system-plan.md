@@ -1,12 +1,37 @@
-# One Timetable
-### A scheduling and room-booking system for IIT Delhi Abu Dhabi
-
-Prepared by Evan Johan Tobias · Draft 1 · 11 September 2026
-
-> This is a proposal, not an institutional document. Every defect cited in Part 1
-> was found mechanically against the office's own files on 10-11 September 2026
-> and can be reproduced.
-
+---
+title: "One Timetable"
+subtitle: "A scheduling and room-booking system for IIT Delhi Abu Dhabi"
+author: "Evan Johan Tobias"
+date: "Draft 1 — 11 September 2026"
+geometry: margin=2.3cm
+fontsize: 10.5pt
+linkcolor: "CrimsonIITD"
+toccolor: "InkIITD"
+toc: true
+toc-depth: 2
+numbersections: false
+header-includes:
+  - \usepackage{xcolor}
+  - \definecolor{CrimsonIITD}{HTML}{A41E22}
+  - \definecolor{DeepIITD}{HTML}{690F12}
+  - \definecolor{InkIITD}{HTML}{191919}
+  - \definecolor{MutedIITD}{HTML}{475569}
+  - \definecolor{RuleIITD}{HTML}{E2E8F0}
+  - \definecolor{TintIITD}{HTML}{FCE6E6}
+  - \usepackage{titlesec}
+  - \titleformat{\section}{\Large\bfseries\color{CrimsonIITD}}{\thesection}{0em}{}
+  - \titleformat{\subsection}{\large\bfseries\color{DeepIITD}}{\thesubsection}{0em}{}
+  - \titleformat{\subsubsection}{\normalsize\bfseries\color{InkIITD}}{\thesubsubsection}{0em}{}
+  - \usepackage{tcolorbox}
+  - \newtcolorbox{keybox}{colback=TintIITD,colframe=CrimsonIITD,boxrule=0.7pt,arc=1mm,left=2.5mm,right=2.5mm,top=1.5mm,bottom=1.5mm}
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhead[L]{\footnotesize\color{MutedIITD}One Timetable}
+  - \fancyhead[R]{\footnotesize\color{MutedIITD}IITD Abu Dhabi · Draft 1}
+  - \fancyfoot[C]{\footnotesize\color{MutedIITD}\thepage}
+  - \renewcommand{\headrulewidth}{0.4pt}
+  - \usepackage{longtable}
+  - \usepackage{booktabs}
 ---
 
 ## Part 1 — The case
@@ -347,7 +372,8 @@ should carry both.
 Database    PostgreSQL
 Backend     one application server; Python/FastAPI or Node/Fastify
 Frontend    server-rendered pages plus light client JS
-Auth        institutional SSO (Microsoft 365 — the campus already runs Outlook and Teams)
+Auth        institutional SSO (Microsoft 365; campus already runs
+            Outlook and Teams)
 Hosting     on campus, on institution-owned infrastructure
 ```
 
@@ -403,7 +429,7 @@ Admin       rooms, users, terms, approval routing.
 Each phase is independently useful. If the project stops after any one of them,
 what was delivered still stands on its own.
 
-### Phase 0 — Publish what already exists (≈2 weeks)
+### Phase 0 — Publish what already exists (about 2 weeks)
 
 Read-only. Import the current workbooks, publish cohort views, room views, and ICS
 feeds. No booking, no editing, no login.
@@ -412,25 +438,25 @@ feeds. No booking, no editing, no login.
 is always current; the end of the eleven-stale-PDFs problem.
 *Risk:* near zero. Nothing is written, nothing is replaced.
 
-### Phase 1 — Upload with validation (≈3 weeks)
+### Phase 1 — Upload with validation (about 3 weeks)
 
 The scheduler uploads a workbook; the system validates, shows a diff, publishes on
 approval. SSO and roles land here.
 
 *Delivers:* the class of errors in §1.2 becomes impossible to publish.
 
-### Phase 2 — Room booking (≈4 weeks)
+### Phase 2 — Room booking (about 4 weeks)
 
 Requests, approval routing, the availability finder, the exclusion constraint.
 
 *Delivers:* booking stops being an email thread.
 
-### Phase 3 — Change notification (≈2 weeks)
+### Phase 3 — Change notification (about 2 weeks)
 
 Generated diff paragraphs, email and web push to affected cohorts. Separate from
 the ICS path, for the reason in §2.3.
 
-### Phase 4 — Utilisation reporting (≈2 weeks)
+### Phase 4 — Utilisation reporting (about 2 weeks)
 
 The measures in §5.5, exportable.
 
@@ -512,3 +538,515 @@ python3 tools/room_schedule.py             the room pivot, clashes, naming confl
 python3 tools/parse_sheet.py --all         the published PDFs
 python3 tools/review.py                    a parse, laid out like the sheet
 ```
+
+\newpage
+
+# Technical appendices
+
+Everything below is implementation detail. Part 1 to 10 can be read without it.
+
+## Appendix C — Schema
+
+Postgres. Written out because the constraints are the design, not an afterthought.
+
+```sql
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+-- ---------- estate ----------
+
+CREATE TABLE building (
+  code        text PRIMARY KEY,              -- 'M4'
+  name        text NOT NULL,
+  name_ar     text
+);
+
+CREATE TABLE room (
+  code        text PRIMARY KEY,              -- 'M4-0-019'. THE identity.
+  building    text NOT NULL REFERENCES building(code),
+  floor       text NOT NULL,                 -- 'G', '1F'
+  plate_en    text,                          -- what the door says
+  plate_ar    text,
+  capacity    integer,
+  kind        text NOT NULL                  -- classroom | lab | hall | seminar
+                CHECK (kind IN ('classroom','lab','hall','seminar','other')),
+  bookable    boolean NOT NULL DEFAULT true,
+  approver_id bigint REFERENCES person(id),
+  plate_photo text,                          -- evidence beats every document
+  verified_on date
+);
+
+-- A name a SOURCE claims for a room. Kept so disagreements stay visible
+-- instead of one source silently winning.
+CREATE TABLE room_name_claim (
+  room_code   text NOT NULL REFERENCES room(code),
+  source      text NOT NULL,        -- '24A1CSEBSEM5', 'door plate'
+  claimed     text NOT NULL,
+  seen_on     date NOT NULL,
+  PRIMARY KEY (room_code, source, claimed)
+);
+
+-- ---------- calendar ----------
+
+CREATE TABLE term (
+  id          text PRIMARY KEY,              -- '2026-27-sem1'
+  label       text NOT NULL,
+  starts      date NOT NULL,
+  ends        date NOT NULL,
+  CHECK (ends > starts)
+);
+
+CREATE TABLE no_class_day (
+  term_id     text NOT NULL REFERENCES term(id),
+  day         date NOT NULL,
+  reason      text NOT NULL,
+  PRIMARY KEY (term_id, day)
+);
+
+-- ---------- curriculum ----------
+
+CREATE TABLE course (
+  code        text PRIMARY KEY,              -- 'ACOL351'
+  title       text NOT NULL,                 -- official, off the sheet
+  short       text,                          -- what a pill shows
+  dept        text,
+  l           integer NOT NULL DEFAULT 0,    -- L-T-P-C, stored apart so it
+  t           integer NOT NULL DEFAULT 0,    -- can be reconciled against
+  p           integer NOT NULL DEFAULT 0,    -- scheduled minutes
+  credits     numeric(4,2) NOT NULL DEFAULT 0
+);
+
+CREATE TABLE cohort (
+  code        text PRIMARY KEY,              -- '24A1CSEBSEM5'
+  label       text NOT NULL,                 -- 'Y3 CSE Sem 5'
+  term_id     text NOT NULL REFERENCES term(id),
+  headcount   integer,
+  n_groups    integer NOT NULL DEFAULT 2     -- Year 1 runs four
+);
+
+CREATE TABLE section (
+  id          bigserial PRIMARY KEY,
+  term_id     text NOT NULL REFERENCES term(id),
+  course_code text NOT NULL REFERENCES course(code),
+  cohort_code text NOT NULL REFERENCES cohort(code),
+  instructor  bigint REFERENCES person(id),
+  UNIQUE (term_id, course_code, cohort_code)
+);
+
+-- ---------- the one occupancy table ----------
+-- A class and a booking are the SAME kind of row. Separate tables would
+-- eventually overlap, because nothing would stop them.
+
+CREATE TABLE occupancy (
+  id          bigserial PRIMARY KEY,
+  revision_id bigint  NOT NULL REFERENCES revision(id),
+  room_code   text    NOT NULL REFERENCES room(code),
+  during      tstzrange NOT NULL,
+  kind        text    NOT NULL
+                CHECK (kind IN ('lecture','tut','lab','proj','help','booking','hold')),
+  status      text    NOT NULL DEFAULT 'confirmed'
+                CHECK (status IN ('confirmed','provisional','cancelled')),
+  section_id  bigint  REFERENCES section(id),      -- set for teaching
+  booking_id  bigint  REFERENCES booking(id),      -- set for a booking
+  groups      int[]   NOT NULL DEFAULT '{}',       -- {} = whole cohort
+  note        text,
+
+  CHECK (num_nonnulls(section_id, booking_id) = 1),
+  CHECK (upper(during) > lower(during)),
+
+  EXCLUDE USING gist (room_code WITH =, during WITH &&)
+    WHERE (status <> 'cancelled')
+);
+
+CREATE INDEX ON occupancy USING gist (during);
+CREATE INDEX ON occupancy (section_id);
+
+-- ---------- bookings ----------
+
+CREATE TABLE booking (
+  id           bigserial PRIMARY KEY,
+  requester_id bigint NOT NULL REFERENCES person(id),
+  purpose      text   NOT NULL,
+  attendees    integer,
+  status       text   NOT NULL DEFAULT 'pending'
+                 CHECK (status IN ('pending','approved','refused',
+                                  'withdrawn','cancelled')),
+  decided_by   bigint REFERENCES person(id),
+  decided_at   timestamptz,
+  reason       text,                          -- required on refusal
+  created_at   timestamptz NOT NULL DEFAULT now()
+);
+
+-- ---------- versioning ----------
+
+CREATE TABLE revision (
+  id          bigserial PRIMARY KEY,
+  term_id     text NOT NULL REFERENCES term(id),
+  n           integer NOT NULL,               -- 1, 2, 3...
+  source      text,                           -- uploaded filename
+  source_hash text,                           -- sha256 of the workbook
+  stamp       text,                           -- the sheet's own footer stamp
+  author_id   bigint NOT NULL REFERENCES person(id),
+  published_at timestamptz,
+  summary     text,                           -- the generated diff paragraph
+  UNIQUE (term_id, n)
+);
+
+CREATE TABLE person (
+  id          bigserial PRIMARY KEY,
+  sso_subject text UNIQUE NOT NULL,           -- from institutional SSO
+  name        text NOT NULL,
+  email       text NOT NULL,
+  role        text NOT NULL
+                CHECK (role IN ('student','faculty','approver','scheduler','admin')),
+  cohort_code text REFERENCES cohort(code),
+  active      boolean NOT NULL DEFAULT true
+);
+
+CREATE TABLE audit (
+  id          bigserial PRIMARY KEY,
+  at          timestamptz NOT NULL DEFAULT now(),
+  actor_id    bigint REFERENCES person(id),
+  action      text NOT NULL,
+  entity      text NOT NULL,
+  entity_id   text NOT NULL,
+  before      jsonb,
+  after       jsonb
+);
+```
+
+\begin{keybox}
+\textbf{Why \texttt{occupancy} carries \texttt{revision\_id}.} Publishing a revision
+writes a new set of rows rather than mutating the old ones. "What did the timetable
+say on 8 September" is then a query, and a bad publish is reverted by pointing the
+term at the previous revision rather than by restoring a backup.
+\end{keybox}
+
+## Appendix D — The validation catalogue
+
+Every rule an upload must pass. The numbering is the error code the interface shows.
+
+### Structural (the file itself)
+
+| Code | Rule | Caught in the real data? |
+|---|---|---|
+| S1 | Every sheet has a recognisable day column | — |
+| S2 | Every day band has group labels in column B | — |
+| S3 | A parsed sheet yields more than zero blocks | **Yes.** Both MTech sheets yielded zero and an earlier checker called that "ok" |
+| S4 | The workbook carries a term the system knows | — |
+
+### Per block
+
+| Code | Rule | Caught? |
+|---|---|---|
+| B1 | End time is strictly after start time | **Yes.** Y1 ELE and Y1 EEN: "15:30 to 14:20" |
+| B2 | Times fall inside the institution's teaching day (07:00–21:00) | — |
+| B3 | Room code parses and exists in `room` | — |
+| B4 | Course code exists in `course` | — |
+| B5 | The block's groups are a subset of its cohort's groups | — |
+| B6 | Duration is a plausible multiple (50 / 80 / 110 / 170 min) | — |
+
+### Cross-block
+
+| Code | Rule | Caught? |
+|---|---|---|
+| X1 | No room holds two different courses at overlapping times | **Yes.** Wed 17:00, `M4-0-019` |
+| X2 | No cohort-group is in two places at once | — |
+| X3 | No instructor is in two places at once | — |
+| X4 | A course taught to several cohorts at one time and place is ONE entry | **Yes.** 248 cohort entries collapse to 161 bookings; without this, 87 false clashes |
+
+### Curriculum
+
+| Code | Rule | Caught? |
+|---|---|---|
+| C1 | Every course on the grid appears in the L-T-P-C table | — |
+| C2 | Every course in the L-T-P-C table appears on the grid | — |
+| C3 | Scheduled contact hours reconcile against L-T-P-C, **per group** | **Yes.** This is what proves group membership |
+| C4 | Declared exceptions are listed, not inferred | `ACOD310` is 0-0-6-3 with one slot reserved |
+| C5 | Non-contact blocks are excluded from C3 | **Yes.** "Help Session if required" broke the reconciliation until excluded |
+
+### Naming
+
+| Code | Rule | Caught? |
+|---|---|---|
+| N1 | A room code maps to one plate name across all sheets | **Yes. Six rooms fail this** |
+| N2 | A plate name maps to one room code | **Yes.** "Classroom 8" is both `M4-0-019` and `M4-1-011` |
+| N3 | Where a photographed plate exists, it wins, and disagreement is reported | **Yes.** Y1 CHE calls `M4-0-011` "Lecture Hall"; the plate says Classroom 3 |
+
+\begin{keybox}
+\textbf{Severity matters.} S and B failures \emph{reject} the upload. X and C
+failures reject unless the scheduler explicitly acknowledges each one, because a
+genuine timetable can carry a deliberate overlap. N failures are \emph{warnings}
+that publish: a naming disagreement should be visible, not blocking.
+\end{keybox}
+
+## Appendix E — API surface
+
+REST, JSON, thin. Public reads need no auth; everything else is SSO-gated.
+
+### Public reads
+
+```
+GET  /api/terms                             the terms, current first
+GET  /api/cohorts                           every cohort, with labels
+GET  /api/cohorts/{code}/week?revision=     meetings, grouped by day
+GET  /api/rooms                             every room, plate names, capacity
+GET  /api/rooms/{code}/week?from=           occupancy for a room
+GET  /api/rooms/free?day=&from=&to=&seats=  the availability finder
+GET  /api/instructors/{id}/week
+GET  /ics/cohort/{code}.ics                 RFC 5545 feed
+GET  /ics/room/{code}.ics
+GET  /ics/instructor/{id}.ics
+GET  /api/revisions?term=                   revision history with diff summaries
+GET  /api/revisions/{n}/diff                sets in, out, moved
+```
+
+### Authenticated
+
+```
+POST /api/bookings                          create a request
+     {room_code, during, purpose, attendees}
+GET  /api/bookings?status=&mine=
+POST /api/bookings/{id}/approve
+POST /api/bookings/{id}/refuse              {reason}  -- required
+POST /api/bookings/{id}/withdraw
+
+POST /api/terms/{id}/uploads                multipart, the workbook
+     -> 202 {upload_id}
+GET  /api/uploads/{id}                      {status, findings[], diff}
+POST /api/uploads/{id}/publish              {acknowledge: [...]}
+
+GET  /api/reports/utilisation?term=&from=&to=
+GET  /api/reports/naming-conflicts
+GET  /api/export/term/{id}.xlsx             full export, any time
+```
+
+### Response shape, `/api/cohorts/{code}/week`
+
+```json
+{
+  "cohort": {"code": "24A1CSEBSEM5", "label": "Y3 CSE Sem 5", "n_groups": 2},
+  "term":   {"id": "2026-27-sem1", "starts": "2026-08-20", "ends": "2026-12-16"},
+  "revision": {"n": 6, "published_at": "2026-09-08T09:30:00Z",
+               "stamp": "8th September 2026 - 1:30pm"},
+  "meetings": [
+    {"day": "Wednesday", "start": "15:30", "end": "16:20",
+     "course": {"code": "ACOL351", "short": "Algos"},
+     "room": {"code": "M4-0-019", "plate": "Classroom 5",
+              "plate_disputed": true, "also_called": ["Classroom 3", "Classroom 8"]},
+     "kind": "tut", "groups": [], "status": "confirmed"}
+  ]
+}
+```
+
+`plate_disputed` is not decoration. It is the interface's licence to show the
+reader that the documents disagree, instead of picking one and being confidently
+wrong.
+
+## Appendix F — State machines
+
+### Booking
+
+```
+                 withdraw
+        ┌─────────────────────────┐
+        v                         │
+   [pending] ──approve──> [approved] ──cancel──> [cancelled]
+        │                    │
+        └───refuse──> [refused]
+```
+
+- `approve` writes an `occupancy` row inside the same transaction. If the
+  exclusion constraint fires, the approval fails and the approver is told which
+  booking holds the slot.
+- `refuse` requires a reason. A refusal with no reason generates a follow-up email
+  to the approver anyway, so the field may as well be mandatory.
+- `cancelled` keeps the row. The slot is released by the partial index, and the
+  history survives.
+
+### Revision
+
+```
+[uploading] ──parse ok──────> [validating]
+     │                              │
+     └──parse failed──> [rejected] <┘  (findings unacknowledged)
+                                    │
+                    clean or acknowledged
+                                    │
+                                    v
+                               [staged] ──publish──> [published]
+                                                          │
+                                                     superseded
+                                                          │
+                                                          v
+                                                     [archived]
+```
+
+Only one revision per term is `published`. Rolling back is publishing an older
+revision, which creates a new revision row recording that it happened.
+
+## Appendix G — Screen specifications
+
+### G1 — Cohort week (the landing view)
+
+- **Layout.** Days as rows, time 08:00–19:00 across. Matches the printed sheet's
+  orientation, which is the artefact everyone already reads.
+- **Block.** Course code in mono at 11px; kind badge; group badge only when the
+  block does not apply to the whole cohort; room plate; time. When a block is
+  narrow, the badges survive and the room is what truncates — the badges are what
+  the reader is checking.
+- **Overlap.** Blocks that overlap stack into lanes. Nothing is ever hidden behind
+  anything else.
+- **State.** `provisional` draws a dashed outline plus a marker; colour alone never
+  carries it.
+- **Now.** A hairline at the current time on today's row, and only on today's row.
+- **Empty.** A term with no published revision says so and links to the upload
+  screen if the viewer is a scheduler. It never renders an empty grid.
+
+### G2 — Room day (the booking surface)
+
+- One room, one day, time across the full width.
+- Teaching in solid fill, approved bookings in a lighter fill of the same hue,
+  pending requests hatched.
+- Free time is genuinely empty and is the click target. Drag across it to open a
+  request with times pre-filled.
+- A right rail shows the room: plate name, capacity, kind, approver, and — if the
+  plate is disputed — every name the documents give it.
+
+### G3 — Room week grid (the office view)
+
+- Rooms down the side, weekdays across, each cell a compressed strip.
+- This is the screen where a clash is visible without anyone searching for one.
+- Sort by building, then floor, then code. Not alphabetically: physical adjacency
+  is what the reader is thinking about.
+
+### G4 — Availability finder
+
+```
+I need a room   [ 90 ] minutes   on [ Tuesday ]   after [ 14:00 ]
+for [ 40 ] people   in [ any building ▾ ]         [ Find ]
+```
+
+Results ranked by **capacity fit**, closest first, not alphabetically. Putting a
+seminar of twelve into a 120-seat lecture hall is a real cost, and a list sorted
+by room code invites exactly that.
+
+### G5 — Utilisation
+
+- Rooms against hours, cell colour by frequency rate.
+- A sequential ramp, not a rainbow. Dark equals busy.
+- Below it, the three headline numbers per building: frequency, occupancy,
+  utilisation.
+- A "never used" list, which is the finding management acts on.
+
+### G6 — Mobile
+
+Single column. The top of the screen answers one question: **what is next, where,
+and how long until it starts.** Everything else is below the fold and that is
+correct — the phone case is a person walking between buildings.
+
+## Appendix H — Emitting iCalendar
+
+```
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//IITD Abu Dhabi//One Timetable//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Y3 CSE Sem 5
+REFRESH-INTERVAL;VALUE=DURATION:PT1H
+X-PUBLISHED-TTL:PT1H
+BEGIN:VEVENT
+UID:meet-8842@timetable.iitdabudhabi.ac.ae
+DTSTAMP:20260908T093000Z
+DTSTART;TZID=Asia/Dubai:20260909T153000
+DTEND;TZID=Asia/Dubai:20260909T162000
+RRULE:FREQ=WEEKLY;BYDAY=WE;UNTIL=20261216T235900Z
+EXDATE;TZID=Asia/Dubai:20261028T153000
+SUMMARY:ACOL351 Tutorial
+LOCATION:M4-0-019 (Classroom 5)
+DESCRIPTION:Analysis and Design of Algorithms\nTutorial\nAll groups
+CATEGORIES:TUTORIAL
+SEQUENCE:3
+END:VEVENT
+END:VCALENDAR
+```
+
+Points that are easy to get wrong:
+
+- **`UID` is stable for the life of the meeting.** Regenerating it on every publish
+  makes every subscriber's calendar duplicate the entire term.
+- **`SEQUENCE` increments on change**, so clients update rather than duplicate.
+- **Store local time with `TZID`, never bare UTC.** `15:30 Asia/Dubai` and its UTC
+  instant are different facts, and if the term shifts the local time is what was
+  meant. This is the specific mistake JSCalendar (RFC 8984) was designed to fix.
+- **No-class days become `EXDATE`**, not deleted occurrences.
+- **Set `REFRESH-INTERVAL` and `X-PUBLISHED-TTL` anyway.** They cost nothing and
+  the clients that honour them are the ones that poll fast. Google ignores both.
+
+## Appendix I — Permissions
+
+| Action | Viewer | Student | Faculty | Approver | Scheduler | Admin |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| See published schedules | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} |
+| Subscribe to a feed | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} |
+| See room availability | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} |
+| Request a room | | | \textbullet{} | \textbullet{} | \textbullet{} | \textbullet{} |
+| See who requested | | | | \textbullet{} | \textbullet{} | \textbullet{} |
+| Approve or refuse | | | | \textbullet{}¹ | \textbullet{} | \textbullet{} |
+| Upload a term | | | | | \textbullet{} | \textbullet{} |
+| Publish a revision | | | | | \textbullet{} | \textbullet{} |
+| Roll back a revision | | | | | | \textbullet{} |
+| Edit rooms and people | | | | | | \textbullet{} |
+| Read the audit log | | | | | \textbullet{} | \textbullet{} |
+
+\* Only for rooms where they are the named approver.
+
+Students cannot request rooms in v1. That is a policy question for Part 9, not a
+technical limit — the row exists, the permission is simply off.
+
+## Appendix J — Testing
+
+Scale here is tiny: eleven cohorts, about 300 meetings, nineteen rooms. **Load is
+not the risk. Correctness is.** The test effort goes almost entirely into the
+validator and the importer.
+
+**Golden-file tests.** The Sem 5 CSE week is hand-verified against the sheet and
+against its own credit table. It is the fixture: import it, assert 23 meetings
+exactly, on day, time, course, room, kind and group. Any importer change that
+breaks it is wrong.
+
+**Property tests.** For any generated set of meetings, publishing then exporting
+then re-importing returns the same set. Round-tripping is where importers rot.
+
+**Constraint tests.** Two concurrent approvals for the same slot: exactly one
+succeeds. Run it against a real Postgres, not a mock — the guarantee is the
+database's, so a mock tests nothing.
+
+**Regression corpus.** Every defective sheet found this week becomes a fixture:
+the "15:30 to 14:20" file, the zero-block MTech sheets, the `M4-0-019` clash, the
+"Classroom 8" mislabel. Each asserts the specific code from Appendix D.
+
+**What not to test.** Rendering. Screenshot tests on a timetable grid are famously
+brittle and catch almost nothing that matters here.
+
+## Appendix K — Effort
+
+Assuming one developer, part-time alongside coursework. Ranges, not promises.
+
+| Phase | Work | Estimate |
+|---|---|---|
+| 0 | Schema, importer, public read views, ICS | 2–3 weeks |
+| 1 | SSO, roles, upload with validation, diff and publish | 3–4 weeks |
+| 2 | Bookings, approval routing, availability finder | 4–5 weeks |
+| 3 | Change notification, generated diff paragraphs | 2 weeks |
+| 4 | Utilisation reporting | 2 weeks |
+| 5 | Course pages, add/drop | a term, scoped separately |
+
+**Phase 0 is short because much of it exists.** The importer that reads the
+office workbooks — including group membership from merged cell spans — is written
+and verified. The room pivot is written. A student-facing site carrying the Sem 5
+timetable, a free-room finder and a wall-display board is live.
+
+**The honest risk is not the code.** It is Part 9, question 1: who owns this after
+I graduate. Every estimate above assumes that gets answered before Phase 2, because
+Phase 2 is where the institution starts depending on it.
