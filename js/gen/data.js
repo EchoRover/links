@@ -364,6 +364,18 @@ window.DATA = {
       "plate": "Computer Lab 03",
       "confirmed": true,
       "lab": true
+    },
+    "M4-0-005": {
+      "building": "M4",
+      "floor": "G",
+      "plate": "Lecture Hall",
+      "confirmed": true
+    },
+    "M4-0-006": {
+      "building": "M4",
+      "floor": "G",
+      "plate": "Classroom 2",
+      "confirmed": true
     }
   },
   "calendar": {
@@ -712,6 +724,18 @@ const ROOMS = {
     "no": "03",
     "ok": true,
     "lab": true
+  },
+  "M4-0-005": {
+    "bldg": "M4",
+    "floor": "G",
+    "no": "Lecture Hall",
+    "ok": true
+  },
+  "M4-0-006": {
+    "bldg": "M4",
+    "floor": "G",
+    "no": "2",
+    "ok": true
   }
 };
 const TERM = {"start": "2026-08-20", "end": "2026-12-16"};
