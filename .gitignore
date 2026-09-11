@@ -10,3 +10,6 @@ Thumbs.db
 
 # local dev server helper
 .devserver.py
+
+# generated deliverable, rebuilt by tools/room_schedule.py
+data/schedules/room-wise-schedule.xlsx
