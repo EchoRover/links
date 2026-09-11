@@ -54,8 +54,23 @@ sheet and every workbook, read mechanically on 10–11 September 2026:
 | Held sheets out of date against what was published | **5 of 11** |
 | A room name contradicted by its own door plate | **1** |
 
-None of that is carelessness. It is what happens when eleven documents are the
-system of record and a spreadsheet is the only integrity check.
+**Five of those six fall to a one-week validation script**, and that should be
+done whatever else is decided (§2.2). The case for a system is what remains after
+they are gone:
+
+- **Six revisions in the first three weeks of term.** Each one silently
+  invalidated every copy anyone held. Nothing announces a reissue.
+- **No room-wise view exists** — the academic office asked for one on
+  11 September, and it cannot be produced from eleven PDFs by any amount of
+  checking.
+- **Booking is an email thread** with no record of who asked or who approved.
+- **"Is M4-0-019 free on Thursday at three?"** cannot be answered without
+  opening eleven files.
+
+The defects are a symptom. **There is no system of record** — eleven documents
+are authoritative about overlapping facts and nothing reconciles them. That is a
+structural property, not a checking one, and it is the only thing here that
+cannot be scripted around or fixed by being more careful.
 
 **What is proposed.** One authoritative schedule; room booking with approval;
 publishing to web, calendar feeds and PDF; conflict prevention enforced by the
@@ -118,28 +133,91 @@ Two of these compound: the Y2 EEN row in the double-booking prints code
 everywhere else. Either the code or the name is a typo, and which one it is
 decides whether the clash is real. **Nobody can answer that from the documents.**
 
-### 1.3 The distribution problem, separately
+### 1.3 What a one-week script would fix, and what it would not
 
-Sheets are reissued often — 23 Aug, 27 Aug, 7 Sep, 8 Sep, 9 Sep, 10 Sep for
-various cohorts — and nothing announces it. A snapshot taken on 10 September found
-**5 of 11 held copies out of date**, two of them by thirteen days. Those two carry
-no revision stamp in the footer at all, so even a careful reader comparing stamps
-sees nothing wrong.
+Before arguing for a system, the honest bridge — because §2.2 puts a one-week
+validation script on the table and most of the table above falls to it.
 
-The workbooks are also *ahead* of the website: Year 2 is dated 10 September while
-the newest published Year 2 PDF is the 8th.
+| Finding | Fixed by validation alone? |
+|---|---|
+| Impossible times ("15:30 to 14:20") | **Yes** |
+| Room double-booked across cohorts | **Yes** |
+| Rooms named inconsistently | **Yes**, as a warning |
+| One class described two ways | **Yes** |
+| Name contradicted by its door plate | **Yes**, given the plate is recorded |
+| Held sheets out of date | **No** |
 
-### 1.4 What this costs
+**Five of six defects fall to a week of work with no server.** A proposal that
+does not say so is not being straight, and that rung should be taken whatever
+else is decided.
+
+So the case for a system does not rest on the defect list. It rests on what is
+left after the defect list is gone.
+
+### 1.4 What remains, and it is the larger half
+
+**Distribution. Six revisions in the first three weeks of term.**
+Revision dates carried by sheets actually issued: 23 August, 27 August, 7, 8, 9
+and 10 September. Term began on 20 August. Each reissue means eleven PDFs
+re-exported and re-uploaded, and each one **silently invalidates every copy
+anyone is holding** — the phone screenshot, the printout on a desk, the file in
+a WhatsApp group. A validation script runs on the author's machine. It cannot
+reach any of those.
+
+That is why 5 of 11 held copies were out of date on 10 September, and why two of
+them had been stale for thirteen days without anything indicating it.
+
+**There is no room-wise view, and the office has asked for one.**
+On 11 September the academic office sent the source workbooks and asked, in
+return, for room-wise schedules. That view cannot be produced from eleven PDFs
+by any amount of validation, because the question crosses every file at once. It
+is a pivot, and a pivot needs the data in one place.
+
+**Booking is an email thread.**
+There is no record of who asked, who approved, or on what basis. Nothing
+prevents a room being promised twice, and nothing tells the timetable that a
+room is spoken for. A script cannot introduce a record where none exists.
+
+**"Is M4-0-019 free on Thursday at three?" cannot be answered.**
+Not by anyone, without opening eleven files and reading them by eye. This is the
+single most common question about a room and the current process has no
+mechanism for it at all.
+
+### 1.5 The underlying problem
+
+The defects are a symptom. **There is no system of record.**
+
+Eleven documents are authoritative about overlapping facts, and nothing
+reconciles them. The same room has three names because three files each get to
+have an opinion. Two cohorts can hold the same room because no file can see the
+other. Copies go stale because a file is a snapshot and nothing announces that a
+newer one exists.
+
+Validation makes each document internally consistent. It cannot make eleven
+documents into one truth, because that is a structural property and not a
+checking one.
+
+**That is the thing worth building, and it is the only thing in this document
+that cannot be bought cheaply, scripted around, or done by being more careful.**
+
+### 1.6 What this costs
 
 - A student walks to the wrong room, because the name on the sheet is not the
   name on the door.
 - Two classes arrive at the same room, and the more junior group leaves.
-- A change is published and reaches nobody until someone happens to re-download.
-- The office cannot answer "is M4-0-019 free on Thursday at 3?" without opening
-  eleven files and reading them by eye.
+- A change is published and reaches nobody until someone re-downloads.
+- The office answers room questions by reading eleven files.
+- Six times in three weeks, everyone's copy became wrong and nobody was told.
 
 None of this is carelessness. It is what happens when eleven documents are the
 system of record and a spreadsheet is the only integrity check.
+
+\begin{keybox}
+\textbf{What I have not measured:} how much time the office actually spends on
+this. Everything above is measured from the documents; the staff-time cost is
+inferred and should be asked rather than assumed. If the honest answer is "very
+little", the case for Phases 2 onward weakens and this document should say so.
+\end{keybox}
 
 ---
 
