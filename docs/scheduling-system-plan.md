@@ -586,9 +586,14 @@ their familiar artefact, and it removes the argument "but we need the PDF".
 requester picks a room and a time
    -> system shows availability live, from the same table teaching uses
    -> submit creates a request in PENDING
-   -> routing rule sends it to the approver for that room
+      (pending reserves NOTHING - see 8.4)
+   -> routing sends it to that room's named approver
+   -> unanswered after 48h, it escalates to the named deputy
+   -> unanswered after 5 days, it auto-refuses with that reason,
+      because a refusal can be appealed and silence cannot (8.3)
    -> approver sees the request beside that room's day
-   -> APPROVE writes a booking; the exclusion constraint refuses an overlap
+   -> APPROVE writes a booking inside one transaction; the exclusion
+      constraint refuses an overlap and names what holds the slot
    -> requester is notified; the room's views and feeds update
 ```
 
@@ -619,8 +624,15 @@ is moved without being told.
 ### 5.4 Change a published schedule
 
 ```
-edit -> validate -> diff -> publish -> notify
+edit -> validate -> diff -> EVICTIONS -> publish -> notify
 ```
+
+The eviction step is not optional and is the one drafts 1 and 2 of this document
+left out. Before a revision can publish, the system computes which approved
+bookings the new schedule would displace and requires the scheduler to
+acknowledge each one. Teaching outranks a booking (§5.3), but it never displaces
+one silently, and the evicted requester is told which revision did it and what
+else is free at that hour (§8.1).
 
 The notification is a sentence, not a file:
 
@@ -794,6 +806,38 @@ carrying who, what for, how many people, the room, and the time — and, critica
 **what else is in that room that day**, so approving does not require opening
 another view. Two buttons. A refusal opens a reason field, because §8.3 makes the
 reason mandatory.
+
+### 6.6a Two screens Part 8 requires and nobody drew
+
+Adding failure modes added interfaces. Leaving them unspecified is how they get
+built badly at the end of a phase.
+
+**The eviction review.** Shown to a scheduler before a publish, listing every
+approved booking the new schedule would displace:
+
+```
+Publishing revision 7 will displace 2 bookings.
+
+  Wed 15:30  M4-0-019   Coding Club, "KBC quiz rehearsal", 30 people
+             requested 2 Sep, approved by A. Hassan
+             displaced by: ACOL351 tutorial
+             free at that hour: M4-0-011 (66), M4-0-017 (45), M4-0-021 (45)
+
+  Thu 16:00  M3-1-014   [ ... ]
+
+  [ ] I have reviewed these displacements        [ Publish ]
+```
+
+The checkbox is deliberate friction. This is the moment someone loses a room
+they were promised, and it should not be possible to do it without reading their
+name.
+
+**The approver's queue.** Oldest first, because age is what turns a request into
+a complaint. Each row carries who, what for, how many, the room, the time, **and
+what else is in that room that day** — so a decision never requires opening
+another screen. Rows past 48 hours are marked as escalated to the deputy; rows
+approaching five days show the auto-refuse deadline, since an approver who can
+see the clock usually beats it.
 
 ### 6.7 When there is nothing to show, or the wrong thing
 
@@ -1990,6 +2034,17 @@ for [ 40 ] people   in [ any building ▾ ]         [ Find ]
 Results ranked by **capacity fit**, closest first, not alphabetically. Putting a
 seminar of twelve into a 120-seat lecture hall is a real cost, and a list sorted
 by room code invites exactly that.
+
+### G4a — Eviction review
+
+Modal, blocking, before publish. One row per displaced booking with requester,
+purpose, approval trail, what displaces it, and three alternatives. An explicit
+acknowledgement, not an OK button. See §6.6a.
+
+### G4b — Approver queue
+
+List, oldest first, with the room's day inline. Escalation and auto-refuse
+deadlines visible on the row. Two actions; refusal requires a reason.
 
 ### G5 — Utilisation
 
