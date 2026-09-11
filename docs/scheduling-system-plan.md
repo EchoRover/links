@@ -67,8 +67,9 @@ are priced for institutions with tens of thousands of students. UniTime is free
 but is a timetabling *solver* for a research university, and our schedule is
 already built well by a person. What fails is everything after that.
 
-**Cost.** One developer, part-time, roughly four months to a system that publishes,
-validates and books. Much of the reading and publishing already exists and runs.
+**Cost.** One developer, part-time. **Sixteen weeks** to a system that publishes,
+validates and books, in five phases each of which is useful on its own (Part 10).
+The first phase is three weeks and much of it already exists and runs.
 
 **What management must decide before Phase 2 (Part 11).** Where it runs and who
 maintains it after I graduate; whether it becomes the system of record or stays a
@@ -198,7 +199,8 @@ Google is both the slowest and the most used.
 3. Publishing: web views, per-cohort and per-room, plus ICS feeds.
 4. Conflict prevention at write time, not discovery after the fact.
 5. Change notification with a human-readable diff.
-6. Utilisation reporting.
+6. Utilisation reporting — frequency rate in v1; occupancy needs
+   enrolment data that does not exist yet (§5.5).
 
 ### 3.2 Explicitly out of scope for v1
 
@@ -217,40 +219,103 @@ Saying no to these in v1 is what makes v1 shippable.
 
 ### 4.1 Entities
 
+Grouped by what they are, because the grouping is itself the argument: three
+layers that change at completely different rates.
+
+**The estate. Changes once a decade.**
+
 ```
-Term            2026-27 Sem 1, start/end, no-class days
-Building        M1 M2 M3 M4
-Room            code (identity), plate name, capacity, kind, building, floor
-Course          code (identity), title, L-T-P-C, department
-Cohort          24A1CSEBSEM5 -> "Y3 CSE Sem 5", size
-Group           a cohort's teaching split: 1, 2, 3, 4, and sub-splits 1A, 2C
-Section         a course taught to a cohort in a term, with an instructor
-Meeting         a section in a room at a time, for a set of groups
-Booking         a non-teaching use of a room, with a requester and a status
-Person          staff, faculty, student; role-scoped
+Building         M1 M2 M3 M4
+Room             code (identity), capacity, kind, building, floor, approver,
+                 deputy
+Room name claim  a name ONE SOURCE gives a room, with where it came from
 ```
+
+**The calendar and curriculum. Changes once a term.**
+
+```
+Term             2026-27 Sem 1, start, end
+No-class day     holidays, mid-sem break, exam weeks
+Course           code (identity), title, L-T-P-C, department
+Cohort           24A1CSEBSEM5 -> "Y3 CSE Sem 5", headcount, number of groups
+Section          a course taught to a cohort this term, with an instructor,
+                 an enrolment kind, and registered heads
+Section shares   the other cohorts attending that same section
+```
+
+**What actually happens, and when. Changes weekly.**
+
+```
+Meeting          the editable pattern: room, weekday, time, groups, from/until
+Occupancy        one instance of a meeting, in a room, at a time
+Booking          a request for non-teaching use, with a status and a decision
+Revision         a published state of a term, with a diff against the last one
+Person           staff, faculty, student; role-scoped
+Audit            who changed what, when
+```
+
+\begin{keybox}
+\textbf{Meeting and Occupancy are two entities on purpose, and this is the single
+most important line in the model.} A weekly class is one editable fact and sixteen
+things that occupy a room. The pattern is what a human edits; the instances are
+what the database polices. Collapse them and you get either a system that cannot
+detect a clash or one where moving a class means rewriting sixteen rows.
+\end{keybox}
 
 ### 4.2 The rules that make it hold together
 
-**A room's code is its identity. Every name is an attribute.**
-`M4-0-019` is the room. "Classroom 5" is what the door says. "Classroom 3" is what
-one sheet claims. Both are stored, neither is the key, and the disagreement stays
-visible instead of being silently resolved. This single rule retires all six
-naming defects in §1.2.
+**1. A room's code is its identity. Every name is an attribute.**
+`M4-0-019` is the room. "Classroom 5" is what the door says. "Classroom 3" is
+what one sheet claims and "Classroom 8" is what another does. All are stored as
+*claims with a source*, none is the key, and the disagreement stays visible
+rather than being silently resolved by whichever file was read last. This one
+rule retires all six naming defects in §1.2.
 
-**Nothing references a course except by code.** Not by title, not by short name.
-A course legitimately has several names — the official title, the everyday name,
-the abbreviation on a timetable pill — and each is a field on one object.
+**2. Nothing references a course except by code.**
+Not by title, not by short name. A course legitimately has several names — the
+official title, the everyday name, the abbreviation on a pill — and each is a
+field on one object.
 
-**A meeting names its groups explicitly.** `[]` means the whole cohort. `[1]` means
-group 1 only. This is exactly what the workbooks already encode as merged cell
-spans, and exactly what the PDF export destroys.
+**3. A meeting names its groups explicitly.**
+`{}` means the whole cohort. `{1}` means group 1 only. This is exactly what the
+workbooks encode as merged cell spans and exactly what the PDF export destroys.
+Year 1 runs four groups with A/B/C sub-splits, so "two groups" must never be
+assumed anywhere.
 
-**Every published state is versioned.** A revision has a stamp, an author, and a
-diff against its predecessor. "What changed between the 7th and the 8th" must be a
-query, not an archaeology exercise.
+**4. A class taught once to several cohorts is one thing.**
+Not one per cohort. In the current term, 248 cohort entries are 161 real
+bookings; without this the other 87 read as double-bookings. `Section shares`
+carries it.
 
----
+**5. Teaching and bookings share a table but not a priority.**
+One `occupancy` table, so they cannot overlap unnoticed. An explicit precedence
+(§5.3), so a society's booking cannot block the institution from publishing its
+own timetable. Precedence decides who is *asked* to move, never who is moved
+silently.
+
+**6. Every published state is versioned.**
+A revision has a stamp, an author, and a diff against its predecessor. "What
+changed between the 7th and the 8th" is a query, not an archaeology exercise —
+and a bad publish is undone by pointing the term at the previous revision rather
+than by restoring a backup.
+
+**7. Nothing is ever *just* deleted.**
+Cancelled occupancy keeps its row and releases its slot through a partial index.
+An evicted booking records which revision displaced it. The audit log keeps the
+before and after. In a system whose entire purpose is settling disagreements
+about who had which room, destroying evidence is the one unrecoverable mistake.
+
+### 4.3 What is deliberately NOT modelled in v1
+
+Naming these is how scope stays honest, because each is a plausible next
+question and each is a term of work:
+
+- **Student enrolment as individuals.** Sections carry a registered *count*, not
+  a roster. A roster is add/drop, which is Part 10 Phase 5.
+- **Attendance.** Different system, different consent question.
+- **Instructor workload and contracts.** HR's, not scheduling's.
+- **Physical seating layout.** Capacity is a number, not a seat map. Exams will
+  eventually want the seat map (§7.6) and that is when to model it.
 
 ## Part 5 — The five flows
 
