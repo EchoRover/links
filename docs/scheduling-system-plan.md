@@ -157,7 +157,7 @@ Google is both the slowest and the most used.
 ### 3.2 Explicitly out of scope for v1
 
 - **Student course registration and add/drop.** Real, wanted, and a different
-  system. Staged as v3 in Part 8.
+  system. Staged as v3 in Part 9.
 - **Automatic timetable generation.** Constraint solvers are the most expensive
   part of every product above and solve a problem the office does not have.
 - **Exam scheduling.** Separate cycle, separate constraints.
@@ -279,13 +279,27 @@ sets moved.
 The standard measures, which are what management actually asks for:
 
 - **Frequency rate** — share of available hours a room is timetabled
-- **Occupancy rate** — headcount against capacity while in use
+- **Occupancy rate** — expected heads against room capacity while in use
 - **Utilisation** — the two multiplied; the headline estate figure
-- **Show rate** — enrolled against actually present, where attendance data exists
+- **Show rate** — expected against actually present, where attendance data exists
 
-Nothing here needs sensors. Timetabled frequency alone answers "do we need more
-rooms" and "which rooms are never used", and both are live questions on a campus
-this size.
+\begin{keybox}
+\textbf{Occupancy rate is the one that is easy to get wrong, and v1 of this
+document did.} It needs expected attendance per \emph{meeting}, not cohort size.
+A group-1 tutorial is half a cohort. An elective marked "Applicable if
+registered" might be a fifth of it. A shared HUL lecture is two cohorts at once.
+Divide room capacity into cohort headcount and every elective and every
+group-split tutorial reports as a near-empty room, which is exactly the finding
+that would get an estates decision wrong. The \texttt{expected} column on
+\texttt{meeting} exists for this and must be populated before any occupancy
+figure is published.
+\end{keybox}
+
+**Frequency rate needs none of that** and should ship first. It answers "do we
+need more rooms" and "which rooms are never used" from the timetable alone, and
+both are live questions on a campus this size. Occupancy and utilisation wait
+for enrolment data; publishing them early with cohort headcount as a stand-in
+would be worse than not publishing them.
 
 ---
 
@@ -327,7 +341,66 @@ pressure points both become obvious in one screen.
 **Mobile.** Single column, and the top of the screen answers one question: what is
 next, where, and how long until it starts.
 
-### 6.3 Theming
+### 6.3 Showing a room, five ways
+
+A room is not one thing on a screen. It is a row in a list, a shape on a plan, a
+volume in a building, a sign on a door, and a line on a phone held while walking.
+Each answers a different question and they are not substitutes.
+
+**As a row — "what is in it this week".**
+The dense view. Room down the side, time across, every booking a bar. This is the
+office's working surface and the only one that shows a clash without anyone
+looking for it.
+
+**As a shape on a floor plan — "which door".**
+The plan of one level, rooms filled by live status: in use, free, free-but-booked-soon,
+unbookable. A person who does not know the building does not think in room codes;
+they think "the corner one past the stairs". LinkCS already carries redrawn floor
+plans for M3 and M4 ground and level 1, with room polygons keyed to codes. This is
+the largest existing asset and it is currently attached to nothing.
+
+**As a volume — "which building, which floor".**
+The 3D view, already built. Its job is orientation, not detail: a newcomer seeing
+M3 and M4 side by side with the busy floors lit. It should never be the primary
+booking surface — 3D is worse than a plan for picking a target — but it is the best
+answer to "I have never been in this building".
+
+**As a sign on the door — "am I in the right place, now".**
+A small always-on display, or at minimum a printed QR, at each teaching room.
+Shows the current class, the next one, and the time until the room frees. This is
+where the institution's naming problem becomes visible to everyone: the sign and
+the door plate must agree, and today across eleven sheets six rooms do not.
+
+**In the hand — "where am I going and can I get there".**
+Phone. Room, floor, walking direction from where the person is standing, and the
+time budget. This is the view that should know the campus bus runs, because a
+09:00 in M3 is a different proposition if the bus arrives at 08:55.
+
+\begin{keybox}
+\textbf{Every one of these reads the same occupancy table.} The moment a floor
+plan has its own copy of "which rooms are busy", the copies drift, and this whole
+document exists because of drift between copies.
+\end{keybox}
+
+### 6.4 Status, precisely
+
+Five states, each needing a distinct form and not only a colour:
+
+| State | Means | Form |
+|---|---|---|
+| Free | Nothing scheduled, bookable now | Empty, outlined, clickable |
+| In use | Teaching or an approved booking | Solid fill, with what and until when |
+| Reserved soon | Free now, booked within 30 min | Outlined with a countdown |
+| Pending | Requested, not yet approved | Hatched |
+| Unavailable | Maintenance, exam hold, not bookable | Diagonal grey, no click target |
+
+"Free" must mean *free*, not "nothing on the sheet I happened to read". A room the
+system has no data for is **unknown**, not free, and says so. That distinction is
+the honest version of the Free Rooms page that exists today.
+
+---
+
+### 6.5 Theming
 
 The institution's own palette, taken from `iitdabudhabi.ac.ae`:
 
@@ -364,7 +437,89 @@ should carry both.
 
 ---
 
-## Part 7 — Architecture
+---
+
+## Part 7 — The wider system
+
+Beyond v1, in rough order of value per unit of work. Nothing here is required for
+the first four phases to be worth doing, and none of it should be built before
+the schedule is trustworthy.
+
+### 7.1 Wayfinding
+
+Room code to a route: building, entrance, floor, turn. The floor plans exist and
+carry room polygons; the missing piece is a walkable graph — corridors, doors,
+stairs, lifts — over the same geometry.
+
+**Step-free routing is not a nice-to-have.** The door plates carry Braille, so the
+institution has already committed to physical accessibility; a wayfinding feature
+that routes everyone up stairs undoes that commitment digitally.
+
+### 7.2 Door signage
+
+E-paper or small panels outside teaching rooms, driven by the same feed as
+everything else. Cheap version first: a printed QR per door linking to that
+room's live day. The QR costs nothing, needs no hardware budget, and tests whether
+anyone actually wants it before panels are purchased.
+
+### 7.3 Equipment as a bookable attribute
+
+Rooms differ by what is in them — projector, whiteboard, lab benches, power at
+every seat, a camera for hybrid teaching. Model equipment as room attributes and
+the availability finder answers "a room for 40 with a camera", which is the query
+people actually have.
+
+### 7.4 Maintenance and cleaning holds
+
+Estates needs to take a room out of service. Today that is an email. As a `hold`
+row it is enforced by the same constraint that stops double-booking, and it
+appears in every view automatically.
+
+### 7.5 Events, with RSVP
+
+Club events, talks, workshops. A booking with a public face: capacity, a
+registration list, a reminder. The Coding Club's quiz night is a booking, a
+capacity, and a list of who is coming; today it is a room request plus a WhatsApp
+thread plus a spreadsheet.
+
+### 7.6 Exams and invigilation
+
+A separate cycle with harder constraints: no student in two exams at once,
+invigilator ratios, seat spacing that cuts effective capacity. Worth building
+only once teaching schedules are stable, and worth building because it is the
+single most painful scheduling task in any academic year.
+
+### 7.7 Instructor preferences, collected before the term is built
+
+The office currently discovers constraints by being told them, often late. A
+short form before timetabling opens — unavailable slots, preferred rooms,
+equipment needed — turns a class of late changes into an input.
+
+**This is the highest-leverage item in this list.** Every late change costs a
+revision, a republish, and a room already booked by someone else.
+
+### 7.8 Term-over-term planning
+
+"Show me last year's Sem 1 against this one." Room pressure, course growth,
+which rooms were never used. Estates decisions are made on this comparison and
+it currently cannot be made at all.
+
+### 7.9 Occupancy sensing
+
+Last, deliberately. Sensors answer "was the booked room actually used", which is
+a real question — but only once booking is reliable enough that the answer means
+something. Buying sensors before that measures noise.
+
+### 7.10 Integration with the campus bus
+
+The institution already runs a shuttle on a published schedule, and LinkCS
+already carries it, verified against the transport office's own workbook. A
+student's real question is not "when is my class" but "when do I need to leave".
+Joining the two is a small piece of work against data that already exists on both
+sides, and no commercial product in Part 2 can do it, because none of them knows
+this campus has a bus.
+
+## Part 8 — Architecture
 
 ### 7.1 Stack
 
@@ -424,7 +579,7 @@ Admin       rooms, users, terms, approval routing.
 
 ---
 
-## Part 8 — Rollout
+## Part 9 — Rollout
 
 Each phase is independently useful. If the project stops after any one of them,
 what was delivered still stands on its own.
@@ -466,11 +621,11 @@ Only once the schedule is trustworthy. The standard pattern is well established:
 a **shopping cart** students fill before registration opens, a **validation** pass
 checking prerequisites, credit limits, time conflicts and consent, then enrolment
 with **waitlists** where a section is full. This needs a decision about whether it
-integrates with the existing ERP or replaces part of it, which is Part 9.
+integrates with the existing ERP or replaces part of it, which is Part 10.
 
 ---
 
-## Part 9 — Decisions management must make
+## Part 10 — Decisions management must make
 
 These block design, not implementation. Each needs an owner and an answer.
 
@@ -503,7 +658,7 @@ explicitly in the proposal rather than leaving implied.
 
 ---
 
-## Part 10 — What is already built
+## Part 11 — What is already built
 
 Not a greenfield proposal. Working today, in `github.com/EchoRover/links`:
 
@@ -629,28 +784,78 @@ CREATE TABLE section (
   course_code text NOT NULL REFERENCES course(code),
   cohort_code text NOT NULL REFERENCES cohort(code),
   instructor  bigint REFERENCES person(id),
+
+  -- Not every course is taken by the whole cohort. The sheets print
+  -- "Applicable if registered" on electives, and a v1 model that assumes
+  -- cohort size = attendance produces utilisation figures that are simply
+  -- wrong for every elective in the estate.
+  enrolment   text NOT NULL DEFAULT 'whole-cohort'
+                CHECK (enrolment IN ('whole-cohort','elective','shared')),
+  registered  integer,          -- actual heads, once registration freezes
   UNIQUE (term_id, course_code, cohort_code)
 );
 
--- ---------- the one occupancy table ----------
--- A class and a booking are the SAME kind of row. Separate tables would
--- eventually overlap, because nothing would stop them.
+-- A course taught once to several cohorts at the same hour in the same room.
+-- AHUL256, AHUL261 and AGRL130 are each taught to Y3 CSE and Y3 EEN together,
+-- and most of Year 1 is shared across all four branches. Without this, a room
+-- pivot reports every shared class as a clash: 248 cohort entries in the
+-- current term are 161 real bookings.
+CREATE TABLE section_shares (
+  section_id  bigint NOT NULL REFERENCES section(id),
+  cohort_code text   NOT NULL REFERENCES cohort(code),
+  groups      int[]  NOT NULL DEFAULT '{}',
+  PRIMARY KEY (section_id, cohort_code)
+);
 
+-- ---------- pattern and occurrence ----------
+-- A weekly class is ONE editable fact ("Wednesdays 15:30, M4-0-019, from
+-- 20 Aug to 16 Dec") and SIXTEEN things that occupy a room. Store only the
+-- first and the exclusion constraint cannot see overlaps. Store only the
+-- second and moving a class means rewriting sixteen rows and losing the fact
+-- that they were ever one thing.
+--
+-- So: both. `meeting` is the editable truth and what the interface edits.
+-- `occupancy` is the materialised enforcement surface, regenerated inside the
+-- same transaction whenever its meeting changes. This is the RFC 5545 model
+-- (RRULE + EXDATE + modified instances) with the expansion persisted so the
+-- database can police it.
+
+CREATE TABLE meeting (
+  id          bigserial PRIMARY KEY,
+  revision_id bigint NOT NULL REFERENCES revision(id),
+  section_id  bigint REFERENCES section(id),
+  booking_id  bigint REFERENCES booking(id),
+  room_code   text NOT NULL REFERENCES room(code),
+  weekday     integer NOT NULL CHECK (weekday BETWEEN 1 AND 7),
+  starts      time NOT NULL,
+  ends        time NOT NULL,
+  tz          text NOT NULL DEFAULT 'Asia/Dubai',   -- never store bare UTC
+  from_date   date NOT NULL,
+  until_date  date NOT NULL,
+  kind        text NOT NULL,
+  groups      int[] NOT NULL DEFAULT '{}',          -- {} = whole cohort
+  expected    integer,                              -- heads, for utilisation
+  CHECK (ends > starts),
+  CHECK (until_date >= from_date),
+  CHECK (num_nonnulls(section_id, booking_id) = 1)
+);
+
+-- One instance. Generated from a meeting, then editable in its own right so a
+-- single week can move or be cancelled without touching the pattern - which is
+-- exactly what a room change for one session is.
 CREATE TABLE occupancy (
   id          bigserial PRIMARY KEY,
-  revision_id bigint  NOT NULL REFERENCES revision(id),
+  meeting_id  bigint  NOT NULL REFERENCES meeting(id) ON DELETE CASCADE,
   room_code   text    NOT NULL REFERENCES room(code),
   during      tstzrange NOT NULL,
   kind        text    NOT NULL
-                CHECK (kind IN ('lecture','tut','lab','proj','help','booking','hold')),
+                CHECK (kind IN ('lecture','tut','lab','proj','help',
+                                'booking','hold','exam','maintenance')),
   status      text    NOT NULL DEFAULT 'confirmed'
                 CHECK (status IN ('confirmed','provisional','cancelled')),
-  section_id  bigint  REFERENCES section(id),      -- set for teaching
-  booking_id  bigint  REFERENCES booking(id),      -- set for a booking
-  groups      int[]   NOT NULL DEFAULT '{}',       -- {} = whole cohort
+  detached    boolean NOT NULL DEFAULT false,   -- edited away from its pattern
   note        text,
 
-  CHECK (num_nonnulls(section_id, booking_id) = 1),
   CHECK (upper(during) > lower(during)),
 
   EXCLUDE USING gist (room_code WITH =, during WITH &&)
@@ -658,7 +863,9 @@ CREATE TABLE occupancy (
 );
 
 CREATE INDEX ON occupancy USING gist (during);
-CREATE INDEX ON occupancy (section_id);
+CREATE INDEX ON occupancy (meeting_id);
+CREATE INDEX ON meeting (revision_id);
+CREATE INDEX ON meeting (section_id);
 
 -- ---------- bookings ----------
 
@@ -715,7 +922,17 @@ CREATE TABLE audit (
 ```
 
 \begin{keybox}
-\textbf{Why \texttt{occupancy} carries \texttt{revision\_id}.} Publishing a revision
+\textbf{Regenerating occurrences is not a background job.} A meeting edit
+deletes and re-inserts its occurrences \emph{inside the same transaction}, so
+the exclusion constraint refuses the edit if any generated instance would
+collide. Do it asynchronously and there is a window where the database holds a
+double-booking. The one exception is an occurrence marked
+\texttt{detached}: it was deliberately moved away from its pattern and
+regeneration must leave it alone.
+\end{keybox}
+
+\begin{keybox}
+\textbf{Why \texttt{meeting} carries \texttt{revision\_id}.} Publishing a revision
 writes a new set of rows rather than mutating the old ones. "What did the timetable
 say on 8 September" is then a query, and a bad publish is reverted by pointing the
 term at the previous revision rather than by restoring a backup.
@@ -1001,7 +1218,7 @@ Points that are easy to get wrong:
 
 \* Only for rooms where they are the named approver.
 
-Students cannot request rooms in v1. That is a policy question for Part 9, not a
+Students cannot request rooms in v1. That is a policy question for Part 10, not a
 technical limit — the row exists, the permission is simply off.
 
 ## Appendix J — Testing
@@ -1047,6 +1264,6 @@ office workbooks — including group membership from merged cell spans — is wr
 and verified. The room pivot is written. A student-facing site carrying the Sem 5
 timetable, a free-room finder and a wall-display board is live.
 
-**The honest risk is not the code.** It is Part 9, question 1: who owns this after
+**The honest risk is not the code.** It is Part 10, question 1: who owns this after
 I graduate. Every estimate above assumes that gets answered before Phase 2, because
 Phase 2 is where the institution starts depending on it.
