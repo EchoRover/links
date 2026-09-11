@@ -62,10 +62,17 @@ publishing to web, calendar feeds and PDF; conflict prevention enforced by the
 database rather than by care; change notification; utilisation reporting. Student
 registration and add/drop are deliberately **out of scope for v1**.
 
-**Build, not buy.** The products in this space — 25Live, CELCAT, Syllabus Plus —
-are priced for institutions with tens of thousands of students. UniTime is free
-but is a timetabling *solver* for a research university, and our schedule is
-already built well by a person. What fails is everything after that.
+**Build, and probably build less than first proposed.** Commercial products
+(25Live, CELCAT, Syllabus Plus) are scoped for institutions with tens of thousands
+of students; UniTime is free but is a timetabling *solver* for a problem we do not
+have. **But the campus already pays for Exchange room mailboxes**, which can carry
+ad-hoc booking, and the strongest version of this proposal uses them and builds
+only the academic layer on top (§2.3). That also removes most of the
+"who maintains it" risk. IT should answer that question before Phase 2 is
+designed.
+
+**If the answer is "not now":** §2.2 rung 1 is a one-week validation script that
+catches most of the defects above and should be done regardless.
 
 **Cost.** One developer, part-time. **Sixteen weeks** to a system that publishes,
 validates and books, in five phases each of which is useful on its own (Part 10).
@@ -148,26 +155,145 @@ system of record and a spreadsheet is the only integrity check.
 | **Untis** | Untis GmbH | Schools, mostly Europe, integrated SIS | Wrong segment |
 | **UniTime** | Apereo Foundation | **Open source**, Java. Course + exam timetabling, student scheduling, room sharing, distributed departmental editing | Closest technical match; heavy |
 
-### 2.2 Buy, adopt, or build
+### 2.2 The ladder, cheapest first
 
-**Don't buy.** These are priced and scoped for institutions with tens of thousands
-of students and dedicated scheduling offices. IITD-AD has eleven cohorts and one
-person maintaining the workbooks.
+A proposal that jumps straight to "build it" invites the obvious reply. So here is
+every rung, honestly costed, including the ones that make this document
+unnecessary.
 
-**Don't adopt UniTime either, despite it being free.** It is a large Java/Hibernate
-application designed for distributed departmental scheduling at a research
-university, with an automatic timetabling solver at its centre. We do not have the
-problem it solves. Our schedule is *already built* by a person who knows what she
-is doing; what fails is everything after that.
+**Rung 1 — Validate the workbook before export. About one week.**
+A script the office runs on the workbook: the rules in Appendix D, no database, no
+server, no login. **This alone catches most of §1.2** — the impossible times, the
+double-booking, the naming conflicts, the credit mismatches.
 
-**Build a focused tool, and copy 25Live's domain model rather than its software.**
-That model is consistent across every serious product in the category:
+It does not fix distribution: sheets still go stale, nothing notifies anyone,
+there is still no room-wise view and no booking. But it is a week, and if the
+answer to this proposal is "not now", **this is the part to do anyway.**
+
+**Rung 2 — One shared workbook instead of five. About zero weeks.**
+Consolidating the workbooks removes some duplication by hand. It does not survive
+contact with eleven cohorts and four authors, and it makes the single-file
+conflict problem worse rather than better. Listed for completeness; not
+recommended.
+
+**Rung 3 — Use what the institution already pays for.** See §2.3, which is the
+serious alternative and was missing from drafts 1 to 6 of this document.
+
+**Rung 4 — Buy a product.** 25Live, CELCAT, Syllabus Plus. Priced and scoped for
+institutions with tens of thousands of students and a dedicated scheduling
+office. IITD-AD has eleven cohorts and one person maintaining the workbooks.
+
+\begin{keybox}
+\textbf{A gap I have not closed:} I have not obtained pricing for any commercial
+product. The judgement that they are disproportionate is based on their scale and
+target market, not on a quote. If management wants the comparison made properly,
+a quote should be requested — and if one of them turns out to be affordable at
+this size, buying beats building, and this document should lose.
+\end{keybox}
+
+**Rung 5 — Adopt UniTime.** Free, open source, Apereo-governed, and technically
+the closest match. But it is a large Java/Hibernate application built around an
+automatic timetabling *solver*, for distributed departmental scheduling at a
+research university. **We do not have the problem it solves.** Our schedule is
+already built, and built well, by a person who knows what she is doing. What fails
+is everything after that. Adopting it means operating a system far larger than the
+problem, and the institution would still need someone to run it — which is the same
+ownership question as building, with less control over the outcome.
+
+**Rung 6 — Build a focused tool.** The recommendation, for the reasons the rest of
+this document gives. Copy 25Live's domain model — request, approve, detect,
+publish — rather than its software.
+
+### 2.3 The option already paid for: Microsoft 365 room mailboxes
+
+The campus runs Outlook and Teams. Exchange includes **room resource mailboxes**,
+which already do a meaningful part of Part 5.3: a room is a mailbox, meeting
+requests to it are auto-accepted or declined by the Resource Booking Assistant,
+conflicts are refused, and a delegate can be required to approve. It is licensed,
+maintained by someone else, needs no new host, and faculty already know it.
+
+Leaving this out of drafts 1 to 6 was the biggest omission in the document,
+because it is the first thing any competent IT person in the room will raise.
+
+**What it genuinely gives:**
+
+- Room availability inside Outlook and Teams, where people already are
+- Conflict rejection without anyone writing it
+- Delegate approval with `AllBookInPolicy` / `AllRequestInPolicy`
+- No server to host, patch, or own after I graduate — which answers the single
+  largest risk in Part 11
+
+**What it cannot do, and these are not small:**
+
+- **It has no idea what a cohort, a course, a group or a credit is.** It cannot
+  validate that ACOL351 has the tutorial hours its L-T-P-C says, because it has
+  never heard of L-T-P-C. Every defect in §1.2 except the double-booking survives
+  untouched.
+- **No import, no revision, no diff.** The workbook problem — five workbooks,
+  eleven exports, five stale copies — is entirely unaddressed.
+- **No per-cohort publishing.** Students do not have a "Y3 CSE" mailbox.
+- **Recurring series are all-or-nothing by default.** Exchange checks every
+  occurrence and declines the *entire series* if one conflicts, tunable only
+  through `ConflictPercentageAllowed` and `MaximumConflictInstances`. A
+  term-long teaching pattern that clashes once in week nine is refused outright,
+  which is precisely the case §8.1 exists to handle gracefully.
+- **No precedence.** Exchange cannot express "teaching outranks a society
+  booking"; whoever asked first wins.
+
+**So the honest recommendation is a hybrid, and it is better than what drafts 1
+to 6 proposed:**
 
 ```
-request a space  ->  rules-based approval  ->  real-time conflict detection  ->  publish
+Exchange room mailboxes   the booking substrate for ad-hoc requests
+                          - availability, approval, invitations,
+                            reminders, and no host to own
+
+This system               the academic layer
+                          - import and validate the term
+                          - cohorts, groups, credits, revisions
+                          - publish per-cohort views and feeds
+                          - push teaching occupancy INTO the room
+                            mailboxes so Outlook shows the real picture
 ```
 
-Four stages. We need all four, at a scale one person can operate.
+Teaching is published to the room mailboxes as busy time. Ad-hoc booking then
+happens in Outlook, against a calendar that finally knows when classes are — which
+today it does not, which is why room conflicts are found by walking into them.
+
+**The trade, stated plainly:** the exclusion constraint in Appendix C stops being
+the single source of truth for ad-hoc bookings, because Exchange owns those. The
+system keeps it for teaching, where it matters most and where precedence lives.
+Two systems holding room state is a real cost, and it buys the removal of the
+largest risk in the proposal.
+
+**This needs IT's answer before Phase 2 is designed**, and it is now question 7 in
+Part 11.
+
+### 2.4 The objection to me building it
+
+It should be in the document rather than left for the meeting.
+
+> *A student is proposing to build infrastructure the institution would come to
+> depend on, and that student graduates.*
+
+That is correct, and it is the strongest argument against this proposal. The
+answers that are honest rather than reassuring:
+
+- **The phasing is the mitigation.** Phase 0 is read-only and disposable — if it
+  is abandoned, the office has lost nothing and gained a room-wise view. Nothing
+  becomes load-bearing until Phase 2, which is why Part 11's ownership question
+  is gated to before Phase 2 rather than before Phase 0.
+- **Full Excel export, always.** The institution's data leaves whenever it wants,
+  in the format it already works in. There is no lock-in to inherit.
+- **§2.3's hybrid halves the exposure.** If ad-hoc booking lives in Exchange, the
+  part that must be maintained forever is the academic layer, not the booking
+  infrastructure.
+- **Boring on purpose.** Postgres, one application, server-rendered pages. No
+  framework that needs a specialist. A competent developer should be able to pick
+  it up from the schema and Appendix D.
+- **What I cannot promise** is that someone will want to maintain it. That is a
+  staffing decision, not an engineering one, and pretending otherwise would be
+  the dishonest part of this document.
 
 ### 2.3 The one thing worth taking from the standards, not the products
 
@@ -1130,6 +1256,11 @@ rather than in the moment.
 **3c. May students request rooms?**
 The permission exists and is switched off in v1 (Appendix I). Turning it on is a
 policy call about who may commit institutional space.
+
+**7. Do we use Exchange room mailboxes as the booking substrate?**
+This is the largest open architectural question and it belongs to IT, not to me
+(§2.3). It decides whether Phase 2 builds a booking system or integrates with
+one, and it materially changes who has to maintain what after I graduate.
 
 **4. What integrates?**
 Blackboard, the ERP, Outlook room resources. Each is a separate piece of work and
