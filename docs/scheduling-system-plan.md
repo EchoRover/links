@@ -154,6 +154,27 @@ else is decided.
 So the case for a system does not rest on the defect list. It rests on what is
 left after the defect list is gone.
 
+\begin{keybox}
+\textbf{Two findings that only a cross-cutting view produces}, both surfaced while
+checking this document's own numbers on 11 September:
+
+\medskip
+\textbf{One cohort has no published timetable at all.} The workbooks contain
+twelve cohorts. The website publishes eleven. \texttt{26A1AIBMSEM1} — a Masters
+AI intake, Sem 1, four scheduled blocks — is in the source workbook and has no
+PDF. Its students cannot download a timetable because none was ever exported.
+
+\medskip
+\textbf{A cohort is labelled with the wrong semester.} The Year 2 workbook
+contains \texttt{25A1ChEBSEM1}. Year 2 Chemical is in Sem 3, and its siblings in
+the same file are \texttt{25A1CSEBSEM3} and \texttt{25A1EENBSEM3}. The sheet
+name says Sem 1.
+
+\medskip
+Neither is visible from inside any single document. Both are obvious the moment
+all twelve are in one place, which is the argument of §1.5 in miniature.
+\end{keybox}
+
 ### 1.4 What remains, and it is the larger half
 
 **Distribution. Six revisions in the first three weeks of term.**
@@ -487,8 +508,8 @@ Year 1 runs four groups with A/B/C sub-splits, so "two groups" must never be
 assumed anywhere.
 
 **4. A class taught once to several cohorts is one thing.**
-Not one per cohort. In the current term, 248 cohort entries are 161 real
-bookings; without this the other 87 read as double-bookings. `Section shares`
+Not one per cohort. In the current term, 248 cohort entries are 160 real
+bookings; without this the other 88 read as double-bookings. `Section shares`
 carries it.
 
 **5. Teaching and bookings share a table but not a priority.**
@@ -1255,7 +1276,7 @@ feeds. No booking, no editing, no login.
 Now also includes, from later drafts: the `meeting` / `occupancy` split and its
 transactional regeneration (§Appendix C), **room discovery mode** so the first
 import is possible at all (§8.5), and `section_shares` so co-taught classes do not
-read as clashes (248 cohort entries are 161 bookings).
+read as clashes (248 cohort entries are 160 bookings).
 
 *Delivers:* the room-wise schedule the office has already asked for; one URL that
 is always current; the end of the eleven-stale-PDFs problem.
@@ -1354,22 +1375,75 @@ explicitly in the proposal rather than leaving implied.
 
 ---
 
-## Part 12 — What is already built
+## Part 12 — What already exists, and how to check it
 
-Not a greenfield proposal. Working today, in `github.com/EchoRover/links`:
+This is the one part of the document a reader cannot verify from the evidence in
+it, because it is a claim about my own work. So every line below is stated as
+something that can be **run or opened**, and the limits are stated with the
+capabilities.
 
-- A reader that pulls every cohort's schedule out of the office workbooks, taking
-  group membership from merged cell spans. Verified **exact** against a
-  hand-checked week on day, time, course, room, kind and group.
-- A reader for the published PDFs, for the case where only a PDF exists, that
-  refuses rather than guesses when a file is not machine-readable.
-- The room-wise pivot in §5.2, which found the defects in §1.2.
-- A live student-facing site (`linkcs.vercel.app`) carrying the Sem 5 timetable,
-  free-room finder, campus bus times and a wall-display board.
+Repository: `github.com/EchoRover/links`.
 
-Phase 0 is largely a matter of connecting what exists to a database and a URL.
+### 12.1 Working, and checkable
 
----
+| Claim | Check it |
+|---|---|
+| Reads all twelve cohorts from the office workbooks, 269 blocks, taking group membership from merged cell spans | `python3 tools/read_xlsx.py` |
+| Year 3 CSE comes out an **exact** match against a hand-verified week on day, time, course, room, kind and group | diff in §12.3 |
+| Produces the room-wise pivot the office asked for: 160 bookings across 19 rooms, shared classes merged | `python3 tools/room_schedule.py` |
+| Finds the clash, the naming conflicts and the impossible times in Part 1 | same command, printed output |
+| Reads the published PDFs where only a PDF exists, and **refuses** rather than guesses on an unreadable one | `python3 tools/parse_sheet.py --all` |
+| Shows a parse laid out like the sheet, for eyeballing | `python3 tools/review.py` |
+| Checks the shipped timetable against the sheet's own credit table | `python3 tools/check_timetable.py` |
+| A live student-facing site: Sem 5 timetable, free-room finder, campus bus times, 3D floor plans, wall-display board | `linkcs.vercel.app` |
+| Campus bus data verified against the transport office's own workbook, including a 20:50 departure that breaks the 20-minute cadence | `data/schedules/`, `js/bus-data.js` |
+
+About 1,800 lines of Python across seven tools, plus the site.
+
+### 12.2 What this is *not*
+
+Stated because the gap between a working script and institutional software is
+where proposals like this usually mislead:
+
+- **No database.** Everything above reads files and prints. There is no schema,
+  no constraint, no transaction — Appendix C is a design, not a running thing.
+- **No authentication, no roles, no writes.** Nothing in Part 5 beyond reading
+  and publishing exists.
+- **No booking, in any form.** All of Part 8 is design.
+- **The tools are for me**, run from a terminal. They are not a product and no
+  member of staff could use them as they stand.
+- **The PDF reader does not cover everything.** Four Year 1 sheets are untagged
+  and have no exact reading; two MTech sheets are tagged but yield zero blocks
+  and are unhandled. The workbooks make this moot, but only while the workbooks
+  keep arriving.
+
+**Honestly: Phase 0 is perhaps 60% done, and Phases 1 to 4 are 0% done.** Reading
+and validating is the part that exists. Storing, authenticating, writing and
+booking is the part that does not, and it is the larger part.
+
+### 12.3 The single check that matters most
+
+If one claim in this document deserves testing before any of it is believed, it
+is that the reader is exact. The test is a diff against a week verified by hand
+against the printed sheet and independently against that sheet's own credit
+table:
+
+```
+python3 - <<'EOF'
+import sys, json; sys.path.insert(0,'tools')
+from read_xlsx import all_cohorts
+got = {(b['day'],b['start'],b['end'],b['course'],b['room'],b['kind'],b['group'])
+       for b in all_cohorts()['24A1CSEBSEM5']['blocks']}
+tt = json.load(open('data/linkcs/timetable.json'))
+want = {(tt['days'][d],b['start'],b['end'],b['course'],b['room'],b['kind'],b['group'])
+        for d,bs in tt['week'].items() for b in bs}
+print('EXACT MATCH' if got == want else f'DIFFERS\n  {want-got}\n  {got-want}')
+EOF
+```
+
+Run on 11 September 2026 against the 8 September workbook: **EXACT MATCH**, 23
+blocks, nothing missing and nothing extra — including the five group assignments
+the sheet never states in words.
 
 ## Appendix A — Sources
 
@@ -1496,7 +1570,7 @@ CREATE TABLE section (
 -- AHUL256, AHUL261 and AGRL130 are each taught to Y3 CSE and Y3 EEN together,
 -- and most of Year 1 is shared across all four branches. Without this, a room
 -- pivot reports every shared class as a clash: 248 cohort entries in the
--- current term are 161 real bookings.
+-- current term are 160 real bookings.
 CREATE TABLE section_shares (
   section_id  bigint NOT NULL REFERENCES section(id),
   cohort_code text   NOT NULL REFERENCES cohort(code),
@@ -1670,7 +1744,7 @@ Every rule an upload must pass. The numbering is the error code the interface sh
 | X1 | No room holds two different courses at overlapping times | **Yes.** Wed 17:00, `M4-0-019` |
 | X2 | No cohort-group is in two places at once | — |
 | X3 | No instructor is in two places at once | — |
-| X4 | A course taught to several cohorts at one time and place is ONE entry | **Yes.** 248 cohort entries collapse to 161 bookings; without this, 87 false clashes |
+| X4 | A course taught to several cohorts at one time and place is ONE entry | **Yes.** 248 cohort entries collapse to 160 bookings; without this, 87 false clashes |
 
 ### Curriculum
 
