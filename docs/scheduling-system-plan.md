@@ -1715,7 +1715,16 @@ term at the previous revision rather than by restoring a backup.
 
 ## Appendix D — The validation catalogue
 
-Every rule an upload must pass. The numbering is the error code the interface shows.
+Every rule the system enforces, what it catches, and **when it runs** — which
+drafts 1 to 9 left implicit and which matters, because a rule that only runs at
+import cannot protect a booking made three weeks later.
+
+| When | What is being checked |
+|---|---|
+| **Import** | a workbook, before anything is written |
+| **Publish** | a staged revision, against the world as it currently is |
+| **Booking** | a single request, at approval time |
+| **Continuous** | a daily sweep over published state, catching drift |
 
 ### Structural (the file itself)
 
@@ -1769,6 +1778,66 @@ Every rule an upload must pass. The numbering is the error code the interface sh
 failures reject unless the scheduler explicitly acknowledges each one, because a
 genuine timetable can carry a deliberate overlap. N failures are \emph{warnings}
 that publish: a naming disagreement should be visible, not blocking.
+\end{keybox}
+
+
+### Completeness — runs at PUBLISH
+
+Rules that ask what is *missing*, which no per-block check can see. Both of these
+would have caught a real defect found on 11 September.
+
+| Code | Rule | When | Caught? |
+|---|---|---|---|
+| P1 | Every cohort in the workbook is published | Publish | **Yes.** Twelve cohorts exist, eleven are published. `26A1AIBMSEM1` has no timetable at all |
+| P2 | Every published cohort still exists in the source | Publish | — |
+| P3 | Every course in the credit table has at least one meeting | Publish | — |
+| P4 | No cohort loses more than 20% of its meetings versus the previous revision without acknowledgement | Publish | Guards against a partial import being published as if complete |
+| P5 | Each cohort's published revision is the newest one held | Continuous | **Yes.** 5 of 11 were stale on 10 September, two by thirteen days |
+
+### Coherence — runs at IMPORT
+
+Rules about whether the labels agree with themselves.
+
+| Code | Rule | When | Caught? |
+|---|---|---|---|
+| H1 | The semester in a cohort code matches the term being imported | Import | **Yes.** The Year 2 workbook contains `25A1ChEBSEM1` while its siblings are `25A1CSEBSEM3` and `25A1EENBSEM3` |
+| H2 | The intake year in a cohort code is consistent with its year of study | Import | — |
+| H3 | A course's L-T-P-C is unchanged from the previous term unless acknowledged | Import | Credits changing mid-programme is usually a typo |
+| H4 | A room's recorded door plate, where one exists, outranks every sheet | Import | **Yes.** The Y1 CHE sheet calls `M4-0-011` "Lecture Hall"; the photographed plate says Classroom 3 |
+
+### Booking — runs at BOOKING and PUBLISH
+
+Part 8 created these and drafts 3 to 9 never wrote them down.
+
+| Code | Rule | When | Notes |
+|---|---|---|---|
+| K1 | The requested range is free, checked in the same transaction that writes it | Booking | The exclusion constraint, not an application check (§8.4) |
+| K2 | A recurring booking ends on or before the term end | Booking | §8.6 |
+| K3 | The requester may book this room | Booking | Policy, per Appendix I |
+| K4 | Attendees do not exceed room capacity, or it is acknowledged | Booking | A warning, not a refusal — people stand |
+| K5 | Evictions are computed and acknowledged before a publish writes | Publish | §8.1 |
+| K6 | An eviction records which revision displaced it | Publish | Without this, "why was my booking cancelled" is unanswerable |
+| K7 | No request has been pending longer than the escalation window | Continuous | §8.3, the check that keeps requests from rotting |
+
+### Integrity — runs CONTINUOUSLY
+
+A daily sweep. These should never fire; if one does, something in the code is
+wrong, which is exactly why they are worth running.
+
+| Code | Rule | When | Notes |
+|---|---|---|---|
+| I1 | Every occupancy row has a meeting, and every meeting has a revision | Continuous | Orphan rows mean a failed transaction left debris |
+| I2 | Regenerating a pattern reproduces its occurrences exactly, except those marked `detached` | Continuous | Catches drift between pattern and instances, the specific risk the two-table design creates |
+| I3 | No confirmed occupancy falls on a no-class day | Continuous | Holidays are added mid-term and this is how a class gets scheduled into one |
+| I4 | Every published revision is reproducible from its source file and hash | Continuous | §8.9 |
+
+\begin{keybox}
+\textbf{The catalogue grew because the design did.} Drafts 1 to 9 wrote 22 rules,
+all of them at import time, for a system that did not yet have publishing,
+booking, eviction or materialised occurrences. It is now 37 rules across four
+moments. **Eight are marked as having caught a real defect in this term's actual
+data**, which is the only column that distinguishes a measured catalogue from a
+plausible one.
 \end{keybox}
 
 ## Appendix E — API surface
@@ -2016,7 +2085,8 @@ database's, so a mock tests nothing.
 
 **Regression corpus.** Every defective sheet found this week becomes a fixture:
 the "15:30 to 14:20" file, the zero-block MTech sheets, the `M4-0-019` clash, the
-"Classroom 8" mislabel. Each asserts the specific code from Appendix D.
+"Classroom 8" mislabel. Each asserts the specific code from Appendix D. Thirteen of the 42 rules
+have a real defect behind them; those are the fixtures that already exist.
 
 **What not to test.** Rendering. Screenshot tests on a timetable grid are famously
 brittle and catch almost nothing that matters here.
