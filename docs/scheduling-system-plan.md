@@ -157,7 +157,7 @@ Google is both the slowest and the most used.
 ### 3.2 Explicitly out of scope for v1
 
 - **Student course registration and add/drop.** Real, wanted, and a different
-  system. Staged as v3 in Part 9.
+  system. Staged as v3 in Part 10.
 - **Automatic timetable generation.** Constraint solvers are the most expensive
   part of every product above and solve a problem the office does not have.
 - **Exam scheduling.** Separate cycle, separate constraints.
@@ -258,6 +258,27 @@ requester picks a room and a time
 
 A booking and a class are **the same kind of row**. If they are separate tables,
 they will overlap eventually.
+
+But they are **not the same priority**, and draft 1 of this document got that
+wrong. Treating them as equals means the exclusion constraint refuses a *publish*
+that collides with an approved booking — so a student society's room request can
+block the institution from publishing its own timetable. That is obviously the
+wrong answer, and it is a policy decision with a technical consequence, so it has
+to be stated rather than inherited from whichever row happened to be written
+first.
+
+**Precedence, highest first:**
+
+```
+1  exam                  fixed by a separate calendar, immovable
+2  teaching              the institution's core function
+3  maintenance hold      estates has taken the room out of service
+4  approved booking      someone was told they had it
+5  provisional / hold    not yet promised to anyone
+```
+
+Precedence never silently overwrites. It decides *who is asked to move*, not who
+is moved without being told.
 
 ### 5.4 Change a published schedule
 
@@ -519,7 +540,142 @@ Joining the two is a small piece of work against data that already exists on bot
 sides, and no commercial product in Part 2 can do it, because none of them knows
 this campus has a bus.
 
-## Part 8 — Architecture
+## Part 8 — Failure modes
+
+Parts 5 and 7 describe what happens when things go right. A booking system is
+mostly the other case, and every row here is a decision someone has to make before
+the code is written.
+
+### 8.1 Publishing over a booking
+
+A scheduler publishes a revision. One of its classes lands on a room at a time
+someone already has an approved booking for.
+
+**What must not happen:** the publish fails, and the timetable cannot go out
+because of a club meeting. Also must not happen: the booking silently vanishes and
+the requester finds out by turning up.
+
+**The flow:**
+
+```
+stage the revision
+  -> compute evictions: approved bookings the new schedule would displace
+  -> if any, the scheduler sees each one: who booked it, what for, when
+  -> publish requires explicit acknowledgement of each eviction
+  -> inside ONE transaction:
+       1. cancel the evicted bookings, with a reason and the revision number
+       2. insert the new occupancy rows
+     (order matters: the partial index only releases the slot once the
+      booking is cancelled, so a reversed order fails on its own constraint)
+  -> each evicted requester is notified, with the reason and the three
+     nearest alternative rooms at the same time
+```
+
+The alternatives matter. "Your booking was cancelled" is an email that generates
+a reply; "your booking was cancelled, here are three rooms free at that hour" is
+one that does not.
+
+### 8.2 Rolling back a revision that bookings were made against
+
+Between publishing revision 6 and discovering it was wrong, people booked rooms
+around it. Rolling back to revision 5 may re-open slots those bookings now sit in,
+or may collide with them.
+
+**Rule:** rollback is a publish. It goes through §8.1 identically, including the
+eviction report. There is no separate rollback path, because a separate path is a
+path with fewer checks.
+
+### 8.3 The approver is unavailable
+
+Requests age silently while someone is on leave. This is the most common way a
+booking system quietly stops being used.
+
+- Every room has a **named approver and a named deputy**. Not a role, people.
+- A request unanswered for **48 hours** escalates to the deputy and appears on the
+  scheduler's dashboard.
+- Unanswered after **5 days** it auto-refuses with that reason, so the requester
+  gets an answer rather than silence. A refusal can be appealed; an unanswered
+  request cannot.
+
+### 8.4 Two people request the same slot at the same moment
+
+Both see it free, both submit. Both requests are valid — pending requests do not
+reserve anything, deliberately, because a system where requesting holds a room
+gets used to hoard rooms.
+
+The **approval** is what serialises. The first approval writes; the second fails
+on the exclusion constraint and the approver is told, in that moment, that the
+slot has just gone and which request took it.
+
+### 8.5 The first import, before any room exists
+
+A bootstrap problem draft 1 walked straight past. Validation rule **B3** requires
+every room code to exist in the `room` table. The only source of room codes is the
+imports. Nothing can ever be imported.
+
+**Resolution:** the first import of a term runs in **discover mode**. Unknown room
+codes are collected and presented to an admin as proposals — code, the names the
+sheets give it, which cohorts use it — to confirm, merge, or reject. After the
+first term, an unknown room code is an error, because by then it means a typo.
+
+### 8.6 A booking beyond the end of term
+
+Recurring bookings must be clamped to the term, or a society books a weekly slot
+that silently extends into a term whose timetable does not exist yet.
+
+Rule: a recurring booking's `until_date` cannot exceed the term end. Wanting next
+term means asking again once next term is published, which is also when the room
+situation is actually known.
+
+### 8.7 Time, stated explicitly rather than got away with
+
+**Asia/Dubai does not observe daylight saving.** That is why a naive
+implementation would work here and break the moment anyone reuses it. Store local
+time with an explicit `tz`, and derive UTC instants; never store bare UTC and
+reconstruct local. If the term shifts, the *local* time is what was meant.
+
+Related: the sheets print `12:00-14:00` as a lunch band and a few blocks run past
+19:00. The teaching day is not 08:00–18:00 and validation rule B2 must not assume
+it is.
+
+### 8.8 Concurrent edits to one meeting
+
+Two schedulers open the same meeting. Last write wins is wrong; it loses an edit
+silently.
+
+Every meeting carries a version. A save sends the version it was loaded at, and a
+stale version is refused with a diff of what changed underneath. This is
+cheap and it is the difference between "someone else changed this, here is what
+they did" and a half-applied timetable.
+
+### 8.9 The import parses but is wrong
+
+Every validation rule in Appendix D passes and the schedule is still wrong,
+because the workbook itself was wrong.
+
+There is no technical answer to this. What the system owes is **traceability**:
+every meeting records the revision, the source file, and its hash. "Where did this
+Wednesday 15:30 come from" is answerable in one query, which is what turns an
+argument into a lookup.
+
+### 8.10 Nobody uses it
+
+The realistic failure. The office keeps using email because the new thing is one
+more place to check.
+
+The mitigations are product decisions, not technical ones, and they are why the
+phasing in Part 9 is ordered the way it is:
+
+- Phase 0 gives the office something it asked for (the room-wise view) before
+  asking it to change anything.
+- The PDF export means adoption costs nobody their familiar artefact.
+- Full Excel export at any time means the institution is never trapped.
+- Approvals arrive by email with approve and refuse links in the message, so an
+  approver never has to visit the system to use it.
+
+---
+
+## Part 9 — Architecture
 
 ### 7.1 Stack
 
@@ -579,7 +735,7 @@ Admin       rooms, users, terms, approval routing.
 
 ---
 
-## Part 9 — Rollout
+## Part 10 — Rollout
 
 Each phase is independently useful. If the project stops after any one of them,
 what was delivered still stands on its own.
@@ -621,11 +777,11 @@ Only once the schedule is trustworthy. The standard pattern is well established:
 a **shopping cart** students fill before registration opens, a **validation** pass
 checking prerequisites, credit limits, time conflicts and consent, then enrolment
 with **waitlists** where a section is full. This needs a decision about whether it
-integrates with the existing ERP or replaces part of it, which is Part 10.
+integrates with the existing ERP or replaces part of it, which is Part 11.
 
 ---
 
-## Part 10 — Decisions management must make
+## Part 11 — Decisions management must make
 
 These block design, not implementation. Each needs an owner and an answer.
 
@@ -640,9 +796,21 @@ publisher and the workbook stays authoritative. If the office edits in the syste
 it is the record and the workbook becomes an export. Phase 0 and 1 work either way;
 Phase 2 onward assumes the second.
 
-**3. Who approves a booking, per room?**
+**3. Who approves a booking, per room, and who deputises?**
 Approval routing is a policy question, not a technical one, and it cannot be
-guessed.
+guessed. Every room needs a named approver *and* a named deputy, or requests rot
+whenever someone takes leave (§8.3).
+
+**3b. Does teaching evict an approved booking?**
+The precedence order in §5.3 says yes, with acknowledgement and notification.
+The alternative is that a society booking can block the timetable being published.
+Management should confirm this explicitly, because the first time it happens
+someone will be unhappy and the answer needs to have been decided in advance
+rather than in the moment.
+
+**3c. May students request rooms?**
+The permission exists and is switched off in v1 (Appendix I). Turning it on is a
+policy call about who may commit institutional space.
 
 **4. What integrates?**
 Blackboard, the ERP, Outlook room resources. Each is a separate piece of work and
@@ -658,7 +826,7 @@ explicitly in the proposal rather than leaving implied.
 
 ---
 
-## Part 11 — What is already built
+## Part 12 — What is already built
 
 Not a greenfield proposal. Working today, in `github.com/EchoRover/links`:
 
@@ -717,6 +885,7 @@ CREATE TABLE building (
 
 CREATE TABLE room (
   code        text PRIMARY KEY,              -- 'M4-0-019'. THE identity.
+  deputy_id   bigint REFERENCES person(id),  -- so a request cannot rot on leave
   building    text NOT NULL REFERENCES building(code),
   floor       text NOT NULL,                 -- 'G', '1F'
   plate_en    text,                          -- what the door says
@@ -854,6 +1023,7 @@ CREATE TABLE occupancy (
   status      text    NOT NULL DEFAULT 'confirmed'
                 CHECK (status IN ('confirmed','provisional','cancelled')),
   detached    boolean NOT NULL DEFAULT false,   -- edited away from its pattern
+  precedence  smallint NOT NULL,               -- 1 exam .. 5 provisional; see 5.3
   note        text,
 
   CHECK (upper(during) > lower(during)),
@@ -861,6 +1031,9 @@ CREATE TABLE occupancy (
   EXCLUDE USING gist (room_code WITH =, during WITH &&)
     WHERE (status <> 'cancelled')
 );
+
+-- Pending requests deliberately reserve NOTHING, so they are not in occupancy.
+-- A system where asking holds a room gets used to hoard rooms.
 
 CREATE INDEX ON occupancy USING gist (during);
 CREATE INDEX ON occupancy (meeting_id);
@@ -1218,7 +1391,7 @@ Points that are easy to get wrong:
 
 \* Only for rooms where they are the named approver.
 
-Students cannot request rooms in v1. That is a policy question for Part 10, not a
+Students cannot request rooms in v1. That is a policy question for Part 11, not a
 technical limit — the row exists, the permission is simply off.
 
 ## Appendix J — Testing
@@ -1264,6 +1437,6 @@ office workbooks — including group membership from merged cell spans — is wr
 and verified. The room pivot is written. A student-facing site carrying the Sem 5
 timetable, a free-room finder and a wall-display board is live.
 
-**The honest risk is not the code.** It is Part 10, question 1: who owns this after
+**The honest risk is not the code.** It is Part 11, question 1: who owns this after
 I graduate. Every estimate above assumes that gets answered before Phase 2, because
 Phase 2 is where the institution starts depending on it.
