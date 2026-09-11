@@ -34,6 +34,52 @@ header-includes:
   - \usepackage{booktabs}
 ---
 
+\newpage
+
+# Summary
+
+**The ask.** Approval to build a scheduling and room-booking system for the
+campus, starting with a two-to-three week read-only phase that costs the office
+nothing and delivers something it has already asked for.
+
+**Why.** The timetable is maintained in five Excel workbooks, exported to eleven
+PDFs, and published with no step between that checks anything. Every published
+sheet and every workbook, read mechanically on 10–11 September 2026:
+
+| | |
+|---|---|
+| Rooms named inconsistently across sheets | **6** |
+| Rooms double-booked across cohorts | **1** |
+| Blocks whose end time precedes their start | **2** |
+| Held sheets out of date against what was published | **5 of 11** |
+| A room name contradicted by its own door plate | **1** |
+
+None of that is carelessness. It is what happens when eleven documents are the
+system of record and a spreadsheet is the only integrity check.
+
+**What is proposed.** One authoritative schedule; room booking with approval;
+publishing to web, calendar feeds and PDF; conflict prevention enforced by the
+database rather than by care; change notification; utilisation reporting. Student
+registration and add/drop are deliberately **out of scope for v1**.
+
+**Build, not buy.** The products in this space — 25Live, CELCAT, Syllabus Plus —
+are priced for institutions with tens of thousands of students. UniTime is free
+but is a timetabling *solver* for a research university, and our schedule is
+already built well by a person. What fails is everything after that.
+
+**Cost.** One developer, part-time, roughly four months to a system that publishes,
+validates and books. Much of the reading and publishing already exists and runs.
+
+**What management must decide before Phase 2 (Part 11).** Where it runs and who
+maintains it after I graduate; whether it becomes the system of record or stays a
+publisher; who approves bookings for each room and who deputises; and whether
+teaching may evict an approved booking.
+
+**The honest risk is not the code.** It is that nobody is named to own this before
+the institution starts depending on it.
+
+\newpage
+
 ## Part 1 — The case
 
 ### 1.1 What the current process is
@@ -713,6 +759,59 @@ check; the constraint refuses the second row. This is the difference between
 (`WHERE status <> 'cancelled'`) matters, or cancelled events hold their slots
 forever.
 
+### Pieces the failure modes require
+
+Part 8 added three moving parts the draft-1 architecture did not have. Naming them
+matters, because each is a thing that can be down.
+
+**A job runner.** Escalation at 48 hours, auto-refuse at five days, nightly feed
+regeneration, backup. One scheduled worker, not a queue cluster — but something has
+to run on a timer, and "a cron entry calling a management command" is a legitimate
+answer at this scale as long as it is *written down* rather than discovered later.
+
+**A mail path.** Approvals, eviction notices, escalations. Sent through the
+institution's own mail, not a third-party service — these carry student names and
+room bookings, and routing them via an external provider is a data question nobody
+asked for. **Approve and refuse links go in the message body**, so an approver
+never has to visit the system to use it (§8.10).
+
+**Observability, at the level this actually needs.** Not a dashboard stack. Three
+things: a health endpoint that checks the database, a log of every publish and
+every approval, and one alert — *the job runner has not run in 24 hours*. That
+single alert catches escalations silently stopping, which is the failure that
+would otherwise be discovered by a complaint.
+
+### Hosting, said plainly
+
+One virtual machine on institution infrastructure, with Postgres on the same host.
+At eleven cohorts and about three hundred meetings, that is ample, and pretending
+otherwise would be architecture theatre.
+
+**The consequence, stated rather than hidden:** one machine means one point of
+failure. If it is down, nobody can book or publish. Published views should be
+servable from static snapshots regenerated on each publish, so an outage degrades
+to "you cannot change anything" instead of "nobody can see their timetable" —
+which is the difference between an inconvenience and an incident.
+
+**Someone must patch it.** That is part of Part 11's ownership question and not a
+separate one.
+
+### Data, retention, and what the system knows about people
+
+The system holds: names and institutional email for staff and faculty; cohort
+membership for students; and who booked which room for what. That last one is a
+record of people's movements, and should be treated as such.
+
+- Booking history is retained for the academic year, then reduced to
+  counts for utilisation reporting with the requester removed.
+- The audit log is retained for two years, because it exists to answer "who
+  changed this" and a one-term window makes it useless.
+- No student is individually identifiable in any published view.
+- Full export belongs to the institution at any time.
+
+Worth confirming against whatever policy the institution already has, rather than
+inventing one here.
+
 ### 7.3 Roles
 
 ```
@@ -740,36 +839,59 @@ Admin       rooms, users, terms, approval routing.
 Each phase is independently useful. If the project stops after any one of them,
 what was delivered still stands on its own.
 
-### Phase 0 — Publish what already exists (about 2 weeks)
+\begin{keybox}
+\textbf{These estimates are revised upward from draft 1}, because drafts 2 and 3
+found work that was not in the plan: the pattern/occurrence split, room discovery
+mode, shared sections, and the whole of Part 8. An estimate that does not move
+when the design moves is not an estimate.
+\end{keybox}
+
+### Phase 0 — Publish what already exists (3 weeks, was 2)
 
 Read-only. Import the current workbooks, publish cohort views, room views, and ICS
 feeds. No booking, no editing, no login.
+
+Now also includes, from later drafts: the `meeting` / `occupancy` split and its
+transactional regeneration (§Appendix C), **room discovery mode** so the first
+import is possible at all (§8.5), and `section_shares` so co-taught classes do not
+read as clashes (248 cohort entries are 161 bookings).
 
 *Delivers:* the room-wise schedule the office has already asked for; one URL that
 is always current; the end of the eleven-stale-PDFs problem.
 *Risk:* near zero. Nothing is written, nothing is replaced.
 
-### Phase 1 — Upload with validation (about 3 weeks)
+### Phase 1 — Upload with validation (3 weeks)
 
 The scheduler uploads a workbook; the system validates, shows a diff, publishes on
 approval. SSO and roles land here.
 
 *Delivers:* the class of errors in §1.2 becomes impossible to publish.
+*Also lands here:* version-checked concurrent edits (§8.8), and traceability from
+every meeting back to its source file and hash (§8.9).
 
-### Phase 2 — Room booking (about 4 weeks)
+### Phase 2 — Room booking (6 weeks, was 4)
 
 Requests, approval routing, the availability finder, the exclusion constraint.
 
-*Delivers:* booking stops being an email thread.
+**The increase is Part 8, and it is not padding.** Precedence and eviction with
+acknowledgement (§8.1), deputies and 48-hour escalation (§8.3), auto-refuse at
+five days, recurring bookings clamped to term end (§8.6), and the first background
+job runner — which nothing before this phase needed.
 
-### Phase 3 — Change notification (about 2 weeks)
+*Delivers:* booking stops being an email thread.
+*This is the phase where the institution starts depending on the system*, which is
+why Part 11's ownership question must be answered before it starts, not after.
+
+### Phase 3 — Change notification (2 weeks)
 
 Generated diff paragraphs, email and web push to affected cohorts. Separate from
 the ICS path, for the reason in §2.3.
 
-### Phase 4 — Utilisation reporting (about 2 weeks)
+### Phase 4 — Utilisation reporting (2 weeks, frequency only)
 
-The measures in §5.5, exportable.
+Frequency rate ships here. **Occupancy and utilisation do not**, because they need
+real enrolment per meeting and publishing them on cohort headcount would report
+every elective and every split tutorial as a near-empty room (§5.5).
 
 ### Phase 5 — Course pages and add/drop (a term of work, decided separately)
 
@@ -1425,12 +1547,17 @@ Assuming one developer, part-time alongside coursework. Ranges, not promises.
 
 | Phase | Work | Estimate |
 |---|---|---|
-| 0 | Schema, importer, public read views, ICS | 2–3 weeks |
-| 1 | SSO, roles, upload with validation, diff and publish | 3–4 weeks |
-| 2 | Bookings, approval routing, availability finder | 4–5 weeks |
-| 3 | Change notification, generated diff paragraphs | 2 weeks |
-| 4 | Utilisation reporting | 2 weeks |
+| 0 | Schema, importer, discover mode, public read views, ICS | 3 weeks |
+| 1 | SSO, roles, upload with validation, diff, publish, versioned edits | 3 weeks |
+| 2 | Bookings, precedence and eviction, deputies, escalation, job runner | 6 weeks |
+| 3 | Change notification, generated diff paragraphs, mail path | 2 weeks |
+| 4 | Frequency-rate reporting (occupancy needs enrolment) | 2 weeks |
 | 5 | Course pages, add/drop | a term, scoped separately |
+
+**Sixteen weeks to a system that publishes, validates and books**, at part-time
+pace. Drafts 2 and 3 moved this up from thirteen, and the increase is Part 8 —
+the failure modes that were missing from the first plan, not scope that was added
+to it.
 
 **Phase 0 is short because much of it exists.** The importer that reads the
 office workbooks — including group membership from merged cell spans — is written
