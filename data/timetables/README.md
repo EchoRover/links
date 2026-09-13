@@ -1,18 +1,12 @@
 # Timetable sheets
 
-The CURRENT revision of every cohort's timetable, one file each. Superseded
-revisions are not kept: they were being read as if they were current, and git
-holds them anyway if a revision history is ever needed.
+The Sem 5 CSE sheet, which is the one this site serves: `js/scripts.js` links
+it and `pages/week.html` links it, and `data/linkcs/timetable.json` is derived
+from it and checked back against it by `tools/check_timetable.py`.
 
-The site links the Sem 5 CSE sheet directly (`js/scripts.js`, `pages/week.html`),
-so these are served, not just archived. `data/linkcs/timetable.json` is derived
-from the Sem 5 CSE sheet and checked back against it by
-`tools/check_timetable.py`.
-
-Two sheets carry NO footer stamp (both MTech ETS), so those two are dated by
-the server's Last-Modified header instead. That is a weaker fact than a stamp
-and it is why they slipped through a staleness check that only compared
-stamps: we held 27 August copies while 9 September ones were published.
+**Every other cohort's sheet, all five source workbooks, and the cross-cohort
+tooling moved to the `onetimetable` repository.** This repo keeps exactly what
+it serves; that one holds the schedule as a whole.
 
 ## Naming: files are named by REVISION date, not by mail date
 

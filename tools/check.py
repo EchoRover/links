@@ -35,18 +35,10 @@ BASE = "https://iitdabudhabi.ac.ae/uploaded_files/semseter-schedule/2026"
 SITE = "https://linkcs.vercel.app"
 
 # cohort key -> path on the college site
+# Only the sheet this site actually serves. Every other cohort moved to the
+# onetimetable repo, which is where the cross-cohort work now lives.
 COHORTS = {
-    "year1-sem1-btech-che": "Year1-Sem1-BTech-CHE",
-    "year1-sem1-btech-cse": "Year1-Sem1-BTech-CSE",
-    "year1-sem1-btech-een": "Year1-Sem1-BTech-EEN",
-    "year1-sem1-btech-ele": "Year1-Sem1-BTech-ELE",
-    "year1-sem1-mtech-ets": "MTech/Year1-Sem1-MTECH-ETS",
-    "year2-sem3-btech-che": "Year2-Sem3-BTECH-CHE",
-    "year2-sem3-btech-cse": "Year2-Sem3-BTECH-CSE",
-    "year2-sem3-btech-een": "Year2-Sem3-BTECH-EEN",
-    "year2-sem3-mtech-ets": "MTech/Year2-Sem3-MTECH-ETS",
     "year3-sem5-btech-cse": "Year3-Sem5-BTECH-CSE",
-    "year3-sem5-btech-een": "Year3-Sem5-BTECH-EEN",
 }
 
 # every URL people already have, which a repo reorganisation must not break
