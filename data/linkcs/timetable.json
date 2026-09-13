@@ -1,4 +1,5 @@
 {
+  "_correction": "The published sheet prints the Wednesday 15:30 ACOL351 tutorial as room M4-0-019 with the name \"Classroom 3\" beside it. The tutorial is held in Classroom 3, and the only room with a photographed Classroom 3 door plate is M4-0-011 - which is also free at that hour and already holds this cohort for the class before it. So the code on the sheet is the error and the block is stored as M4-0-011. Raised with the academic office 14 Sep 2026; revert this if they say otherwise.",
   "_note": "Week grid for Sem 5. Blocks reference a course by CODE and a room by CODE, never by name, which is why a revision can move a block to a new day, time or room without anything else in the repo changing. Times are the ones printed INSIDE each block on the grid, not the column headings above it: those are different numbers and the countdown is only honest if it uses the printed ones.",
   "source": {
     "sheet": "data/timetables/2026-09-08-year3-sem5-btech-cse.pdf",
@@ -154,7 +155,7 @@
         "start": "15:30",
         "end": "16:20",
         "course": "ACOL351",
-        "room": "M4-0-019",
+        "room": "M4-0-011",
         "kind": "tut",
         "group": 0
       },

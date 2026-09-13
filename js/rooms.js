@@ -30,7 +30,13 @@ const SLOTS = (() => {
 
 const ALL_ROOMS = [...new Set(SLOTS.map(x => x.room))].sort();
 
-const ROOM_KIND_LABEL = { lec: "Lecture", tut: "Tutorial", lab: "Lab", res: "Reserved" };
+const ROOM_KIND_LABEL = { lec: "Lecture", tut: "Tutorial", lab: "Lab",
+                          proj: "Project", help: "Help session" };
+
+// The M2 rooms carry no friendly name on ANY sheet - the office writes
+// only the code. Show the code rather than inventing "Room 009" out of
+// its last three digits.
+function roomLabel(code) { return ROOM_NAMES[code] || code; }
 
 // Not alphabetical: this is where the CSE cohort actually is. M4 holds the
 // classrooms, M3 the labs; M1/M2 are the tail. Anything not on the list keeps
@@ -71,11 +77,24 @@ function badges(who) {
         (hidden ? `<span class="prog-badge more">+${hidden}</span>` : "");
 }
 
+// Two cohorts' sheets can send two different courses to the same room at the
+// same hour. That is not something to smooth over on a page whose whole job is
+// "where can I sit": the slot is marked, and the room is never counted free
+// just because the two entries disagree.
+const CLASHING = new Set();
+for (const a of SLOTS) {
+    for (const b of SLOTS) {
+        if (a === b || a.room !== b.room || a.day !== b.day) continue;
+        if (a.code !== b.code && a.from < b.to && b.from < a.to) CLASHING.add(a);
+    }
+}
+
 function slotLabel(x) {
     const title = COURSE_TITLES[x.code] || "";
     return `<span class="slot-course">${x.code}</span>` +
         (title ? ` <span class="slot-title">${title}</span>` : "") +
-        `<span class="kind-chip">${ROOM_KIND_LABEL[x.kind] || "Class"}</span>`;
+        `<span class="kind-chip">${ROOM_KIND_LABEL[x.kind] || "Class"}</span>` +
+        (CLASHING.has(x) ? `<span class="kind-chip clash" title="Another cohort's sheet books this room at the same time. Check before you rely on it.">double-booked</span>` : "");
 }
 
 // ---------- day selection ----------
@@ -186,8 +205,9 @@ function renderRooms() {
             if (freeRooms.length) {
                 html += `<div class="free-strip">` + freeRooms.map(room =>
                     `<button class="free-chip" data-room="${room}">` +
-                    `<span class="free-chip-name">${ROOM_NAMES[room] || "Room " + room.slice(-3)}</span>` +
-                    `<span class="free-chip-code">${room}</span></button>`).join("") + `</div>`;
+                    `<span class="free-chip-name">${roomLabel(room)}</span>` +
+                    (ROOM_NAMES[room] ? `<span class="free-chip-code">${room}</span>` : "") +
+                    `</button>`).join("") + `</div>`;
             }
 
             if (busyRooms.length) html += `<div class="rooms-grid">`;
@@ -208,8 +228,8 @@ function renderRooms() {
                 html += `
             <article class="room-card busy${open.has(room) ? " open" : ""}" data-room="${room}">
                 <div class="room-head">
-                    <span class="room-name">${ROOM_NAMES[room] || "Room " + room.slice(-3)}</span>
-                    <span class="room-code">${room}</span>
+                    <span class="room-name">${roomLabel(room)}</span>
+                    ${ROOM_NAMES[room] ? `<span class="room-code">${room}</span>` : ""}
                 </div>
                 <div class="room-status">${statusHTML(room, now)}</div>
                 <div class="room-day">${dayHTML}</div>

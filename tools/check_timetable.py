@@ -74,6 +74,19 @@ PARTIALLY_SCHEDULED = {"ACOD310"}
 #   sign say Classroom 5.
 DOOR_SIGN = {"M4-0-019": ("M4-Classroom 3", "M4-Classroom 5")}
 
+# Blocks where we deliberately store a different room CODE from the sheet.
+# Same contract as DOOR_SIGN: the left-hand value is what the sheet must
+# still print. If it changes, this check fails rather than silently keeping
+# a correction that no longer applies.
+#   The Wed 15:30 ACOL351 tutorial prints code M4-0-019 with the name
+#   "Classroom 3" beside it. The tutorial is held in Classroom 3, and the
+#   only room with a photographed Classroom 3 plate is M4-0-011 - free at
+#   that hour, and already holding this cohort for the class before it. So
+#   the code is the error. Raised with the academic office 14 Sep 2026.
+ROOM_CODE_FIX = {
+    ("Wednesday", "15:30", "16:20", "ACOL351"): ("M4-0-019", "M4-0-011"),
+}
+
 
 def parse_week():
     """data/linkcs/timetable.json -> [(course, kind, minutes, group)]."""
@@ -250,6 +263,22 @@ def main():
     # --- block-level diff: the sheet rebuilt by coordinate vs WEEK ---
     sheet_blocks, sheet_labels = parse_sheet_blocks(sheet)
     js_blocks = parse_week_blocks()
+    # Re-apply the deliberate code corrections to the SHEET side, so the diff
+    # compares like with like and still fails if the sheet stops printing the
+    # code we are correcting.
+    corrected, stale = [], dict(ROOM_CODE_FIX)
+    for b in sheet_blocks:
+        fix = ROOM_CODE_FIX.get(b[:4])
+        if fix and b[4] == fix[0]:
+            stale.pop(b[:4], None)
+            b = b[:4] + (fix[1],)
+        corrected.append(b)
+    for key, (was, _now) in stale.items():
+        failures.append(
+            f"     stale correction: the sheet no longer prints {was} for "
+            f"{key} - drop it from ROOM_CODE_FIX or re-check the room")
+    sheet_blocks = corrected
+
     only_sheet = sorted(set(sheet_blocks) - set(js_blocks))
     only_js = sorted(set(js_blocks) - set(sheet_blocks))
     for b in only_sheet:
