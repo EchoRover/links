@@ -150,9 +150,8 @@ function renderViewing(live) {
 // it just states what it is and when it was read.
 // A menu read off a photograph of a wall WILL be wrong sometimes, and the only
 // way that gets fixed is someone standing in the mess noticing. So the ask is
-// on the page rather than in a README nobody opens - and it names the specific
-// things already known to be odd, because "report bugs" gets nothing and
-// "is the yoghurt row really bread?" gets an answer.
+// on the page rather than in a README nobody opens, and it sits after the food
+// rather than before it.
 function renderReport() {
     const el = document.getElementById("mess-report");
     const r = MESS.service.report || {};
@@ -162,12 +161,7 @@ function renderReport() {
         <p>Tell <span id="report-who"><b>${who}</b></span>. The menu is read off
            photographs of the sheets on the mess wall, so a dish can be wrong, a
            week can be out of step, or the mess can simply change what it is
-           cooking. Nothing here is checked against the counter.</p>
-        <p class="report-known">Already known, and reproduced from the sheet
-           rather than corrected: Week&nbsp;1 dinner lists
-           <b>yoghurt</b> as &ldquo;Arabic Bread &amp; Soft Roll&rdquo; every
-           day, and two Week&nbsp;1 lunch specials are cut off mid-sentence by
-           their own cell. Those are on the paper.</p>`;
+           cooking. Nothing here is checked against the counter.</p>`;
 
     // Built rather than interpolated into an href="" - a URL from data does not
     // belong in a template string, and the link checker is right to read one
