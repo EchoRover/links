@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>All Timetables — linkCS</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/webp" href="/assets/hacker.webp">
+    <script src="/js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* ============================================================
+           ALL TIMETABLES — unlisted. Scoped styles only.
+           ============================================================ */
+        .tt-wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px 56px; }
+
+        .tt-hero { margin: 22px 0 4px; }
+        .tt-title { font-family: var(--font-serif); font-style: italic; font-weight: 500;
+                    font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--fg); margin: 0; }
+        .tt-title em { color: var(--coral); }
+        .tt-sub { font-size: 0.88rem; color: var(--fg-soft); max-width: 66ch;
+                  line-height: 1.5; margin: 8px 0 0; }
+
+        /* Eleven cohorts is too many for a segmented pill, so they wrap as
+           chips. The one you picked is remembered, because whoever opens this
+           page is almost always looking at the same cohort each time. */
+        .tt-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin: 18px 0 6px; }
+        .tt-tabs button { font-family: var(--font-mono); font-size: 0.82rem;
+                          padding: 7px 13px; border: 1px solid var(--rule);
+                          border-radius: 999px; background: var(--bg-card);
+                          color: var(--fg-soft); cursor: pointer; }
+        .tt-tabs button:hover { border-color: var(--coral); }
+        .tt-tabs button.on { background: var(--coral); border-color: var(--coral);
+                             color: var(--bg-card); }
+        .tt-tabs button:focus-visible { outline: 2px solid var(--coral-bright);
+                                        outline-offset: 2px; }
+
+        .tt-count { font-family: var(--font-mono); font-size: 0.82rem;
+                    color: var(--fg-soft); margin: 0 0 18px; }
+
+        /* Five day columns, blocks in time order. NOT to scale: eleven cohorts
+           span 08:00 to 20:20 and a proportional axis over that range leaves a
+           50-minute tutorial too small to read. week.html draws the real
+           proportional grid, for the one cohort it is reconciled against. */
+        .tt-grid { display: grid; gap: 18px;
+                   grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        .tt-day h2 { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600;
+                     text-transform: uppercase; letter-spacing: 0.1em;
+                     color: var(--fg-soft); margin: 0 0 10px; padding-bottom: 7px;
+                     border-bottom: 1px solid var(--rule); }
+        .tt-block { padding: 10px 0; border-bottom: 1px solid var(--rule-faint); }
+        .tt-block:last-child { border-bottom: none; }
+        .tt-time { font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); }
+        .tt-code { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600;
+                   color: var(--fg); margin-top: 2px; }
+        /* NOT .tt-title - that is the page heading, set in the serif display
+           face, and a course name sharing the class inherited italic Fraunces
+           at a size only the override was holding down. */
+        .tt-course { font-size: 0.92rem; color: var(--fg); line-height: 1.3;
+                     margin-top: 1px; }
+        .tt-room { font-size: 0.86rem; color: var(--fg-soft); margin-top: 3px; }
+        .tt-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+        .tt-tags span { font-family: var(--font-mono); font-size: 0.68rem;
+                        text-transform: uppercase; letter-spacing: 0.06em;
+                        color: var(--coral); border: 1px solid var(--coral);
+                        border-radius: 4px; padding: 1px 5px; }
+        .tt-none { font-family: var(--font-mono); font-size: 0.8rem;
+                   color: var(--fg-soft); margin: 6px 0 0; }
+
+        .tt-note { margin: 34px 0 0; padding-top: 16px; border-top: 1px solid var(--rule);
+                   font-size: 0.86rem; color: var(--fg-soft); line-height: 1.55;
+                   max-width: 74ch; }
+        .tt-note p { margin: 0 0 8px; }
+        .tt-note b { color: var(--fg); }
+
+        @media (max-width: 1100px) {
+            .tt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 680px) {
+            .tt-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="tt-wrap">
+        <header class="topbar">
+            <div class="brand">
+                <a href="/" class="brand-logo" aria-label="linkCS home">
+                    <img src="/assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="/assets/circle.webp" class="circle-img" alt="">
+                </a>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">all timetables</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="/" class="pill"><span class="pill-name">&larr; Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">&#9686;</button>
+            </div>
+        </header>
+
+        <div class="tt-hero">
+            <h1 class="tt-title">Every <em>cohort</em></h1>
+            <p class="tt-sub">All eleven running programmes, Semester&nbsp;1 2026&ndash;27,
+                read out of the academic office&rsquo;s own workbooks. Not linked from
+                anywhere &mdash; the sheets carry real errors and this page shows them
+                as they are.</p>
+        </div>
+
+        <div class="tt-tabs" id="tt-tabs"></div>
+        <p class="tt-count" id="tt-count"></p>
+
+        <div class="tt-grid" id="tt-grid"></div>
+
+        <div class="tt-note">
+            <p><b>Where this comes from.</b> The five schedule workbooks, read cell by
+                cell &mdash; group membership from the merged cell spans, and the two
+                Year&nbsp;2 blocks that exist only as a picture pasted over the grid.
+                Hidden worksheets are skipped, because a hidden sheet is a programme
+                that is not running.</p>
+            <p><b>What has been corrected.</b> Where a cell printed a room code that
+                contradicts the room name beside it, the code was corrected &mdash; the
+                academic office&rsquo;s own rule, applied to 13 cells. Two blocks print
+                an end time before their start and are read as 50-minute tutorials.
+                Every one of those is listed in the header of
+                <code>data/rooms-data.js</code>.</p>
+            <p><b>Use <a href="/pages/week.html">the week grid</a> instead if you are Y3&nbsp;CSE.</b>
+                It is the only cohort mechanically reconciled against its published PDF,
+                and it draws time to scale. This page orders blocks but does not size
+                them.</p>
+        </div>
+    </main>
+
+    <script src="/data/rooms-data.js"></script>
+    <script src="/js/timetables.js"></script>
+</body>
+
+</html>

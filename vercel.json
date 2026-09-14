@@ -36,6 +36,10 @@
     {
       "source": "/both",
       "destination": "/pages/both"
+    },
+    {
+      "source": "/timetables",
+      "destination": "/pages/timetables"
     }
   ]
 }
