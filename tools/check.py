@@ -45,8 +45,8 @@ COHORTS = {
 }
 
 # every URL people already have, which a repo reorganisation must not break
-URLS = ["/", "/screen", "/bus", "/bus.html", "/week", "/rooms", "/campus",
-        "/3d", "/m3", "/m4"]
+URLS = ["/", "/screen", "/mess", "/mess.html", "/bus", "/bus.html", "/week",
+        "/rooms", "/campus", "/3d", "/m3", "/m4"]
 
 QUIET = "--quiet" in sys.argv
 

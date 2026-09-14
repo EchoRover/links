@@ -6,6 +6,10 @@
       "destination": "/pages/both"
     },
     {
+      "source": "/mess",
+      "destination": "/pages/mess"
+    },
+    {
       "source": "/bus",
       "destination": "/pages/bus"
     },
