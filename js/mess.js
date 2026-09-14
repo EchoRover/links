@@ -158,27 +158,10 @@ function renderReport() {
     const who = esc(r.who || "whoever runs this");
     el.innerHTML = `
         <h3 class="report-head">Found a mistake?</h3>
-        <p>Tell <span id="report-who"><b>${who}</b></span>. The menu is read off
-           photographs of the sheets on the mess wall, so a dish can be wrong, a
-           week can be out of step, or the mess can simply change what it is
-           cooking. Nothing here is checked against the counter.</p>`;
-
-    // Built rather than interpolated into an href="" - a URL from data does not
-    // belong in a template string, and the link checker is right to read one
-    // there as a path into this repo.
-    if (r.href) {
-        const a = document.createElement("a");
-        a.className = "report-link";
-        a.textContent = r.who || "message";
-        a.setAttribute("href", r.href);
-        if (/^https?:/i.test(r.href)) {
-            a.target = "_blank";
-            a.rel = "noopener";
-        }
-        const slot = document.getElementById("report-who");
-        slot.textContent = "";
-        slot.appendChild(a);
-    }
+        <p>Tell <b>${who}</b>. The menu is read off photographs of the sheets
+           on the mess wall, so a dish can be wrong, a week can be out of step,
+           or the mess can simply change what it is cooking. Nothing here is
+           checked against the counter.</p>`;
 }
 
 function renderNote() {

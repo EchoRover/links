@@ -35,8 +35,7 @@
     "anchor_week": 1
   },
   "report": {
-    "_note": "Where a wrong dish goes. The menu is read off photographs of a wall, so it will be wrong sometimes and the only way that gets fixed is someone standing in the mess saying so. Set `href` to a wa.me / mailto / whatever link; leave it empty and the line still shows, just without a link.",
-    "who": "Evan",
-    "href": ""
+    "_note": "Who to tell when a dish is wrong. Deliberately a name and not a link: anyone in the mess who would bother reporting it already knows how to reach him, and a phone number on a public page is a different decision.",
+    "who": "Evan"
   }
 }

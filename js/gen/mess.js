@@ -2397,8 +2397,7 @@ window.MESS = {
    "anchor_week": 1
   },
   "report": {
-   "who": "Evan",
-   "href": ""
+   "who": "Evan"
   }
  }
 };
