@@ -33,5 +33,10 @@
     "_note": "The menu alternates Week-1 / Week-2. Confirmed on the ground: the week beginning Monday 14 September 2026 is Week-1. Everything after that follows on its own - count whole weeks from the anchor, even means Week-1 and odd means Week-2 - so this needs changing only if the mess restarts the cycle out of step.",
     "anchor_monday": "2026-09-14",
     "anchor_week": 1
+  },
+  "report": {
+    "_note": "Where a wrong dish goes. The menu is read off photographs of a wall, so it will be wrong sometimes and the only way that gets fixed is someone standing in the mess saying so. Set `href` to a wa.me / mailto / whatever link; leave it empty and the line still shows, just without a link.",
+    "who": "Evan",
+    "href": ""
   }
 }

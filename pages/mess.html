@@ -106,7 +106,21 @@
         .mess-empty { font-family: var(--font-mono); font-size: 0.9rem; color: var(--fg-soft);
                       padding: 26px 0; }
 
-        .mess-note { margin: 30px 0 0; padding-top: 14px; border-top: 1px solid var(--rule-faint);
+        /* The ask sits after the food, not before it - someone opening this
+           page wants lunch, not a form. */
+        .mess-report { margin: 34px 0 0; padding-top: 18px;
+                       border-top: 1px solid var(--rule); max-width: 62ch; }
+        .report-head { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600;
+                       text-transform: uppercase; letter-spacing: 0.1em;
+                       color: var(--fg); margin: 0 0 8px; }
+        .mess-report p { margin: 0 0 8px; font-size: 0.9rem; line-height: 1.5;
+                         color: var(--fg-soft); }
+        .mess-report p:last-child { margin-bottom: 0; }
+        .report-known { font-size: 0.84rem !important; color: var(--fg-faint) !important; }
+        .report-known b, .mess-report b { color: var(--fg); font-weight: 600; }
+        .report-link { color: var(--coral); font-weight: 600; }
+
+        .mess-note { margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--rule-faint);
                      font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-faint); }
 
         @media (max-width: 620px) {
@@ -164,6 +178,8 @@
         <p class="mess-window" id="mess-window"></p>
 
         <div id="mess-body"></div>
+
+        <section class="mess-report" id="mess-report"></section>
 
         <p class="mess-note" id="mess-note"></p>
 

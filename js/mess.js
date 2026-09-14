@@ -148,6 +148,45 @@ function renderViewing(live) {
 // One line, and only when the menu is whole. A page that is missing two of its
 // six sheets should say so; a page that has all six has nothing to explain, so
 // it just states what it is and when it was read.
+// A menu read off a photograph of a wall WILL be wrong sometimes, and the only
+// way that gets fixed is someone standing in the mess noticing. So the ask is
+// on the page rather than in a README nobody opens - and it names the specific
+// things already known to be odd, because "report bugs" gets nothing and
+// "is the yoghurt row really bread?" gets an answer.
+function renderReport() {
+    const el = document.getElementById("mess-report");
+    const r = MESS.service.report || {};
+    const who = esc(r.who || "whoever runs this");
+    el.innerHTML = `
+        <h3 class="report-head">Found a mistake?</h3>
+        <p>Tell <span id="report-who"><b>${who}</b></span>. The menu is read off
+           photographs of the sheets on the mess wall, so a dish can be wrong, a
+           week can be out of step, or the mess can simply change what it is
+           cooking. Nothing here is checked against the counter.</p>
+        <p class="report-known">Already known, and reproduced from the sheet
+           rather than corrected: Week&nbsp;1 dinner lists
+           <b>yoghurt</b> as &ldquo;Arabic Bread &amp; Soft Roll&rdquo; every
+           day, and two Week&nbsp;1 lunch specials are cut off mid-sentence by
+           their own cell. Those are on the paper.</p>`;
+
+    // Built rather than interpolated into an href="" - a URL from data does not
+    // belong in a template string, and the link checker is right to read one
+    // there as a path into this repo.
+    if (r.href) {
+        const a = document.createElement("a");
+        a.className = "report-link";
+        a.textContent = r.who || "message";
+        a.setAttribute("href", r.href);
+        if (/^https?:/i.test(r.href)) {
+            a.target = "_blank";
+            a.rel = "noopener";
+        }
+        const slot = document.getElementById("report-who");
+        slot.textContent = "";
+        slot.appendChild(a);
+    }
+}
+
 function renderNote() {
     const el = document.getElementById("mess-note");
     const gaps = MESS.menu.incomplete;
@@ -169,6 +208,7 @@ function draw() {
     renderMenu();
     renderViewing(live);
     renderNote();
+    renderReport();
 }
 
 function start() {
