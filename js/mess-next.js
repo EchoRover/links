@@ -184,11 +184,6 @@ function renderMenu() {
                      <dl class="sides">${restHTML}</dl>` : "");
 }
 
-function renderWarnSub() {
-    const el = document.getElementById("warn-sub");
-    if (el) el.textContent = "Some of it shows up anyway.";
-}
-
 function renderNote() {
     const el = document.getElementById("note");
     const gaps = MESS.menu.incomplete;
@@ -206,7 +201,6 @@ function draw() {
     renderMeals();
     renderDays(live);
     renderMenu();
-    renderWarnSub();
     renderNote();
 }
 

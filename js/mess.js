@@ -208,18 +208,6 @@ function renderReport() {
            checked against the counter.</p>`;
 }
 
-// The second half of the warning. Says what the page IS - a plan the mess only
-// partly follows - and, while the trial is on, what to do about it. Rendered
-// rather than typed into the HTML so that "tap anything that didn't" stops
-// being printed the day the trial ends and the taps disappear.
-function renderWarnSub() {
-    const el = document.getElementById("warn-sub");
-    if (!el) return;
-    el.textContent = trialOpen()
-        ? "Some of it shows up anyway — tap anything that didn't."
-        : "Some of it shows up anyway.";
-}
-
 function renderNote() {
     const el = document.getElementById("mess-note");
     const gaps = MESS.menu.incomplete;
@@ -241,7 +229,6 @@ function draw() {
     renderMenu();
     renderViewing(live);
     renderNote();
-    renderWarnSub();
     renderReport();
 }
 
