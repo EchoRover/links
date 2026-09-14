@@ -30,8 +30,13 @@
 // recorded.
 // ============================================================
 
-const URL_ = process.env.UPSTASH_REDIS_REST_URL;
-const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+// The Vercel Marketplace Upstash integration has injected these under two
+// different names over time - UPSTASH_* now, KV_REST_API_* for stores that came
+// across from the retired Vercel KV. Accepting both means the integration can
+// be installed without anyone having to rename a variable to match this file,
+// which is the kind of step that gets skipped and then debugged for an hour.
+const URL_ = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
 const MEALS = ["breakfast", "lunch", "dinner"];
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
@@ -73,12 +78,27 @@ const KINDS = ["dish", "meal", "right"];
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
+  // Says exactly what is missing. A bare "not configured" sends you to the
+  // dashboard guessing; this tells you whether the integration ran at all.
   if (!URL_ || !TOKEN) {
     return res.status(503).json({
       ok: false,
       error: "no store configured",
-      detail: "set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN",
+      sawUrl: Boolean(URL_),
+      sawToken: Boolean(TOKEN),
+      detail: "add a Redis store from the Vercel Marketplace and redeploy - " +
+              "it injects UPSTASH_REDIS_REST_URL/TOKEN (or KV_REST_API_URL/TOKEN)",
     });
+  }
+
+  // GET with no query is a health check: is the store reachable from here?
+  if (req.method === "GET" && !req.query.week) {
+    try {
+      await redis("PING");
+      return res.status(200).json({ ok: true, store: "reachable" });
+    } catch {
+      return res.status(502).json({ ok: false, error: "store unreachable" });
+    }
   }
 
   try {
