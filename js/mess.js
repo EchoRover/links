@@ -114,7 +114,7 @@ function renderMenu() {
     const mainHTML = mains.map(c => {
         const many = c.items.length > 1;
         return `<article class="main">
-            <h2 class="main-name">${esc(c.course.toLowerCase())}${
+            <h2 class="main-name">${esc(c.course)}${
                 many ? `<span class="main-pick">pick one</span>` : ""}</h2>
             <ul class="main-items">${c.items.map(i =>
                 `<li>${esc(i)}</li>`).join("")}</ul>
@@ -124,7 +124,7 @@ function renderMenu() {
     // The rest is reference, not a decision, so it is set as tight label/value
     // pairs that can be skimmed down rather than read across.
     const restHTML = rest.map(c => `<div class="side">
-        <dt>${esc(c.course.toLowerCase())}</dt>
+        <dt>${esc(c.course)}</dt>
         <dd>${c.items.map(esc).join(" <i>or</i> ")}</dd>
     </div>`).join("");
 

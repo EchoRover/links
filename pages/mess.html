@@ -103,10 +103,11 @@
                      padding-top: 18px; border-top: 1px solid var(--rule); }
         .sides { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
                  column-gap: 44px; row-gap: 2px; }
-        .side { display: grid; grid-template-columns: 132px 1fr; gap: 16px;
+        .side { display: grid; grid-template-columns: 158px 1fr; gap: 16px;
                 align-items: baseline; padding: 10px 0;
                 border-bottom: 1px solid var(--rule-faint); }
-        .side dt { font-size: 1.05rem; color: var(--fg-soft); line-height: 1.4; }
+        .side dt { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 600;
+                   letter-spacing: 0.05em; color: var(--fg-soft); line-height: 1.5; }
         .side dd { margin: 0; font-size: 1.05rem; color: var(--fg); line-height: 1.4; }
         .side dd i { font-style: normal; color: var(--fg-soft); padding: 0 3px; }
 
@@ -159,7 +160,7 @@
             /* one column: the divider becomes a rule between stacked blocks */
             .main + .main { border-left: none; padding-left: 0; margin-left: 0;
                             border-top: 1px solid var(--rule-faint); padding-top: 16px; }
-            .side { grid-template-columns: 116px 1fr; gap: 12px; }
+            .side { grid-template-columns: 130px 1fr; gap: 12px; }
         }
     </style>
 </head>
