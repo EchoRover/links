@@ -11,46 +11,55 @@
 // data/image-blocks.json. Hidden sheets are skipped - a hidden sheet
 // is a programme that is not running.
 //
-//   11 cohorts, 294 bookings, 20 rooms,
+//   11 cohorts, 303 bookings, 20 rooms,
 //   2 double-booked room/hour(s).
 //
-// Room CODES are authoritative. The friendly names printed beside
-// them contradict each other across sheets; the name shown here is
-// the majority reading for that code. Codes where the sheets
-// disagree, exactly as printed:
-//     M4-0-017: Classroom 4 x16, Classroom 5 x1
-//     M4-1-017: Classroom 4 x1, Classroom 6 x2, Classroom 7 x18
-//     M4-1-011: Classroom 8 x13, Classroom 5 x1
-//     M4-0-021: Classroom 6 x22, Classroom  6 x1, Classroom 4 x1
-//     M4-0-019: Classroom 5 x15, Classroom5 x2, Classroom 8 x1, Classroom 3 x1
-//     M4-0-011: Lecture Hall x3, Classroom 3 x14
+// Room NAMES are authoritative, and the names here are the academic
+// office's own, sent 14 Sep 2026. Where a sheet printed a code that
+// contradicts the name beside it, the code was corrected to match.
+// That is the office's stated rule, not our guess. It moved
+// 13 blocks:
+//     M4-1-017  -> M4-0-017  AETL728 Thursday 15:30
+//     M4-1-017  -> M4-0-021  AETL704 Monday 19:00
+//     M4-1-017  -> M4-0-021  AETL702 Wednesday 16:00
+//     M4-0-011  -> M4-0-005  ACML1002 Tuesday 08:00
+//     M4-0-011  -> M4-0-005  ACML1002 Thursday 08:00
+//     (no code) -> M4-0-005  APYL1001 Tuesday 14:00
+//     M4-0-021  -> M4-0-017  ACHL1002 Tuesday 15:00
+//     M4-0-017  -> M4-0-019  AMTL2008 Thursday 16:00
+//     M4-0-011  -> M4-0-005  ACML1002 Tuesday 08:00
+//     M4-1-011  -> M4-0-019  AESL2061 Tuesday 09:00
+//     M4-0-019  -> M4-1-011  AMLL1001 Wednesday 17:00
+//     M4-0-011  -> M4-0-005  (no code) Thursday 08:00
+//     M4-0-019  -> M4-0-011  ACOL351 Wednesday 15:30
 //
-// 4 printed errors ARE corrected here, because the site has
-// to be usable today. Every one is on the list the academic office has been
-// asked to confirm; the .xlsx sent to them carries the sheets as
-// printed, uncorrected.
+// 2 further errors are corrected here - times the sheets
+// print impossibly, which the office has not ruled on yet:
 //   26A1ELEBSEM1 AMTL1001 Monday 15:30: end '14:20' -> '16:20'  (sheet prints "15:30 to 14:20")
-//   26A1ELEBSEM1 APYL1001 Tuesday 14:00: room '' -> 'M4-0-005'  (block prints a room name and no code)
 //   26A1EENBSEM1 AMTL1001 Monday 15:30: end '14:20' -> '16:20'  (sheet prints "15:30 to 14:20")
-//   24A1CSEBSEM5 ACOL351 Wednesday 15:30: room 'M4-0-019' -> 'M4-0-011'  (sheet prints M4-0-019 next to the name "Classroom 3")
 // ============================================================
 
 const ROOM_NAMES = {
-    "M3-0-004": "Computer Lab 03",
-    "M3-0-022": "Computer Lab 02",
-    "M3-1-004": "Computer Lab 04",
-    "M3-1-009": "Energy Lab",
-    "M3-1-014": "Electrical Lab",
-    "M3-1-029": "Chemistry Lab",
-    "M3-1-031": "Biology Lab",
-    "M4-0-005": "Lecture Hall",
-    "M4-0-006": "Classroom 2",
-    "M4-0-011": "Classroom 3",
-    "M4-0-017": "Classroom 4",
-    "M4-0-019": "Classroom 5",
-    "M4-0-021": "Classroom 6",
-    "M4-1-011": "Classroom 8",
-    "M4-1-017": "Classroom 7",
+    "M2-2-007": "M2-2-007 Classroom",
+    "M2-2-009": "M2-2-009 Classroom",
+    "M2-2-015": "M2-2-015 Classroom",
+    "M2-2-031": "M2-Teaching Lab3",
+    "M3-0-004": "M3-Computer Lab03",
+    "M3-0-022": "M3-Computer Lab02",
+    "M3-1-004": "M3-Computer Lab04",
+    "M3-1-009": "M3-Energy Lab",
+    "M3-1-014": "M3-Electrical Lab",
+    "M3-1-029": "M3-ChemistryLab",
+    "M3-1-031": "M3-BiologyLab",
+    "M4-0-005": "M4-LectureHall",
+    "M4-0-006": "M4-Classroom2",
+    "M4-0-011": "M4-Classroom3",
+    "M4-0-017": "M4-Classroom4",
+    "M4-0-018": "M4-ComputerLab",
+    "M4-0-019": "M4-Classroom5",
+    "M4-0-021": "M4-Classroom6",
+    "M4-1-011": "M4-Classroom8",
+    "M4-1-017": "M4- Classroom7",
 };
 
 const PROGRAMS = {
@@ -68,6 +77,7 @@ const PROGRAMS = {
 };
 
 const COURSE_TITLES = {
+    "(no code)": "Course not named on the sheet",
     "ACHL1000": "Intro to Chemical Engg",
     "ACHL1002": "Material & Energy Balances",
     "ACHL2001": "Numerical Analysis for ChemE",
@@ -122,6 +132,10 @@ const COURSE_TITLES = {
 // [day 1=Mon..5=Fri, start, end, course, room, program, group, kind]
 //   kind: "lec" lecture · "tut" tutorial · "lab" lab · "proj" project · "help" help session
 const OCC = [
+    [1, "08:00", "11:50", "ACMP1000", "M3-1-029", "y1che", "G4", "lab"],
+    [1, "08:00", "11:50", "ACMP1000", "M3-1-029", "y1cse", "G4", "lab"],
+    [1, "08:00", "11:50", "ACMP1000", "M3-1-029", "y1een", "G4", "lab"],
+    [1, "08:00", "11:50", "ACMP1000", "M3-1-029", "y1ele", "G4", "lab"],
     [1, "08:00", "09:20", "AMTL1001", "M4-0-005", "y1che", "G1 & G2", "lec"],
     [1, "08:00", "09:20", "AMTL1001", "M4-0-005", "y1cse", "G1 & G2", "lec"],
     [1, "08:00", "09:20", "AMTL1001", "M4-0-005", "y1een", "G1 & G2", "lec"],
@@ -139,6 +153,7 @@ const OCC = [
     [1, "10:00", "10:50", "APYL1001", "M2-2-015", "y1ele", "G3", "tut"],
     [1, "10:00", "11:20", "ACHL2002", "M4-0-017", "y2che", "all", "lec"],
     [1, "10:00", "10:50", "ACML1002", "M4-0-021", "y1che", "G1 & G2", "tut"],
+    [1, "10:00", "10:50", "ACML1002", "M4-0-021", "y1cse", "G1 & G2", "tut"],
     [1, "10:00", "10:50", "ACOL331", "M4-1-017", "y3cse", "all", "lec"],
     [1, "10:30", "11:50", "AMEL1140", "M4-0-019", "y2cse", "all", "lec"],
     [1, "10:30", "11:50", "AMEL1140", "M4-0-019", "y2een", "all", "lec"],
@@ -163,6 +178,7 @@ const OCC = [
     [1, "14:00", "15:20", "ADAN1100", "M4-0-005", "y1ele", "G1 & G2", "lec"],
     [1, "14:00", "15:20", "AHUL256", "M4-0-011", "y3cse", "all", "lec"],
     [1, "14:00", "15:20", "AHUL256", "M4-0-011", "y3een", "all", "lec"],
+    [1, "14:00", "15:20", "ACHL2001", "M4-0-017", "y2che", "all", "lec"],
     [1, "14:00", "14:50", "AESL2061", "M4-0-019", "y2een", "all", "lec"],
     [1, "14:00", "15:20", "ACOL2015", "M4-0-021", "y2cse", "all", "lec"],
     [1, "15:30", "16:20", "AMTL1001", "M2-2-009", "y1een", "G2", "tut"],
@@ -182,10 +198,10 @@ const OCC = [
     [1, "17:00", "17:50", "AETL702", "M4-0-021", "m1ets", "all", "lec"],
     [1, "17:30", "20:20", "AETP715", "M4-0-018", "m2ets", "all", "lab"],
     [1, "18:00", "18:50", "AETL703", "M4-0-021", "m1ets", "all", "lec"],
-    [1, "19:00", "19:50", "AETL704", "M4-1-017", "m1ets", "all", "lec"],
+    [1, "19:00", "19:50", "AETL704", "M4-0-021", "m1ets", "all", "lec"],
+    [2, "08:00", "08:50", "ACML1002", "M4-0-005", "y1che", "all", "lec"],
     [2, "08:00", "08:50", "ACML1002", "M4-0-005", "y1cse", "all", "lec"],
-    [2, "08:00", "08:50", "ACML1002", "M4-0-011", "y1che", "all", "lec"],
-    [2, "08:00", "08:50", "ACML1002", "M4-0-011", "y2een", "all", "lec"],
+    [2, "08:00", "08:50", "ACML1002", "M4-0-005", "y2een", "all", "lec"],
     [2, "08:00", "08:50", "ACHL1002", "M4-0-017", "y2che", "all", "lec"],
     [2, "08:00", "08:50", "ACOL351", "M4-1-017", "y3cse", "all", "lec"],
     [2, "09:00", "09:50", "AELL1000", "M2-2-007", "y1che", "G1", "tut"],
@@ -199,7 +215,7 @@ const OCC = [
     [2, "09:00", "10:20", "ACOL1000", "M4-0-005", "y1een", "G3 & G4", "lec"],
     [2, "09:00", "10:20", "ACOL1000", "M4-0-005", "y1ele", "G3 & G4", "lec"],
     [2, "09:00", "09:50", "ASBL1100", "M4-0-017", "y2che", "all", "lec"],
-    [2, "09:00", "09:50", "AESL2061", "M4-1-011", "y2een", "all", "lec"],
+    [2, "09:00", "09:50", "AESL2061", "M4-0-019", "y2een", "all", "lec"],
     [2, "09:00", "09:50", "ACOL331", "M4-1-017", "y3cse", "all", "lec"],
     [2, "10:00", "10:50", "ASBL100", "M2-2-007", "y3een", "all", "lec"],
     [2, "10:00", "10:50", "ACHL1000", "M4-0-017", "y2che", "all", "lec"],
@@ -239,7 +255,7 @@ const OCC = [
     [2, "15:00", "16:20", "AMTL1001", "M4-0-005", "y1cse", "G3 & G4", "lec"],
     [2, "15:00", "16:20", "AMTL1001", "M4-0-005", "y1een", "G3 & G4", "lec"],
     [2, "15:00", "16:20", "AMTL1001", "M4-0-005", "y1ele", "G3 & G4", "lec"],
-    [2, "15:00", "15:50", "ACHL1002", "M4-0-021", "y2che", "all", "tut"],
+    [2, "15:00", "15:50", "ACHL1002", "M4-0-017", "y2che", "all", "tut"],
     [2, "15:30", "16:50", "AHSL2062", "M4-0-005", "y2cse", "all", "lec"],
     [2, "15:30", "16:50", "AETL714", "M4-0-021", "m1ets", "all", "lec"],
     [2, "15:30", "16:50", "AHSL2675", "M4-1-011", "y2cse", "all", "lec"],
@@ -248,6 +264,7 @@ const OCC = [
     [2, "16:00", "18:50", "AENP225", "M3-1-009", "y3een", "G1", "lab"],
     [2, "16:00", "16:50", "AMTL2006", "M4-0-011", "y2cse", "all", "tut"],
     [2, "16:00", "17:20", "AETL726", "M4-0-017", "m2ets", "all", "lec"],
+    [2, "16:00", "17:50", "ACHL2001", "M4-0-018", "y2che", "all", "lab"],
     [2, "16:00", "16:50", "ACML1002", "M4-0-019", "y2een", "all", "tut"],
     [2, "16:30", "18:20", "ACOL333", "M3-0-004", "y3cse", "all", "lab"],
     [2, "16:30", "17:20", "ACML1002", "M4-0-019", "y1che", "G3", "tut"],
@@ -302,6 +319,7 @@ const OCC = [
     [3, "14:00", "15:20", "ADAN1100", "M4-0-005", "y1ele", "G3 & G4", "lec"],
     [3, "14:00", "15:20", "AHUL256", "M4-0-011", "y3cse", "all", "lec"],
     [3, "14:00", "15:20", "AHUL256", "M4-0-011", "y3een", "all", "lec"],
+    [3, "14:00", "15:20", "ACHL2001", "M4-0-017", "y2che", "all", "lec"],
     [3, "14:00", "15:20", "ACOL2015", "M4-0-021", "y2cse", "all", "lec"],
     [3, "15:30", "18:20", "AENP200", "M3-1-009", "y3een", "G2", "lab"],
     [3, "15:30", "16:50", "AHSL2062", "M4-0-005", "y2che", "all", "lec"],
@@ -316,17 +334,18 @@ const OCC = [
     [3, "16:00", "17:50", "AELL1000", "M3-1-014", "y1che", "G2", "lab"],
     [3, "16:00", "17:50", "AELL1000", "M3-1-014", "y1een", "G2", "lab"],
     [3, "16:00", "17:20", "AETL726", "M4-0-017", "m2ets", "all", "lec"],
-    [3, "16:00", "16:50", "AETL702", "M4-1-017", "m1ets", "all", "lec"],
+    [3, "16:00", "16:50", "AETL702", "M4-0-021", "m1ets", "all", "lec"],
     [3, "17:00", "18:50", "ACOL2015", "M3-0-004", "y2cse", "all", "lab"],
-    [3, "17:00", "17:50", "AMLL1001", "M4-0-019", "y2een", "all", "tut"],
     [3, "17:00", "17:50", "AETL701", "M4-0-021", "m1ets", "all", "lec"],
+    [3, "17:00", "17:50", "AMLL1001", "M4-1-011", "y2een", "all", "tut"],
     [3, "17:00", "17:50", "AHUL256", "M4-1-017", "y3cse", "G1", "tut"],
     [3, "17:00", "17:50", "AHUL256", "M4-1-017", "y3een", "G1", "tut"],
     [3, "17:30", "18:50", "AETL739", "M4-0-017", "m2ets", "all", "lec"],
     [3, "18:00", "19:20", "AETL712", "M4-0-021", "m1ets", "all", "lec"],
     [3, "19:30", "20:20", "AETL703", "M4-0-021", "m1ets", "all", "lec"],
+    [4, "08:00", "08:50", "ACML1002", "M4-0-005", "y1che", "all", "lec"],
     [4, "08:00", "08:50", "ACML1002", "M4-0-005", "y1cse", "all", "lec"],
-    [4, "08:00", "08:50", "ACML1002", "M4-0-011", "y1che", "all", "lec"],
+    [4, "08:00", "08:50", "(no code)", "M4-0-005", "y2een", "all", "lec"],
     [4, "08:00", "08:50", "ACHL1002", "M4-0-017", "y2che", "all", "lec"],
     [4, "08:00", "08:50", "ACOL1101", "M4-0-019", "y2cse", "all", "lec"],
     [4, "09:00", "09:50", "AENL226", "M2-2-007", "y3een", "all", "tut"],
@@ -385,13 +404,13 @@ const OCC = [
     [4, "15:00", "18:50", "ACMP1000", "M3-1-029", "y1een", "G2", "lab"],
     [4, "15:00", "18:50", "ACMP1000", "M3-1-029", "y1ele", "G2", "lab"],
     [4, "15:30", "17:20", "ACOL331", "M3-0-004", "y3cse", "all", "lab"],
-    [4, "15:30", "16:50", "AETL728", "M4-1-017", "m2ets", "all", "lec"],
+    [4, "15:30", "16:50", "AETL728", "M4-0-017", "m2ets", "all", "lec"],
     [4, "16:00", "17:50", "AENL228", "M2-2-031", "y3een", "G1", "lec"],
     [4, "16:00", "18:50", "AENP225", "M3-1-009", "y3een", "G2", "lab"],
     [4, "16:00", "17:50", "AELL1000", "M3-1-014", "y1che", "G1", "lab"],
     [4, "16:00", "17:50", "AELL1000", "M3-1-014", "y1een", "G1", "lab"],
     [4, "16:00", "17:50", "AELL1000", "M3-1-014", "y2cse", "all", "lab"],
-    [4, "16:00", "16:50", "AMTL2008", "M4-0-017", "y2che", "all", "lec"],
+    [4, "16:00", "16:50", "AMTL2008", "M4-0-019", "y2che", "all", "lec"],
     [4, "17:00", "18:20", "AETL714", "M4-0-021", "m1ets", "all", "lec"],
     [4, "18:00", "18:50", "AMLL1001", "M4-0-011", "y2cse", "all", "tut"],
     [5, "08:00", "11:50", "ACMP1000", "M3-1-029", "y1che", "G1 & G2", "lab"],

@@ -293,8 +293,12 @@ def main():
     # timetable.js ROOMS, rooms-data.js ROOM_NAMES and campus-tools-data.js
     # all name M4-0-019. In Sep 2026 all three said "Classroom 5" while the
     # sheet said "Classroom 3", because fixing one never touched the others.
+    # Match on the shape of the CODE, not of the name. The old pattern keyed on
+    # names starting "Classroom"/"Computer Lab"/"Lecture Hall"; when the office
+    # sent its own list and the names became "M4-Classroom5", the pattern
+    # matched nothing and the check passed by comparing zero rooms.
     for rel, pattern in (
-        ("data/rooms-data.js", r'"([^"]+)":\s*"((?:Classroom|Computer Lab|Lecture Hall)[^"]*)"'),
+        ("data/rooms-data.js", r'"(M\d[-.]\d[-.]\d{3})":\s*"([^"]+)"'),
     ):
         path = ROOT / rel
         if not path.exists():
@@ -303,11 +307,13 @@ def main():
             ours = rooms.get(code.replace(".", "-"))
             if ours is None:
                 continue
-            # ROOMS stores "M4-Classroom 3"; these files store "Classroom 3"
-            short = ours.split("-", 1)[1] if "-" in ours else ours
-            if short.split() != name.split():
+            # "M4-Classroom 3", "M4-Classroom3" and "Classroom 3" are one name
+            def fold(n):
+                return re.sub(r"\s+", "", re.sub(r"^M\d[-\s]+(?!\d)", "", n)).lower()
+
+            if fold(ours) != fold(name):
                 failures.append(
-                    f"     {code}: {rel} says '{name}', rooms.json says '{short}'"
+                    f"     {code}: {rel} says '{name}', rooms.json says '{ours}'"
                 )
 
     # --- room NAMES: a rename does not touch the room code ---
