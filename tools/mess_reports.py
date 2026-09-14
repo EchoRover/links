@@ -7,8 +7,8 @@ reports and the per-cell counts straight out of the store, so the question
 
 Needs the same two variables the endpoint uses:
 
-    export UPSTASH_REDIS_REST_URL=...
-    export UPSTASH_REDIS_REST_TOKEN=...
+    export KV_REST_API_URL=...      # or UPSTASH_REDIS_REST_URL
+    export KV_REST_API_TOKEN=...    # or UPSTASH_REDIS_REST_TOKEN
     python3 tools/mess_reports.py
 
     python3 tools/mess_reports.py --cell 1 lunch Monday    one cell's counts
@@ -20,8 +20,11 @@ import os
 import sys
 import urllib.request
 
-URL = os.environ.get("UPSTASH_REDIS_REST_URL")
-TOKEN = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+# Both namings, same as api/report.js. The endpoint learned this and this tool
+# did not, which is exactly how two halves of one feature drift apart.
+URL = os.environ.get("UPSTASH_REDIS_REST_URL") or os.environ.get("KV_REST_API_URL")
+TOKEN = (os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+         or os.environ.get("KV_REST_API_TOKEN"))
 
 
 def redis(*cmd):
@@ -35,8 +38,8 @@ def redis(*cmd):
 
 def main():
     if not URL or not TOKEN:
-        sys.exit("set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN "
-                 "(Vercel > project > Storage > .env.local)")
+        sys.exit("set KV_REST_API_URL and KV_REST_API_TOKEN (or the "
+                 "UPSTASH_REDIS_REST_* names) - Vercel > project > Storage")
     ap = argparse.ArgumentParser()
     ap.add_argument("--cell", nargs=3, metavar=("WEEK", "MEAL", "DAY"))
     ap.add_argument("--raw", type=int, default=40,
