@@ -40,6 +40,10 @@
     {
       "source": "/timetables",
       "destination": "/pages/timetables"
+    },
+    {
+      "source": "/mess-next",
+      "destination": "/pages/mess-next"
     }
   ]
 }

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Mess Menu (preview) — linkCS</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/webp" href="/assets/hacker.webp">
+    <script src="/js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* ============================================================
+           MESS MENU — PREVIEW. Unlisted. Scoped styles only.
+           The reasoning for each change is in js/mess-next.js.
+           ============================================================ */
+        .wrap { max-width: 1000px; margin: 0 auto; padding: 0 20px 56px; }
+
+        .lab { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+               margin: 18px 0 0; padding: 9px 14px; border-radius: 10px;
+               background: var(--coral-soft); border: 1px solid var(--coral);
+               font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg); }
+        .lab a { color: var(--coral); font-weight: 600; }
+
+        .title { font-family: var(--font-serif); font-style: italic; font-weight: 500;
+                 font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--fg);
+                 margin: 22px 0 0; }
+        .title em { color: var(--coral); }
+
+        /* The status badge. Three states, and the colour never carries the
+           meaning alone - the word does, and the dot only reinforces it. */
+        .status { display: inline-flex; align-items: center; gap: 10px;
+                  margin: 14px 0 20px; padding: 9px 16px; border-radius: 999px;
+                  font-family: var(--font-mono); font-size: 0.92rem;
+                  border: 1px solid transparent; }
+        .status-dot { width: 9px; height: 9px; border-radius: 50%;
+                      background: currentColor; flex: none; }
+        .status-text b { font-weight: 700; }
+        .status-sub { opacity: 0.75; }
+        .status--open { background: var(--cyan-soft); color: var(--cyan);
+                        border-color: var(--cyan); }
+        .status--soon { background: var(--amber-soft, rgba(180,119,15,0.14));
+                        color: var(--amber, #96650C); border-color: currentColor; }
+        .status--shut { background: var(--bg-card); color: var(--fg-soft);
+                        border-color: var(--rule); }
+
+        .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+        .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px;
+               overflow: hidden; background: var(--bg-card); width: fit-content; }
+        .seg button { font-family: var(--font-mono); font-size: 0.86rem; padding: 8px 18px;
+                      border: none; background: transparent; color: var(--fg-soft);
+                      cursor: pointer; }
+        .seg button.on { background: var(--coral); color: var(--bg-card); }
+
+        /* Fourteen days in one scrollable strip: both weeks, one decision,
+           one control. Today gets a dot so it stays separate from selection. */
+        .day-strip { display: flex; gap: 7px; overflow-x: auto; padding: 2px 0 8px;
+                     scroll-snap-type: x proximity; scrollbar-width: thin; }
+        .chip { scroll-snap-align: center; flex: 0 0 auto; cursor: pointer;
+                display: flex; flex-direction: column; align-items: center; gap: 1px;
+                min-width: 58px; padding: 8px 10px 6px; border-radius: 12px;
+                border: 1px solid var(--rule); background: var(--bg-card);
+                font-family: var(--font-mono); color: var(--fg-soft); }
+        .chip:hover { border-color: var(--coral); }
+        .chip-day { font-size: 0.86rem; }
+        .chip-wk { font-size: 0.64rem; opacity: 0.7; }
+        .chip.on { background: var(--coral); border-color: var(--coral);
+                   color: var(--bg-card); }
+        .chip.today::after { content: ""; width: 4px; height: 4px; border-radius: 50%;
+                             background: var(--coral); margin-top: 3px; }
+        .chip.today.on::after { background: var(--bg-card); }
+        .chip:focus-visible { outline: 2px solid var(--coral-bright); outline-offset: 2px; }
+
+        /* Mains: hierarchy by WEIGHT, not only size, so the mono label reads as
+           chrome and the dish reads as the thing being chosen. */
+        .mains { display: grid; grid-auto-flow: column;
+                 grid-auto-columns: minmax(0, 1fr); align-items: start;
+                 gap: 0 4px; margin-bottom: 34px; }
+        .main { padding: 2px 0 18px; }
+        .main-name { font-family: var(--font-mono); font-size: 0.74rem; font-weight: 500;
+                     text-transform: uppercase; letter-spacing: 0.1em;
+                     color: var(--fg-soft); margin: 0 0 10px; }
+        .main-items { list-style: none; margin: 0; padding: 0;
+                      display: flex; flex-direction: column; gap: 9px; }
+        .main-items li { font-size: 1.18rem; line-height: 1.32; color: var(--fg);
+                         font-weight: 600; }
+        /* Sits beside the FIRST dish of each column, not floating at the
+           vertical centre of two columns of unequal height. */
+        .or-gutter { align-self: start; font-family: var(--font-serif);
+                     font-style: italic; font-size: 0.95rem; color: var(--fg-soft);
+                     padding: 30px 14px 0; }
+
+        .rest-head { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600;
+                     text-transform: uppercase; letter-spacing: 0.11em;
+                     color: var(--fg-soft); margin: 0 0 14px; padding-top: 18px;
+                     border-top: 1px solid var(--rule); }
+        .sides { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+                 column-gap: 44px; row-gap: 2px; }
+        .side { display: grid; grid-template-columns: 158px 1fr; gap: 16px;
+                align-items: baseline; padding: 10px 0;
+                border-bottom: 1px solid var(--rule-faint); }
+        .side dt { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 500;
+                   letter-spacing: 0.05em; color: var(--fg-soft); line-height: 1.5; }
+        .side dd { margin: 0; font-size: 1.05rem; font-weight: 500; color: var(--fg);
+                   line-height: 1.4; }
+        .side dd i { font-style: normal; font-weight: 400; color: var(--fg-soft);
+                     padding: 0 3px; }
+
+        /* FSSAI marks. The non-veg one is a TRIANGLE on purpose - the shape is
+           what makes it readable without relying on the colour. */
+        .diet { display: inline-block; margin-right: 7px; vertical-align: 1px; }
+        .diet--veg { width: 10px; height: 10px; border: 1.5px solid #0E8A3E;
+                     background: #0E8A3E; }
+        .diet--nonveg { width: 0; height: 0; border-left: 5px solid transparent;
+                        border-right: 5px solid transparent;
+                        border-bottom: 10px solid #8A3E1A; }
+        .diet--egg { width: 10px; height: 10px; border-radius: 50%;
+                     border: 1.5px solid #B4770F; background: #F3C969; }
+
+        .empty { font-family: var(--font-mono); font-size: 0.9rem; color: var(--fg-soft);
+                 padding: 26px 0; }
+        .note { margin: 30px 0 0; padding-top: 14px; border-top: 1px solid var(--rule-faint);
+                font-size: 0.86rem; color: var(--fg-soft); line-height: 1.55;
+                max-width: 74ch; }
+        .note b { color: var(--fg); }
+        .note .bad { color: var(--red); font-family: var(--font-mono); }
+
+        @media (max-width: 800px) {
+            .mains { grid-auto-flow: row; grid-auto-columns: auto; }
+            .or-gutter { padding: 4px 0 12px; }
+        }
+        @media (max-width: 760px) { .sides { grid-template-columns: 1fr; } }
+        @media (max-width: 620px) {
+            .main-items li { font-size: 1.12rem; }
+            .side { grid-template-columns: 130px 1fr; gap: 12px; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrap">
+        <header class="topbar">
+            <div class="brand">
+                <a href="/" class="brand-logo" aria-label="linkCS home">
+                    <img src="/assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="/assets/circle.webp" class="circle-img" alt="">
+                </a>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">mess &middot; preview</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="/" class="pill"><span class="pill-name">&larr; Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">&#9686;</button>
+            </div>
+        </header>
+
+        <p class="lab">Preview &mdash; not linked from anywhere. Same data as
+            <a href="/pages/mess.html">the live page</a>, different presentation.</p>
+
+        <h1 class="title">Mess <em>menu</em></h1>
+        <div class="status" id="status"></div>
+
+        <div class="controls">
+            <div class="seg" id="seg-meal"></div>
+            <div class="day-strip" id="day-strip" role="tablist" aria-label="Day"></div>
+        </div>
+
+        <div id="body"></div>
+        <p class="note" id="note"></p>
+    </main>
+
+    <script src="/js/gen/mess.js" defer></script>
+    <script src="/js/mess-data.js" defer></script>
+    <script src="/js/mess-next.js" defer></script>
+</body>
+
+</html>
