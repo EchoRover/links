@@ -12,7 +12,7 @@
 // is a programme that is not running.
 //
 //   11 cohorts, 303 bookings, 20 rooms,
-//   2 double-booked room/hour(s).
+//   1 double-booked room/hour(s).
 //
 // Room NAMES are authoritative, and the names here are the academic
 // office's own, sent 14 Sep 2026. Where a sheet printed a code that
@@ -256,9 +256,7 @@ const OCC = [
     [2, "15:00", "16:20", "AMTL1001", "M4-0-005", "y1een", "G3 & G4", "lec"],
     [2, "15:00", "16:20", "AMTL1001", "M4-0-005", "y1ele", "G3 & G4", "lec"],
     [2, "15:00", "15:50", "ACHL1002", "M4-0-017", "y2che", "all", "tut"],
-    [2, "15:30", "16:50", "AHSL2062", "M4-0-005", "y2cse", "all", "lec"],
     [2, "15:30", "16:50", "AETL714", "M4-0-021", "m1ets", "all", "lec"],
-    [2, "15:30", "16:50", "AHSL2675", "M4-1-011", "y2cse", "all", "lec"],
     [2, "15:30", "16:20", "AHUL256", "M4-1-017", "y3cse", "G2", "tut"],
     [2, "15:30", "16:20", "AHUL256", "M4-1-017", "y3een", "G2", "tut"],
     [2, "16:00", "18:50", "AENP225", "M3-1-009", "y3een", "G1", "lab"],
@@ -323,9 +321,11 @@ const OCC = [
     [3, "14:00", "15:20", "ACOL2015", "M4-0-021", "y2cse", "all", "lec"],
     [3, "15:30", "18:20", "AENP200", "M3-1-009", "y3een", "G2", "lab"],
     [3, "15:30", "16:50", "AHSL2062", "M4-0-005", "y2che", "all", "lec"],
+    [3, "15:30", "16:50", "AHSL2062", "M4-0-005", "y2cse", "all", "lec"],
     [3, "15:30", "16:50", "AHSL2062", "M4-0-005", "y2een", "all", "lec"],
     [3, "15:30", "16:20", "ACOL351", "M4-0-011", "y3cse", "all", "tut"],
     [3, "15:30", "16:50", "AHSL2675", "M4-1-011", "y2che", "all", "lec"],
+    [3, "15:30", "16:50", "AHSL2675", "M4-1-011", "y2cse", "all", "lec"],
     [3, "15:30", "16:50", "AHSL2675", "M4-1-011", "y2een", "all", "lec"],
     [3, "16:00", "17:50", "ACOL1000", "M3-1-004", "y1che", "G3 & G4", "lab"],
     [3, "16:00", "17:50", "ACOL1000", "M3-1-004", "y1cse", "G3 & G4", "lab"],
