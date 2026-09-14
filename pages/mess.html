@@ -44,6 +44,18 @@
         .mess-now.open strong { color: var(--cyan); }
         .mess-now strong { color: var(--fg); font-weight: 600; }
 
+        /* Not a footnote. The sheet on the wall and the food on the counter
+           have been observed to differ on the same day, so the single most
+           useful thing this page can say is that it is a guide. It sits above
+           the menu because a caveat under it is read after the damage. */
+        .warn-banner { margin: 16px 0 20px; padding: 13px 16px;
+                       border-radius: 10px; border: 1px solid var(--red);
+                       background: var(--red-soft);
+                       font-size: 0.98rem; line-height: 1.45; color: var(--fg);
+                       max-width: 74ch; }
+        .warn-banner b { display: block; font-size: 1.06rem; font-weight: 700;
+                         color: var(--red); margin-bottom: 3px; }
+
         .mess-controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
                          margin: 16px 0 6px; }
         .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px;
@@ -193,6 +205,12 @@
             </div>
             <div class="mess-now" id="mess-now"><span class="dot"></span><span id="mess-now-text">&hellip;</span></div>
         </div>
+
+        <p class="warn-banner">
+            <b>This is the printed menu, not what is actually cooked.</b>
+            The mess changes dishes without notice and often does &mdash; check
+            the counter before you count on anything here.
+        </p>
 
         <div class="mess-controls">
             <div class="seg-group">
