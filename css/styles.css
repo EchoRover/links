@@ -330,6 +330,11 @@ a:focus-visible, button:focus-visible {
 .brand-logo .text-img { height: 56px; width: auto; display: block; }
 .brand-logo .circle-img { height: 56px; width: auto; display: block; }
 [data-theme="dark"] .brand-logo .text-img { filter: invert(1); }
+/* The mark is an <a> on every page except the home page it points at. It
+   must not pick up link colour or an underline - it is an image, and looking
+   like body copy that happens to be blue would be worse than not linking. */
+a.brand-logo { text-decoration: none; color: inherit; border-radius: 6px; }
+a.brand-logo:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; }
 
 .brand-name {
     display: inline-flex;

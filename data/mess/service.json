@@ -1,0 +1,37 @@
+{
+  "_note": "When the mess serves, as told to us on 14 Sep 2026. Breakfast runs half an hour later on Saturday and Sunday; nothing else changes at the weekend. The menu itself is in menu.json and is a two-week rotation. If these times are ever posted somewhere official, replace this file and say where it came from.",
+  "source": "told to Evan, 14 September 2026",
+  "meals": [
+    {
+      "meal": "breakfast",
+      "label": "Breakfast",
+      "start": "07:00",
+      "end": "09:00",
+      "weekend": {
+        "start": "07:00",
+        "end": "09:30"
+      }
+    },
+    {
+      "meal": "lunch",
+      "label": "Lunch",
+      "start": "12:00",
+      "end": "15:00"
+    },
+    {
+      "meal": "dinner",
+      "label": "Dinner",
+      "start": "19:00",
+      "end": "21:00"
+    }
+  ],
+  "weekend_days": [
+    "Saturday",
+    "Sunday"
+  ],
+  "cycle": {
+    "_note": "The menu alternates Week-1 / Week-2. Confirmed on the ground: the week beginning Monday 14 September 2026 is Week-1. Everything after that follows on its own - count whole weeks from the anchor, even means Week-1 and odd means Week-2 - so this needs changing only if the mess restarts the cycle out of step.",
+    "anchor_monday": "2026-09-14",
+    "anchor_week": 1
+  }
+}

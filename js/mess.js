@@ -1,0 +1,181 @@
+// ============================================================
+// MESS PAGE — rendering.
+//
+// The menu, the serving windows and every time calculation live in
+// js/mess-data.js. Nothing below decides WHAT is served or WHEN; it
+// only decides how that is drawn.
+// ============================================================
+
+const MEAL_ORDER = ["breakfast", "lunch", "dinner"];
+const DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                   "Saturday", "Sunday"];
+const DAY_SHORT = { Monday: "Mon", Tuesday: "Tue", Wednesday: "Wed",
+                    Thursday: "Thu", Friday: "Fri", Saturday: "Sat",
+                    Sunday: "Sun" };
+
+// What the controls are currently showing. Set once from the clock, then only
+// by the user - a re-render on the minute must never yank the view back to
+// today while someone is reading Thursday.
+let view = { meal: null, day: null, week: null };
+
+function t12(hhmm) {
+    const [h, m] = hhmm.split(":").map(Number);
+    const ampm = h < 12 ? "AM" : "PM";
+    const hr = h % 12 === 0 ? 12 : h % 12;
+    return `${hr}:${String(m).padStart(2, "0")} ${ampm}`;
+}
+
+function human(mins) {
+    if (mins < 60) return `${mins} min`;
+    const h = Math.floor(mins / 60), m = mins % 60;
+    return m ? `${h} hr ${m} min` : `${h} hr`;
+}
+
+function esc(s) {
+    return String(s).replace(/[&<>"]/g, c =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// ---------- the live line ----------
+
+function renderStatus(now) {
+    const s = messStatus(now);
+    const el = document.getElementById("mess-now");
+    const text = document.getElementById("mess-now-text");
+    el.classList.toggle("open", !!s.now);
+    if (s.now) {
+        text.innerHTML = `<strong>${esc(s.now.label)}</strong> now &middot; ` +
+            `until ${t12(s.now.end)} (${human(s.untilEnd)})`;
+    } else {
+        const when = s.tomorrow ? "tomorrow" : "today";
+        text.innerHTML = `<strong>${esc(s.next.label)}</strong> ${when} at ` +
+            `${t12(s.next.start)} &middot; in ${human(s.untilNext)}`;
+    }
+    document.getElementById("mess-sub").textContent =
+        `Week ${s.week} of the rotation. ${s.day}.`;
+    return s;
+}
+
+// ---------- controls ----------
+
+function seg(id, options, current, onPick) {
+    const host = document.getElementById(id);
+    host.innerHTML = "";
+    for (const o of options) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = o.label;
+        b.className = o.value === current ? "on" : "";
+        b.addEventListener("click", () => { onPick(o.value); draw(); });
+        host.appendChild(b);
+    }
+}
+
+function renderControls() {
+    seg("seg-meal", MEAL_ORDER.map(m => ({
+        value: m, label: MESS.service.meals.find(x => x.meal === m).label
+    })), view.meal, v => { view.meal = v; });
+    seg("seg-day", DAY_ORDER.map(d => ({ value: d, label: DAY_SHORT[d] })),
+        view.day, v => { view.day = v; });
+    seg("seg-week", [{ value: 1, label: "Week 1" }, { value: 2, label: "Week 2" }],
+        view.week, v => { view.week = v; });
+}
+
+// ---------- the menu itself ----------
+
+function renderMenu() {
+    const body = document.getElementById("mess-body");
+    const courses = messMenu(view.week, view.meal, view.day);
+    const win = messWindow(view.meal, view.day);
+
+    document.getElementById("mess-window").textContent =
+        win ? `${win.label} &middot; ${t12(win.start)} – ${t12(win.end)}`
+                  .replace("&middot;", "·")
+            : "";
+
+    if (!courses.length) {
+        body.innerHTML = `<p class="mess-empty">No menu recorded for week ` +
+            `${view.week}, ${esc(view.meal)}, ${esc(view.day)}.</p>`;
+        return;
+    }
+
+    body.innerHTML = courses.map(c => {
+        const choice = /choose/i.test(c.rule || "") && c.items.length > 1;
+        const items = c.items.map(i => `<div class="item">${esc(i)}</div>`).join("");
+        const rule = choice ? `<span class="course-rule">choose one</span>` : "";
+        return `<div class="course">
+            <div class="course-name">${esc(c.course)}${rule}</div>
+            <div class="items${choice ? " choice" : ""}">${items}</div>
+        </div>`;
+    }).join("");
+}
+
+// Only speaks when the view has been moved off today, so the line is silent in
+// the common case and load-bearing when it appears. Browsing a different MEAL
+// of today is not browsing a different day, and saying "not today" for it was
+// simply false.
+function renderViewing(live) {
+    const el = document.getElementById("mess-viewing");
+    const today = view.day === live.day && view.week === live.week;
+    el.innerHTML = today ? "" :
+        `Showing <b>week ${view.week}, ${esc(view.day)}</b> — not today.`;
+}
+
+// One line, and only when the menu is whole. A page that is missing two of its
+// six sheets should say so; a page that has all six has nothing to explain, so
+// it just states what it is and when it was read.
+function renderNote() {
+    const el = document.getElementById("mess-note");
+    const gaps = MESS.menu.incomplete;
+    if (gaps && gaps.length) {
+        el.textContent = `Incomplete — still missing ${gaps.join(", ")}.`;
+        el.style.color = "var(--red)";
+        return;
+    }
+    el.style.color = "";
+    el.textContent = `Beta — read off photographs of the sheets on the mess ` +
+        `wall, ${MESS.menu.posted_on}, so it may be wrong or out of date. ` +
+        `The wall wins.`;
+}
+
+function draw() {
+    const now = new Date();
+    const live = renderStatus(now);
+    renderControls();
+    renderMenu();
+    renderViewing(live);
+    renderNote();
+}
+
+function start() {
+    if (typeof MESS === "undefined") return;
+    const now = new Date();
+    const live = messStatus(now);
+    // open on what someone walking to the mess wants: the meal being served,
+    // or the next one if nothing is
+    view = {
+        meal: live.now ? live.now.meal : live.next.meal,
+        day: live.tomorrow
+            ? DAY_ORDER[(DAY_ORDER.indexOf(live.day) + 1) % 7]
+            : live.day,
+        week: live.week
+    };
+    draw();
+    setInterval(draw, 30000);
+}
+
+document.addEventListener("DOMContentLoaded", start);
+
+// The same eight lines sit in scripts.js, bus.js and building.js. Repeated
+// rather than shared because each page loads exactly one of those and there is
+// no shared bundle; if a fifth copy ever appears, that is the signal to pull
+// them all into one file.
+const toggleBtn = document.getElementById("theme-toggle");
+if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+        const theme = document.documentElement.getAttribute("data-theme");
+        const newTheme = theme === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+    });
+}

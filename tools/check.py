@@ -21,6 +21,9 @@ without it:
   routing     /bus, /week and /rooms all 404'd in production while every
               local check passed, because rewrites are Vercel behaviour that
               nothing in this repo can see.
+  mess        the menu is transcribed off photographs of six wall sheets, so
+              a dish can land under the wrong course or a day can go missing
+              with nothing to show for it. Checks the shape the sheets have.
 """
 import hashlib
 import pathlib
@@ -105,6 +108,7 @@ def main():
     local_only = "--local" in sys.argv
     results = [
         run("data", ["check_data.py"]),
+        run("mess", ["check_mess.py"]),
         run("links", ["check_links.py"]),
         run("timetable", ["check_timetable.py"]),
     ]
