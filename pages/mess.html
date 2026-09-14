@@ -47,7 +47,7 @@
         .mess-controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
                          margin: 16px 0 6px; }
         .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px;
-               overflow: hidden; background: var(--bg-card); }
+               overflow: hidden; background: var(--bg-card); min-width: 0; }
         .seg button { font-family: var(--font-mono); font-size: 0.86rem; padding: 8px 16px;
                       border: none; background: transparent; color: var(--fg-soft); cursor: pointer; }
         .seg button.on { background: var(--coral); color: var(--bg-card); }
@@ -56,7 +56,7 @@
                      letter-spacing: 0.09em; color: var(--fg-soft); }
         /* label and buttons wrap as one unit - at a narrower width the label
            was stranding itself on the line above its own control */
-        .seg-group { display: inline-flex; align-items: center; gap: 9px; }
+        .seg-group { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
 
         /* Says what the current view is showing whenever it is NOT today's
            actual meal, so a browsed day can never be mistaken for the live one. */
@@ -141,6 +141,18 @@
 
         .mess-note { margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--rule-faint);
                      font-family: var(--font-mono); font-size: 0.82rem; color: var(--fg-soft); }
+
+        /* Seven day buttons will not fit a phone at desktop padding, and .seg
+           clips overflow, so they were being cut off rather than wrapping.
+           Each control takes the full width and its buttons share it evenly -
+           the day row stays one tap target per day at any size. */
+        @media (max-width: 700px) {
+            .mess-controls { gap: 10px; }
+            .seg-group { width: 100%; }
+            .seg { flex: 1; }
+            .seg button { flex: 1; padding: 9px 4px; font-size: 0.82rem;
+                          text-align: center; }
+        }
 
         @media (max-width: 620px) {
             .main-items li { font-size: 1.12rem; }
