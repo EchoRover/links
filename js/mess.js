@@ -83,15 +83,23 @@ function renderControls() {
 
 // ---------- the menu itself ----------
 
+// The courses people actually choose between, per meal. Everything else is
+// what comes with it. The printed sheet gives all fifteen rows the same green
+// block, which is why it is a wall of text - the pickle gets the same weight as
+// the main. Two tiers instead: what you decide on, then what arrives anyway.
+const MAINS = {
+    breakfast: ["MAIN BREAKFAST DISH", "EGG PREPARATION"],
+    lunch: ["SPECIAL DISH", "NON VEG PROTEIN", "VEG DISH"],
+    dinner: ["SPECIAL DISH", "NON VEG PROTEIN", "VEG DISH"]
+};
+
 function renderMenu() {
     const body = document.getElementById("mess-body");
     const courses = messMenu(view.week, view.meal, view.day);
     const win = messWindow(view.meal, view.day);
 
     document.getElementById("mess-window").textContent =
-        win ? `${win.label} &middot; ${t12(win.start)} – ${t12(win.end)}`
-                  .replace("&middot;", "·")
-            : "";
+        win ? `${win.label} · ${t12(win.start)} – ${t12(win.end)}` : "";
 
     if (!courses.length) {
         body.innerHTML = `<p class="mess-empty">No menu recorded for week ` +
@@ -99,15 +107,31 @@ function renderMenu() {
         return;
     }
 
-    body.innerHTML = courses.map(c => {
-        const choice = /choose/i.test(c.rule || "") && c.items.length > 1;
-        const items = c.items.map(i => `<div class="item">${esc(i)}</div>`).join("");
-        const rule = choice ? `<span class="course-rule">choose one</span>` : "";
-        return `<div class="course">
-            <div class="course-name">${esc(c.course)}${rule}</div>
-            <div class="items${choice ? " choice" : ""}">${items}</div>
-        </div>`;
+    const lead = MAINS[view.meal] || [];
+    const mains = lead.map(n => courses.find(c => c.course === n)).filter(Boolean);
+    const rest = courses.filter(c => !mains.includes(c));
+
+    const mainHTML = mains.map(c => {
+        const many = c.items.length > 1;
+        return `<article class="main">
+            <h2 class="main-name">${esc(c.course.toLowerCase())}${
+                many ? `<span class="main-pick">pick one</span>` : ""}</h2>
+            <ul class="main-items">${c.items.map(i =>
+                `<li>${esc(i)}</li>`).join("")}</ul>
+        </article>`;
     }).join("");
+
+    // The rest is reference, not a decision, so it is set as tight label/value
+    // pairs that can be skimmed down rather than read across.
+    const restHTML = rest.map(c => `<div class="side">
+        <dt>${esc(c.course.toLowerCase())}</dt>
+        <dd>${c.items.map(esc).join(" <i>or</i> ")}</dd>
+    </div>`).join("");
+
+    body.innerHTML =
+        (mainHTML ? `<div class="mains">${mainHTML}</div>` : "") +
+        (restHTML ? `<h3 class="rest-head">and with it</h3>
+                     <dl class="sides">${restHTML}</dl>` : "");
 }
 
 // Only speaks when the view has been moved off today, so the line is silent in
