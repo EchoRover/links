@@ -41,10 +41,15 @@ const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TO
 const MEALS = ["breakfast", "lunch", "dinner"];
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
               "Saturday", "Sunday"];
-// one browser, one flag per dish per day - this is a nudge against a bored
-// thumb, not a security control. Anonymous means it is gameable and the
-// numbers should be read as "several people said so", never as a count.
-const COOLDOWN = 60 * 60 * 12;
+// One flag per dish per hour. A nudge against a bored thumb, not a security
+// control - anonymous means gameable, and the counts should read as "several
+// people said so", never as a number.
+//
+// An hour rather than a day for two reasons. It is long enough to cover one
+// meal sitting, which is all the double-tapping it needs to stop. And the key
+// it writes contains the reporter's IP, so the shorter it lives the less true
+// it is that this page keeps anything about who tapped.
+const COOLDOWN = 60 * 60;
 const MAX_LEN = 120;
 
 async function redis(...cmd) {
