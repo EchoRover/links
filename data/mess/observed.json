@@ -1,0 +1,19 @@
+{
+ "_note": "What actually turned up, against what the sheet said. One lunch is not a measurement - the page currently says only that the sheet is a plan, and it will keep saying only that until there are enough of these to say something sharper. Append with tools/log_mess.py; it scores each observation against the menu and prints the running rate.",
+ "observations": [
+  {
+   "date": "2026-09-14",
+   "day": "Monday",
+   "week": 1,
+   "meal": "lunch",
+   "seen": [
+    "vada pav"
+   ],
+   "matched": [],
+   "missed": [
+    "vada pav"
+   ],
+   "special": "Ganesh Chaturthi - festival menu"
+  }
+ ]
+}

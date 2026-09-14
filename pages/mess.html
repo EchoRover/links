@@ -153,6 +153,54 @@
         .mess-report b { color: var(--fg); font-weight: 600; }
         .report-link { color: var(--coral); font-weight: 600; }
 
+        /* ---- trial reporting ---- */
+        /* Always visible, never hover-only: this is opened on a phone, and a
+           control that needs a mouse to appear does not exist there. Quiet
+           enough that eleven of them down a page do not shout. */
+        .flag { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.04em;
+                margin-left: 8px; padding: 1px 7px; border-radius: 999px;
+                border: 1px solid var(--rule); background: transparent;
+                color: var(--fg-faint); cursor: pointer; vertical-align: 2px;
+                white-space: nowrap; }
+        .flag:hover { border-color: var(--red); color: var(--red); }
+        .flag.done { border-color: var(--rule-faint); color: var(--fg-faint);
+                     cursor: default; opacity: 0.7; }
+        .flag:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+        .instead { display: flex; gap: 6px; margin: 7px 0 2px; max-width: 380px; }
+        .instead input { flex: 1; min-width: 0; font: inherit; font-size: 0.9rem;
+                         padding: 6px 10px; border-radius: 8px;
+                         border: 1px solid var(--rule); background: var(--bg-card);
+                         color: var(--fg); }
+        .instead button { font-family: var(--font-mono); font-size: 0.78rem;
+                          padding: 6px 12px; border-radius: 8px; cursor: pointer;
+                          border: 1px solid var(--coral); background: var(--coral);
+                          color: var(--bg-card); }
+
+        .trial { margin: 30px 0 0; padding: 16px 18px; border-radius: 12px;
+                 border: 1px solid var(--coral); background: var(--coral-soft);
+                 max-width: 70ch; }
+        .trial h3 { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600;
+                    text-transform: uppercase; letter-spacing: 0.1em;
+                    color: var(--coral); margin: 0 0 8px; }
+        .trial p { margin: 0 0 10px; font-size: 0.92rem; line-height: 1.5;
+                   color: var(--fg-soft); }
+        .trial b { color: var(--fg); }
+        .trial-acts { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 10px; }
+        .trial-btn { font-family: var(--font-mono); font-size: 0.82rem;
+                     padding: 8px 14px; border-radius: 999px; cursor: pointer;
+                     border: 1px solid var(--rule); background: var(--bg-card);
+                     color: var(--fg); }
+        .trial-btn:hover:not(:disabled) { border-color: var(--coral); }
+        .trial-btn.warn:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+        .trial-btn:disabled { opacity: 0.6; cursor: default; }
+        .trial-say { min-height: 1.2em; font-family: var(--font-mono);
+                     font-size: 0.8rem; color: var(--cyan); }
+        .trial-say.bad { color: var(--red); }
+        .trial-why { font-size: 0.84rem !important; }
+        .trial-over { margin: 26px 0 0; font-family: var(--font-mono);
+                      font-size: 0.82rem; color: var(--fg-soft); }
+
         .mess-note { margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--rule-faint);
                      font-family: var(--font-mono); font-size: 0.82rem; color: var(--fg-soft); }
 
@@ -209,8 +257,7 @@
 
         <p class="warn-banner">
             <b>The mess has not read this menu.</b>
-            Some of it turns up, some of it doesn&rsquo;t. This is the plan,
-            not the food.
+            Treat it as the plan, not the food.
         </p>
 
         <div class="mess-controls">

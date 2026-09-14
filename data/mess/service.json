@@ -37,5 +37,10 @@
   "report": {
     "_note": "Who to tell when a dish is wrong. Deliberately a name and not a link: anyone in the mess who would bother reporting it already knows how to reach him, and a phone number on a public page is a different decision.",
     "who": "Evan"
+  },
+  "trial": {
+    "_note": "A bounded window where reporting is the POINT, not a complaint box. Framing it as a trial is what gets people to tap - nobody files a bug against a menu, but plenty of people will help test one. When `until` passes the page stops asking and says the trial is over; read the results with tools/mess_reports.py.",
+    "until": "2026-09-28",
+    "started": "2026-09-14"
   }
 }

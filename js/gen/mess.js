@@ -2398,6 +2398,10 @@ window.MESS = {
   },
   "report": {
    "who": "Evan"
+  },
+  "trial": {
+   "until": "2026-09-28",
+   "started": "2026-09-14"
   }
  }
 };
