@@ -13,3 +13,9 @@ Thumbs.db
 
 # generated deliverable, rebuilt by tools/room_schedule.py
 data/schedules/room-wise-schedule.xlsx
+
+# credentials - the Upstash tokens live only in Vercel's env, never here
+.env
+.env.*
+*.env
+.vercel
