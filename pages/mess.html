@@ -51,8 +51,7 @@
         .warn-banner { margin: 16px 0 20px; padding: 13px 16px;
                        border-radius: 10px; border: 1px solid var(--red);
                        background: var(--red-soft);
-                       font-size: 0.98rem; line-height: 1.45; color: var(--fg);
-                       max-width: 74ch; }
+                       font-size: 0.98rem; line-height: 1.45; color: var(--fg); }
         .warn-banner b { display: block; font-size: 1.06rem; font-weight: 700;
                          color: var(--red); margin-bottom: 3px; }
         .warn-banner b em { font-style: italic; }
@@ -177,9 +176,13 @@
                           border: 1px solid var(--coral); background: var(--coral);
                           color: var(--bg-card); }
 
+        /* A bordered box spans the content; a plain paragraph keeps a readable
+           measure. Mixing the two rules is what made the page look ragged on a
+           wide screen - the warning box and this one both have edges, and
+           edges that stop in different places read as a mistake. */
         .trial { margin: 30px 0 0; padding: 16px 18px; border-radius: 12px;
-                 border: 1px solid var(--coral); background: var(--coral-soft);
-                 max-width: 70ch; }
+                 border: 1px solid var(--coral); background: var(--coral-soft); }
+        .trial p { max-width: 74ch; }
         .trial h3 { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600;
                     text-transform: uppercase; letter-spacing: 0.1em;
                     color: var(--coral); margin: 0 0 8px; }
