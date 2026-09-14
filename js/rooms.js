@@ -81,10 +81,17 @@ function badges(who) {
 // same hour. That is not something to smooth over on a page whose whole job is
 // "where can I sit": the slot is marked, and the room is never counted free
 // just because the two entries disagree.
+// A block the sheet never named cannot be shown to be a DIFFERENT course from
+// the one beside it, so it is not a clash. Year 2 EEN Thursday 08:00 is an
+// unnamed "General Engineering option" in the Lecture Hall at the same hour as
+// Year 1's second ACML1002 lecture, which is almost certainly what it is.
+const UNNAMED = "(no code)";
 const CLASHING = new Set();
 for (const a of SLOTS) {
+    if (a.code === UNNAMED) continue;
     for (const b of SLOTS) {
         if (a === b || a.room !== b.room || a.day !== b.day) continue;
+        if (b.code === UNNAMED) continue;
         if (a.code !== b.code && a.from < b.to && b.from < a.to) CLASHING.add(a);
     }
 }
