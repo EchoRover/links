@@ -139,23 +139,26 @@
         .mess-empty { font-family: var(--font-mono); font-size: 0.9rem; color: var(--fg-soft);
                       padding: 26px 0; }
 
-        /* The ask sits after the food, not before it - someone opening this
-           page wants lunch, not a form. */
-        .mess-report { margin: 34px 0 0; padding-top: 18px;
-                       border-top: 1px solid var(--rule); max-width: 62ch; }
-        .report-head { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600;
-                       text-transform: uppercase; letter-spacing: 0.1em;
-                       color: var(--fg); margin: 0 0 8px; }
-        .mess-report p { margin: 0 0 8px; font-size: 0.9rem; line-height: 1.5;
-                         color: var(--fg-soft); }
-        .mess-report p:last-child { margin-bottom: 0; }
-        .mess-report b { color: var(--fg); font-weight: 600; }
-        .report-link { color: var(--coral); font-weight: 600; }
-
         /* ---- trial reporting ---- */
-        /* Always visible, never hover-only: this is opened on a phone, and a
-           control that needs a mouse to appear does not exist there. Quiet
-           enough that eleven of them down a page do not shout. */
+        /* The dish name IS the control. It has to look like the text it
+           replaced, not like a button - so no border, no background, inherited
+           type, and only the underline on hover/focus admits it is tappable.
+           The revealed button follows the name inline, after its last line, so
+           a two-line dish still wraps the way a plain <li> did. */
+        .dish { display: inline; }
+        .dish-name { font: inherit; color: inherit; text-align: left;
+                     padding: 0; margin: 0; border: none; background: none;
+                     cursor: pointer; }
+        .dish-name:hover { text-decoration: underline;
+                           text-decoration-color: var(--fg-faint);
+                           text-underline-offset: 3px; }
+        .dish-name:focus-visible { outline: 2px solid var(--coral);
+                                   outline-offset: 2px; border-radius: 3px; }
+        .main-items .dish { display: block; }
+        .main-items .dish-name { display: inline-block; max-width: 100%; }
+
+        /* Revealed by tapping the dish, not by hover - this is opened on a
+           phone, where a control that needs a mouse to appear does not exist. */
         .flag { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.04em;
                 margin-left: 8px; padding: 1px 7px; border-radius: 999px;
                 border: 1px solid var(--rule); background: transparent;
@@ -165,6 +168,9 @@
         .flag.done { border-color: var(--rule-faint); color: var(--fg-faint);
                      cursor: default; opacity: 0.7; }
         .flag:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+        .main-items .flag { display: inline-block; margin: 5px 0 0; vertical-align: 0; }
+        /* after the display rule above, or it loses to it and hidden shows */
+        .flag[hidden] { display: none; }
 
         .instead { display: flex; gap: 6px; margin: 7px 0 2px; max-width: 380px; }
         .instead input { flex: 1; min-width: 0; font: inherit; font-size: 0.9rem;
@@ -197,7 +203,11 @@
         .trial-btn:hover:not(:disabled) { border-color: var(--coral); }
         .trial-btn.warn:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
         .trial-btn:disabled { opacity: 0.6; cursor: default; }
-        .trial-say { min-height: 1.2em; font-family: var(--font-mono);
+        /* Reserves its line so a reply does not shove the box taller, but it
+           is the last thing in the box now that the festivals note is gone -
+           its paragraph margin was just dead space under the buttons. */
+        .trial-say { min-height: 1.2em; margin-bottom: 0 !important;
+                     font-family: var(--font-mono);
                      font-size: 0.8rem; color: var(--cyan); }
         .trial-say.bad { color: var(--red); }
         .trial-why { font-size: 0.84rem !important; }
@@ -282,8 +292,6 @@
         <p class="mess-window" id="mess-window"></p>
 
         <div id="mess-body"></div>
-
-        <section class="mess-report" id="mess-report"></section>
 
         <p class="mess-note" id="mess-note"></p>
 

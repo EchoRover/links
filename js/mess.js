@@ -93,6 +93,12 @@ const MAINS = {
     dinner: ["SPECIAL DISH", "NON VEG PROTEIN", "VEG DISH"]
 };
 
+// The 30-second tick re-runs draw(), and a blind re-render would close every
+// revealed "not this" and wipe a half-typed "what was there instead" box. The
+// menu only depends on these four things, so when none of them moved there is
+// nothing to redraw.
+let drawnKey = null;
+
 function renderMenu() {
     const body = document.getElementById("mess-body");
     const courses = messMenu(view.week, view.meal, view.day);
@@ -100,6 +106,10 @@ function renderMenu() {
 
     document.getElementById("mess-window").textContent =
         win ? `${win.label} · ${t12(win.start)} – ${t12(win.end)}` : "";
+
+    const key = [view.week, view.meal, view.day, trialOpen()].join("|");
+    if (key === drawnKey) return;
+    drawnKey = key;
 
     if (!courses.length) {
         body.innerHTML = `<p class="mess-empty">No menu recorded for week ` +
@@ -117,7 +127,7 @@ function renderMenu() {
             <h2 class="main-name">${esc(c.course)}${
                 many ? `<span class="main-pick">pick one</span>` : ""}</h2>
             <ul class="main-items">${c.items.map(i =>
-                `<li>${esc(i)}${flagHTML(c.course, i)}</li>`).join("")}</ul>
+                `<li>${dishHTML(c.course, i)}</li>`).join("")}</ul>
         </article>`;
     }).join("");
 
@@ -125,7 +135,7 @@ function renderMenu() {
     // pairs that can be skimmed down rather than read across.
     const restHTML = rest.map(c => `<div class="side">
         <dt>${esc(c.course)}</dt>
-        <dd>${c.items.map(i => esc(i) + flagHTML(c.course, i))
+        <dd>${c.items.map(i => dishHTML(c.course, i))
                      .join(" <i>or</i> ")}</dd>
     </div>`).join("");
 
@@ -136,13 +146,27 @@ function renderMenu() {
         trialHTML();
 }
 
-// One tap per dish. Deliberately always visible rather than revealed on
-// hover - most people open this on a phone, where there is no hover.
-function flagHTML(course, dish) {
-    if (!trialOpen()) return "";
-    const id = cellId(dish);
-    const done = sentSet().has(id);
+// Every dish carried its own "not this" button, always on screen. Fifteen of
+// them down a page is a column of controls with the food threaded through it,
+// and the thing the page exists to show competes with a thing almost nobody
+// taps. So the dish itself is the control: tap the name, the button appears
+// under it. One tap to reach it, none to ignore it. Not hover - this is opened
+// on a phone, where hover does not exist.
+//
+// Already-reported dishes come back expanded, because "you already told us"
+// is worth saying without being asked.
+function dishHTML(course, dish) {
+    if (!trialOpen()) return esc(dish);
+    const done = sentSet().has(cellId(dish));
+    return `<span class="dish">` +
+        `<button type="button" class="dish-name" aria-expanded="${done}" ` +
+        `title="Not what was served? Tap.">${esc(dish)}</button>` +
+        flagHTML(course, dish, done) + `</span>`;
+}
+
+function flagHTML(course, dish, done) {
     return `<button type="button" class="flag${done ? " done" : ""}" ` +
+        `${done ? "" : "hidden "}` +
         `data-dish="${esc(dish)}" data-course="${esc(course)}" ` +
         `aria-label="${done ? "Already reported" : "Report: this was not served"}" ` +
         `title="${done ? "You reported this" : "Not what was served?"}">` +
@@ -159,7 +183,7 @@ function trialHTML() {
     return `<section class="trial">
         <h3>Two-week trial &mdash; help check this</h3>
         <p>Nobody knows how closely the mess follows the printed sheet. Tap
-           <b>not this</b> beside anything that was not served, and say what
+           any dish that was not served, then <b>not this</b>, and say what
            turned up instead if you can be bothered. Anonymous, no account,
            nothing else asked. Running until ${esc(TRIAL.until)}.</p>
         <div class="trial-acts">
@@ -172,9 +196,6 @@ function trialHTML() {
                            : "Whole meal was different"}</button>
         </div>
         <p class="trial-say" id="trial-say"></p>
-        <p class="trial-why">Festival days and one-offs go under &ldquo;whole meal
-           was different&rdquo; &mdash; that keeps one special day from reading as
-           fourteen separate mistakes in the menu.</p>
     </section>`;
 }
 
@@ -189,37 +210,22 @@ function renderViewing(live) {
         `Showing <b>week ${view.week}, ${esc(view.day)}</b> — not today.`;
 }
 
-// One line, and only when the menu is whole. A page that is missing two of its
-// six sheets should say so; a page that has all six has nothing to explain, so
-// it just states what it is and when it was read.
-// A menu read off a photograph of a wall WILL be wrong sometimes, and the only
-// way that gets fixed is someone standing in the mess noticing. So the ask is
-// on the page rather than in a README nobody opens, and it sits after the food
-// rather than before it.
-function renderReport() {
-    const el = document.getElementById("mess-report");
-    const r = MESS.service.report || {};
-    const who = esc(r.who || "whoever runs this");
-    el.innerHTML = `
-        <h3 class="report-head">Found a mistake?</h3>
-        <p>Tell <b>${who}</b>. The menu is read off photographs of the sheets
-           on the mess wall, so a dish can be wrong, a week can be out of step,
-           or the mess can simply change what it is cooking. Nothing here is
-           checked against the counter.</p>`;
-}
-
+// Only speaks when there is a real gap. The standing "read off photographs of
+// the wall" line is gone: the banner at the top already says the mess has not
+// read this menu, and a second hedge at the bottom was the same admission in
+// smaller type. A whole menu says nothing; a menu missing two of its six
+// sheets still has to say so.
 function renderNote() {
     const el = document.getElementById("mess-note");
     const gaps = MESS.menu.incomplete;
     if (gaps && gaps.length) {
         el.textContent = `Incomplete — still missing ${gaps.join(", ")}.`;
         el.style.color = "var(--red)";
+        el.hidden = false;
         return;
     }
-    el.style.color = "";
-    el.textContent = `Beta — read off photographs of the sheets on the mess ` +
-        `wall, ${MESS.menu.posted_on}, so it may be wrong or out of date. ` +
-        `The wall wins.`;
+    el.textContent = "";
+    el.hidden = true;
 }
 
 function draw() {
@@ -229,7 +235,6 @@ function draw() {
     renderMenu();
     renderViewing(live);
     renderNote();
-    renderReport();
 }
 
 function start() {
@@ -373,6 +378,15 @@ function askInstead(li, course, dish) {
 }
 
 document.addEventListener("click", e => {
+    const name = e.target.closest(".dish-name");
+    if (name) {
+        const flag = name.parentElement.querySelector(".flag");
+        if (flag) {
+            flag.hidden = !flag.hidden;
+            name.setAttribute("aria-expanded", String(!flag.hidden));
+        }
+        return;
+    }
     const flag = e.target.closest(".flag");
     if (flag && !flag.classList.contains("done")) {
         const { dish, course } = flag.dataset;
