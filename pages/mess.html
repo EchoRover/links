@@ -35,9 +35,21 @@
 
         /* The status line is the reason to open the page: it answers "can I eat
            right now" before anything has to be read or tapped. */
-        .mess-now { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono);
-                    font-size: 0.92rem; color: var(--fg-soft); white-space: nowrap; }
-        .mess-now .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--fg-faint); }
+        /* It was nowrap, and the closed-state line ("Breakfast tomorrow at
+           7:00 AM · in 9 hr 58 min") is wider than a phone. The two halves
+           are their own spans, so on a phone it breaks between them - meal and
+           when on one line, the countdown under it - never mid-phrase. */
+        .mess-now { display: flex; align-items: flex-start; gap: 9px; font-family: var(--font-mono);
+                    font-size: 0.92rem; color: var(--fg-soft); line-height: 1.5; min-width: 0; }
+        .mess-now .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--fg-faint);
+                         flex: 0 0 auto; margin-top: 0.45em; }
+        .mess-now .half { white-space: nowrap; }
+        .mess-now .half + .half::before { content: "\00b7"; padding: 0 0.55em;
+                                          color: var(--fg-faint); }
+        @media (max-width: 700px) {
+            .mess-now .half { display: block; }
+            .mess-now .half + .half::before { content: none; }
+        }
         .mess-now.open .dot { background: var(--cyan); box-shadow: 0 0 9px var(--cyan-glow); }
         .mess-now.open strong { color: var(--cyan); }
         .mess-now strong { color: var(--fg); font-weight: 600; }

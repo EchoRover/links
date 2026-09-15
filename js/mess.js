@@ -75,12 +75,13 @@ function renderStatus(now) {
     const text = document.getElementById("mess-now-text");
     el.classList.toggle("open", !!s.now);
     if (s.now) {
-        text.innerHTML = `<strong>${esc(s.now.label)}</strong> now &middot; ` +
-            `until ${t12(s.now.end)} (${human(s.untilEnd)})`;
+        text.innerHTML = `<span class="half"><strong>${esc(s.now.label)}</strong> now</span>` +
+            `<span class="half">until ${t12(s.now.end)} (${human(s.untilEnd)})</span>`;
     } else {
         const when = s.tomorrow ? "tomorrow" : "today";
-        text.innerHTML = `<strong>${esc(s.next.label)}</strong> ${when} at ` +
-            `${t12(s.next.start)} &middot; in ${human(s.untilNext)}`;
+        text.innerHTML = `<span class="half"><strong>${esc(s.next.label)}</strong> ${when} ` +
+            `at ${t12(s.next.start)}</span>` +
+            `<span class="half">in ${human(s.untilNext)}</span>`;
     }
     return s;
 }
