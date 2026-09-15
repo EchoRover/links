@@ -167,11 +167,14 @@
                      text-transform: uppercase; letter-spacing: 0.11em;
                      color: var(--fg-soft); margin: 0 0 14px;
                      padding-top: 18px; border-top: 1px solid var(--rule); }
-        .sides { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-                 column-gap: 44px; row-gap: 2px; }
+        /* Two independent columns, not a grid: in a grid every row is as
+           tall as its tallest cell, so a one-line SOUP beside a four-line
+           SALAD got three lines of nothing under it. */
+        .sides { margin: 0; columns: 2; column-gap: 44px; }
         .side { display: grid; grid-template-columns: 158px 1fr; gap: 16px;
                 align-items: baseline; padding: 10px 0;
-                border-bottom: 1px solid var(--rule-faint); }
+                border-bottom: 1px solid var(--rule-faint);
+                break-inside: avoid; }
         .side dt { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 600;
                    letter-spacing: 0.05em; color: var(--fg-soft); line-height: 1.5; }
         .side dd { margin: 0; font-size: 1.05rem; color: var(--fg); line-height: 1.4; }
@@ -187,7 +190,7 @@
                             border-top: 1px solid var(--rule-faint); padding-top: 16px; }
         }
         @media (max-width: 760px) {
-            .sides { grid-template-columns: 1fr; }
+            .sides { columns: 1; }
         }
 
         .mess-empty { font-family: var(--font-mono); font-size: 0.9rem; color: var(--fg-soft);
@@ -210,6 +213,17 @@
                                    outline-offset: 2px; border-radius: 3px; }
         .main-items .dish { display: block; }
         .main-items .dish-name { display: inline-block; max-width: 100%; }
+        /* An inline-block's baseline is its LAST line, so a two-line dish
+           was dragging the row's baseline - and the label beside it - down
+           to line two. Top-aligned, the line keeps the strut's baseline and
+           the label sits on the first line again. */
+        .side .dish-name { vertical-align: top; }
+        /* The grey tap flash iOS paints over a button reads as a glitch on
+           something that looks like text; the underline is the feedback. */
+        .dish-name { -webkit-tap-highlight-color: transparent; }
+        .dish-name:active { text-decoration: underline;
+                            text-decoration-color: var(--coral);
+                            text-underline-offset: 3px; }
 
         /* Revealed by tapping the dish, not by hover - this is opened on a
            phone, where a control that needs a mouse to appear does not exist. */
