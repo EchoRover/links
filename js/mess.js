@@ -7,16 +7,47 @@
 // ============================================================
 
 const MEAL_ORDER = ["breakfast", "lunch", "dinner"];
-const DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-                   "Saturday", "Sunday"];
 const DAY_SHORT = { Monday: "Mon", Tuesday: "Tue", Wednesday: "Wed",
                     Thursday: "Thu", Friday: "Fri", Saturday: "Sat",
                     Sunday: "Sun" };
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// how many weeks the strip can page either side of this one
+const WEEK_REACH = 1;
 
 // What the controls are currently showing. Set once from the clock, then only
 // by the user - a re-render on the minute must never yank the view back to
 // today while someone is reading Thursday.
-let view = { meal: null, day: null, week: null };
+//
+// The user picks a DATE. Day-of-week and rotation week are worked out from
+// it, so the "which week of the rotation is it" question never reaches the
+// screen - that was a second control the person had to get right before the
+// first one meant anything.
+let view = { meal: null, date: null, day: null, week: null };
+
+function setDate(d) {
+    view.date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    view.day = MESS_DAYS[view.date.getDay()];
+    view.week = messWeekOf(view.date);
+}
+
+function sameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()
+        && a.getDate() === b.getDate();
+}
+
+function fmtDate(d) {
+    return `${DAY_SHORT[MESS_DAYS[d.getDay()]]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+
+function addDays(d, n) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+}
+
+// the Monday on or before a date, at midnight
+function mondayOf(d) {
+    return addDays(d, -((d.getDay() + 6) % 7));
+}
 
 function t12(hhmm) {
     const [h, m] = hhmm.split(":").map(Number);
@@ -51,8 +82,6 @@ function renderStatus(now) {
         text.innerHTML = `<strong>${esc(s.next.label)}</strong> ${when} at ` +
             `${t12(s.next.start)} &middot; in ${human(s.untilNext)}`;
     }
-    document.getElementById("mess-sub").textContent =
-        `Week ${s.week} of the rotation. ${s.day}.`;
     return s;
 }
 
@@ -71,14 +100,63 @@ function seg(id, options, current, onPick) {
     }
 }
 
-function renderControls() {
+// The week strip: the calendar-app pattern. Seven days fill the row, always
+// the same seven columns, so nothing scrolls and nothing is cut off; the
+// arrows page a whole week, which is exactly the "one week back, one week
+// forward" that a two-week rotation needs. Today is a ring, the selection is
+// a filled disc - two separate facts, drawn two separate ways, the way every
+// calendar does it. It replaces a seven-way day control AND a week control:
+// the rotation week is read off the date and never reaches the screen.
+//
+// Paging moves the selection with it (same weekday, next week) - the menu
+// is the thing being read, and a row showing next week while the menu still
+// showed this one would be two views disagreeing on one screen. Bounded to
+// a week either side: that is the whole rotation for any weekday.
+//
+// Rebuilt only when today or the selection moves; draw() runs every thirty
+// seconds and there is no reason to touch the DOM under someone's thumb.
+let stripKey = null;
+
+function weekBounds(now) {
+    const thisMon = mondayOf(now);
+    return { first: addDays(thisMon, -7 * WEEK_REACH),
+             last: addDays(thisMon, 7 * WEEK_REACH) };
+}
+
+function renderDays(now) {
+    const key = [now.toDateString(), view.date.toDateString()].join("|");
+    if (key === stripKey) return;
+    stripKey = key;
+
+    const mon = mondayOf(view.date);
+    const sun = addDays(mon, 6);
+    const { first, last } = weekBounds(now);
+    document.getElementById("wk-prev").disabled = mon <= first;
+    document.getElementById("wk-next").disabled = mon >= last;
+    document.getElementById("wk-label").innerHTML =
+        `${fmtDate(mon)} &ndash; ${fmtDate(sun)}`;
+
+    const out = [];
+    for (let i = 0; i < 7; i++) {
+        const d = addDays(mon, i);
+        const on = sameDay(d, view.date);
+        const today = sameDay(d, now);
+        out.push(
+            `<button type="button" role="tab" aria-selected="${on}" ` +
+            `data-date="${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}" ` +
+            `aria-label="${fmtDate(d)}${today ? ", today" : ""}" ` +
+            `class="day${on ? " on" : ""}${today ? " today" : ""}">` +
+            `<span class="day-name">${DAY_SHORT[MESS_DAYS[d.getDay()]]}</span>` +
+            `<span class="day-num">${d.getDate()}</span></button>`);
+    }
+    document.getElementById("day-strip").innerHTML = out.join("");
+}
+
+function renderControls(now) {
     seg("seg-meal", MEAL_ORDER.map(m => ({
         value: m, label: MESS.service.meals.find(x => x.meal === m).label
     })), view.meal, v => { view.meal = v; });
-    seg("seg-day", DAY_ORDER.map(d => ({ value: d, label: DAY_SHORT[d] })),
-        view.day, v => { view.day = v; });
-    seg("seg-week", [{ value: 1, label: "Week 1" }, { value: 2, label: "Week 2" }],
-        view.week, v => { view.week = v; });
+    renderDays(now);
 }
 
 // ---------- the menu itself ----------
@@ -203,13 +281,6 @@ function trialHTML() {
 // the common case and load-bearing when it appears. Browsing a different MEAL
 // of today is not browsing a different day, and saying "not today" for it was
 // simply false.
-function renderViewing(live) {
-    const el = document.getElementById("mess-viewing");
-    const today = view.day === live.day && view.week === live.week;
-    el.innerHTML = today ? "" :
-        `Showing <b>week ${view.week}, ${esc(view.day)}</b> — not today.`;
-}
-
 // Only speaks when there is a real gap. The standing "read off photographs of
 // the wall" line is gone: the banner at the top already says the mess has not
 // read this menu, and a second hedge at the bottom was the same admission in
@@ -228,30 +299,77 @@ function renderNote() {
     el.hidden = true;
 }
 
+// The way back to today lives on this line rather than in the strip: the
+// line only exists when you are away from today, which is the only time a
+// "Today" control has anything to do.
+function renderViewing(now) {
+    const el = document.getElementById("mess-viewing");
+    el.innerHTML = sameDay(view.date, now) ? "" :
+        `Showing <b>${fmtDate(view.date)}</b> — not today. ` +
+        `<button type="button" class="today-link" id="btn-today">Back to today</button>`;
+}
+
 function draw() {
     const now = new Date();
-    const live = renderStatus(now);
-    renderControls();
+    renderStatus(now);
+    renderControls(now);
     renderMenu();
-    renderViewing(live);
+    renderViewing(now);
     renderNote();
+}
+
+// Where the page opens: what someone walking to the mess wants, which is the
+// meal being served, or the next one if nothing is.
+//
+// The day moves to tomorrow ONLY when nothing is on now and the next meal is
+// tomorrow's. It used to move whenever messStatus said `tomorrow`, and during
+// dinner "next" is always tomorrow's breakfast, so for the whole of dinner,
+// every night, the page opened on the wrong day while the status line said
+// "Dinner now" (found live 2026-09-15 at 20:30). The week is worked out from
+// the actual date rather than copied from today, so a Sunday night after
+// dinner lands on the right Monday.
+function livePosition(now) {
+    const live = messStatus(now);
+    if (live.now || !live.tomorrow) {
+        return { meal: live.now ? live.now.meal : live.next.meal, date: now };
+    }
+    const d2 = new Date(now);
+    d2.setDate(d2.getDate() + 1);
+    return { meal: live.next.meal, date: d2 };
+}
+
+// Back to today. The date only - the meal is its own control, sitting right
+// there, and a button called "Today" that also changed the meal would be
+// doing something its label does not say.
+function goToday() {
+    setDate(new Date());
+    draw();
 }
 
 function start() {
     if (typeof MESS === "undefined") return;
-    const now = new Date();
-    const live = messStatus(now);
-    // open on what someone walking to the mess wants: the meal being served,
-    // or the next one if nothing is
-    view = {
-        meal: live.now ? live.now.meal : live.next.meal,
-        day: live.tomorrow
-            ? DAY_ORDER[(DAY_ORDER.indexOf(live.day) + 1) % 7]
-            : live.day,
-        week: live.week
-    };
+    const open = livePosition(new Date());
+    view.meal = open.meal;
+    setDate(open.date);
     draw();
     setInterval(draw, 30000);
+    document.getElementById("day-strip").addEventListener("click", e => {
+        const b = e.target.closest("button[data-date]");
+        if (!b) return;
+        const [y, m, d] = b.dataset.date.split("-").map(Number);
+        setDate(new Date(y, m - 1, d));
+        draw();
+    });
+    document.getElementById("wk-prev").addEventListener("click", () => {
+        setDate(addDays(view.date, -7)); draw();
+    });
+    document.getElementById("wk-next").addEventListener("click", () => {
+        setDate(addDays(view.date, 7)); draw();
+    });
+    // the button is re-rendered with the line it sits on, so listen above it
+    document.getElementById("mess-viewing").addEventListener("click", e => {
+        if (e.target.closest("#btn-today")) goToday();
+    });
 }
 
 document.addEventListener("DOMContentLoaded", start);

@@ -32,8 +32,6 @@
                     color: var(--coral); border: 1px solid var(--coral);
                     border-radius: 999px; padding: 2px 8px; vertical-align: 0.35em;
                     margin-left: 6px; }
-        .mess-sub { font-size: 0.88rem; color: var(--fg-soft); max-width: 60ch;
-                    line-height: 1.45; margin: 6px 0 0; }
 
         /* The status line is the reason to open the page: it answers "can I eat
            right now" before anything has to be read or tapped. */
@@ -56,8 +54,20 @@
                          color: var(--red); margin-bottom: 3px; }
         .warn-banner b em { font-style: italic; }
 
-        .mess-controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-                         margin: 16px 0 6px; }
+        /* Phone: a stack, each control the full width. Wider: one band, the
+           meal on the left and the week on the right, so the controls use the
+           width instead of huddling in the left third of an iPad. */
+        .mess-controls { display: flex; flex-direction: column; align-items: flex-start;
+                         gap: 12px; margin: 16px 0 6px; }
+        @media (min-width: 701px) {
+            .mess-controls { flex-direction: row; align-items: center;
+                             justify-content: space-between; gap: 24px;
+                             padding: 12px 0; border-top: 1px solid var(--rule-faint);
+                             border-bottom: 1px solid var(--rule-faint); margin: 18px 0 12px; }
+            /* the meal never shrinks; the week gives way first, down to a floor */
+            .seg-group { flex: 0 0 auto; }
+            .week { flex: 0 1 480px; min-width: 360px; }
+        }
         .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px;
                overflow: hidden; background: var(--bg-card); min-width: 0; }
         .seg button { font-family: var(--font-mono); font-size: 0.86rem; padding: 8px 16px;
@@ -69,6 +79,50 @@
         /* label and buttons wrap as one unit - at a narrower width the label
            was stranding itself on the line above its own control */
         .seg-group { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
+
+        /* The week strip. Seven columns that always fill the row - nothing
+           scrolls, nothing is cut off, and a day is the same width on every
+           page. The number sits in a disc: filled when selected, a ring when
+           it is today, so the two facts never share one mark. The arrows
+           page a whole week; the label says which one. */
+        .week { width: 100%; }
+        .wk-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .wk-label { flex: 1; text-align: center; font-family: var(--font-mono);
+                    font-size: 0.82rem; color: var(--fg); }
+        .wk-arrow { width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+                    border: 1px solid var(--rule); background: var(--bg-card);
+                    color: var(--fg); font-size: 1.3rem; line-height: 1;
+                    display: grid; place-items: center; padding: 0 0 3px; }
+        .wk-arrow:hover:not(:disabled) { border-color: var(--coral); color: var(--coral); }
+        .wk-arrow:disabled { opacity: 0.3; cursor: default; }
+        .wk-arrow:focus-visible { outline: 2px solid var(--coral-bright); outline-offset: 2px; }
+
+        .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .day { display: flex; flex-direction: column; align-items: center; gap: 4px;
+               padding: 6px 0 4px; border: none; background: none; cursor: pointer;
+               border-radius: 10px; font-family: var(--font-mono); }
+        .day:hover .day-num { border-color: var(--coral); }
+        .day:focus-visible { outline: 2px solid var(--coral-bright); outline-offset: 1px; }
+        .day-name { font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase;
+                    color: var(--fg-faint); }
+        .day-num { width: 36px; height: 36px; border-radius: 50%; display: grid;
+                   place-items: center; font-size: 0.95rem; color: var(--fg);
+                   border: 1.5px solid transparent; }
+        .day.today .day-name { color: var(--coral); }
+        .day.today .day-num { border-color: var(--coral); }
+        .day.on .day-num { background: var(--coral); border-color: var(--coral);
+                           color: var(--bg-card); font-weight: 600; }
+        .day.on .day-name { color: var(--coral); }
+
+        /* "Back to today", inline on the not-today line - a link, because it
+           sits inside a sentence. */
+        .today-link { font: inherit; color: var(--coral); font-weight: 600;
+                      background: none; border: none; padding: 0; cursor: pointer;
+                      text-decoration: underline; text-underline-offset: 3px;
+                      text-decoration-color: var(--coral-soft); }
+        .today-link:hover { text-decoration-color: var(--coral); }
+        .today-link:focus-visible { outline: 2px solid var(--coral-bright);
+                                    outline-offset: 2px; border-radius: 3px; }
 
         /* Says what the current view is showing whenever it is NOT today's
            actual meal, so a browsed day can never be mistaken for the live one. */
@@ -263,7 +317,6 @@
         <div class="mess-hero">
             <div>
                 <h1 class="mess-title">Mess <em>menu</em> <span class="tag-beta">beta</span></h1>
-                <p class="mess-sub" id="mess-sub"></p>
             </div>
             <div class="mess-now" id="mess-now"><span class="dot"></span><span id="mess-now-text">&hellip;</span></div>
         </div>
@@ -278,13 +331,15 @@
                 <span class="seg-label">Meal</span>
                 <div class="seg" id="seg-meal"></div>
             </div>
-            <div class="seg-group">
-                <span class="seg-label">Day</span>
-                <div class="seg" id="seg-day"></div>
-            </div>
-            <div class="seg-group">
-                <span class="seg-label">Week</span>
-                <div class="seg" id="seg-week"></div>
+            <div class="week">
+                <div class="wk-head">
+                    <button type="button" class="wk-arrow" id="wk-prev"
+                            aria-label="Previous week">&lsaquo;</button>
+                    <span class="wk-label" id="wk-label"></span>
+                    <button type="button" class="wk-arrow" id="wk-next"
+                            aria-label="Next week">&rsaquo;</button>
+                </div>
+                <div class="days" id="day-strip" role="tablist" aria-label="Day"></div>
             </div>
         </div>
 
