@@ -355,6 +355,12 @@ addUpdate("quizzes", "ACOL331: OS C lab exam 2, 16/09/2026", "2026-09-16");
 
 addUpdate("quizzes", "AHUL261: Psychology quiz, 08/09/2026", "2026-09-08");
 
+// In the Thu 15:30-17:20 ACOL331 lab block, M3-0-004.
+addUpdate("quizzes", "ACOL331: OS lab 1 exam, 08/10/2026", "2026-10-08");
+
+addUpdate("assignments", "ACOL333: AI assignment 1, 12/10/2026", "2026-10-12");
+addUpdate("assignments", "AGRL130: Value proposition (FAB table + personas), 12/10/2026", "2026-10-12");
+
 // ACOL351 runs a quiz in EVERY tutorial (Wed 15:30-16:20, M4-0-019 --
 // moved there in the 7 Sep revision; it was Wed 10:00-10:50 before).
 // No list of dates was ever published, only the pattern, so posting a
