@@ -160,6 +160,48 @@ async function load() {
   tick();
 }
 
+// Model answers come from /api/answers, which withholds them while the
+// quiz is running, so a closed dropdown here really is empty.
+async function loadAnswers() {
+  const box = $("bt-ans");
+  const note = $("bt-ans-note");
+  let j;
+  try {
+    j = await (await fetch(`/api/answers?round=${ROUND.id}`, { cache: "no-store" })).json();
+  } catch {
+    note.textContent = "can't load";
+    return;
+  }
+  if (j.hidden) {
+    const until = new Date(j.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    note.textContent = `hidden during the quiz, back at ${until}`;
+    box.innerHTML = "";
+    return;
+  }
+  if (!j.ok || box.children.length) return; // already shown: keep open dropdowns open
+  note.textContent = "";
+  j.answers.forEach((a) => {
+    const d = document.createElement("details");
+    d.className = "bt-a";
+    d.innerHTML = `<summary><span class="bt-n">Q${a.q}</span><span></span></summary>
+      <div class="bt-a-body">
+        <p class="bt-verdict"></p>
+        <p><b>Idea</b><span class="i"></span></p>
+        <pre></pre>
+        <p><b>Why</b><span class="w"></span></p>
+        <p class="t"><b>Time</b><span></span></p>
+      </div>`;
+    d.querySelector("summary span:nth-child(2)").textContent = ROUND.questions[a.q - 1];
+    d.querySelector(".bt-verdict").textContent = a.verdict;
+    d.querySelector(".i").textContent = a.idea;
+    d.querySelector("pre").textContent = a.code;
+    d.querySelector(".w").textContent = a.why;
+    if (a.time) d.querySelector(".t span").textContent = a.time;
+    else d.querySelector(".t").remove();
+    box.appendChild(d);
+  });
+}
+
 async function place(ev) {
   ev.preventDefault();
   const name = $("bt-name").value.trim();
@@ -192,6 +234,8 @@ document.addEventListener("DOMContentLoaded", () => {
   $("bt-name").addEventListener("input", renderForm);
   $("bt-form").addEventListener("submit", place);
   load();
+  loadAnswers();
+  setInterval(loadAnswers, 60000);
   setInterval(tick, 1000);
   setInterval(load, 20000);
 });

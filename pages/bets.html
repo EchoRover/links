@@ -62,6 +62,26 @@
         .bt-pair { font-family: var(--font-mono); font-size: 0.85rem; }
         .bt-at { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-soft); text-align: right; }
 
+        #bt-ans-note { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; color: var(--fg-soft); }
+        /* minmax(0, 1fr): without it a long code line widens the whole column
+           past the screen instead of scrolling inside its own box */
+        #bt-ans { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+        .bt-a { min-width: 0; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 10px; }
+        .bt-a summary { display: grid; grid-template-columns: 3rem 1fr auto; gap: 10px; align-items: center;
+                        padding: 10px 12px; cursor: pointer; list-style: none; font-weight: 600; font-size: 0.95rem; }
+        .bt-a summary::-webkit-details-marker { display: none; }
+        .bt-a summary::after { content: "▾"; color: var(--fg-soft); transition: transform .15s; }
+        .bt-a[open] summary::after { transform: rotate(180deg); }
+        .bt-a[open] { border-color: var(--coral); }
+        .bt-a-body { padding: 0 12px 12px; font-size: 0.92rem; line-height: 1.5; color: var(--fg); }
+        .bt-a-body p { margin: 8px 0 0; }
+        .bt-a-body b { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em;
+                       text-transform: uppercase; color: var(--coral); margin-right: 6px; }
+        .bt-verdict { font-weight: 700; }
+        .bt-a-body pre { font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.45; margin: 8px 0 0;
+                         padding: 10px; background: var(--bg); border: 1px solid var(--rule-faint);
+                         border-radius: 8px; overflow-x: auto; }
+
         @media (max-width: 520px) {
             .bt-q { grid-template-columns: 2.4rem 1fr 1.6rem; }
             .bt-bar { grid-column: 2 / 3; grid-row: 2; }
@@ -110,6 +130,11 @@
             <section class="bt-board">
                 <h2>The board <span id="bt-count"></span></h2>
                 <ul id="bt-list"></ul>
+            </section>
+
+            <section class="bt-board">
+                <h2>Model answers <span id="bt-ans-note"></span></h2>
+                <div id="bt-ans"></div>
             </section>
         </div>
     </main>
