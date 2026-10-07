@@ -49,12 +49,5 @@
       "source": "/predict",
       "destination": "/pages/predict"
     }
-  ],
-  "redirects": [
-    {
-      "source": "/bets",
-      "destination": "/predict",
-      "permanent": false
-    }
   ]
 }
