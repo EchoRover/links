@@ -241,12 +241,12 @@ function renderUpdates() {
       body.appendChild(eventEl);
       row.appendChild(body);
 
-      // The side pot on which problems the tut quiz asks.
+      // The Question Prediction Machine for the tut quiz.
       if (code === "ACOL351" && /tutorial quiz/i.test(event)) {
         const bet = document.createElement("a");
         bet.className = "upd-bet";
-        bet.href = "/bets";
-        bet.setAttribute("aria-label", "Bet on the quiz questions");
+        bet.href = "/predict";
+        bet.setAttribute("aria-label", "Predict the quiz questions");
         bet.textContent = "⚄";
         row.appendChild(bet);
       }

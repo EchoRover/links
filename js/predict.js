@@ -1,5 +1,6 @@
 // ============================================================
-// /bets — put your name on which 2 problems the ACOL351 tutorial quiz asks.
+// /predict — the Question Prediction Machine, human powered: put your name
+// on which 2 problems the ACOL351 tutorial quiz asks.
 //
 // Each week: add the round to ROUNDS in api/bets.js (id, count, close time)
 // and point ROUND below at it with the sheet's short titles. After the quiz,
@@ -10,7 +11,7 @@
 const ROUND = {
   id: "acol351-tut5",
   label: "ACOL351 · Tutorial 5 quiz · Wed 7 Oct",
-  // Problems 12 and 13 are starred on the sheet: never asked, so not bettable.
+  // Problems 12 and 13 are starred on the sheet: never asked, so not predictable.
   questions: [
     "Bottleneck paths (modify Dijkstra)",
     "One free edge (the voucher)",
@@ -95,7 +96,7 @@ function renderForm() {
   }
   if (state.closed) {
     form.hidden = true;
-    note.textContent = "Betting closed. Waiting on the quiz.";
+    note.textContent = "Predictions closed. Waiting on the quiz.";
     return;
   }
   form.hidden = false;
@@ -110,8 +111,8 @@ function renderBoard() {
   const list = $("bt-list");
   list.innerHTML = "";
   $("bt-count").textContent = state.bets.length
-    ? `${state.bets.length} bet${state.bets.length === 1 ? "" : "s"}`
-    : "no bets yet";
+    ? `${state.bets.length} prediction${state.bets.length === 1 ? "" : "s"}`
+    : "no predictions yet";
 
   const rows = [...state.bets];
   if (ROUND.answer) rows.sort((a, b) => hits(b) - hits(a));

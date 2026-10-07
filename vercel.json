@@ -46,8 +46,15 @@
       "destination": "/pages/mess-next"
     },
     {
+      "source": "/predict",
+      "destination": "/pages/predict"
+    }
+  ],
+  "redirects": [
+    {
       "source": "/bets",
-      "destination": "/pages/bets"
+      "destination": "/predict",
+      "permanent": false
     }
   ]
 }
