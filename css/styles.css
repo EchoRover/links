@@ -1101,19 +1101,20 @@ a.brand-logo:focus-visible { outline: 2px solid var(--coral); outline-offset: 3p
     color: var(--fg);
     line-height: 1.3;
 }
+/* Always shown: phones have no hover, so a reveal-on-hover die was
+   invisible to most of the people it was for. The padding is the tap target. */
 .upd-bet {
     margin-left: auto;
     align-self: center;
-    padding: 0 0.3rem;
-    font-size: 1rem;
+    padding: 0.45rem 0.55rem;
+    font-size: 1.35rem;
     line-height: 1;
-    color: var(--fg);
+    color: var(--coral);
     text-decoration: none;
-    opacity: 0.08;
-    transition: opacity 0.2s, color 0.2s;
+    border-radius: 8px;
+    transition: background 0.2s;
 }
-.upd-row:hover .upd-bet { opacity: 0.35; }
-.upd-bet:hover, .upd-bet:focus-visible { opacity: 1; color: var(--coral); }
+.upd-bet:hover, .upd-bet:focus-visible { background: var(--coral-soft); }
 
 /* ============================================================
    RESPONSIVE

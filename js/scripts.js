@@ -241,8 +241,7 @@ function renderUpdates() {
       body.appendChild(eventEl);
       row.appendChild(body);
 
-      // The side pot on which problems the tut quiz asks. Near-invisible
-      // on purpose: it is for the people who get told about it.
+      // The side pot on which problems the tut quiz asks.
       if (code === "ACOL351" && /tutorial quiz/i.test(event)) {
         const bet = document.createElement("a");
         bet.className = "upd-bet";
