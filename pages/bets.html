@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Call the quiz · linkCS</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/webp" href="/assets/hacker.webp">
+    <script src="/js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .bt-wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 80px; }
+        .bt-hero { margin: 22px 0 4px; }
+        .bt-title { font-size: 1.6rem; font-weight: 800; color: var(--fg); margin: 0; letter-spacing: -0.02em; }
+        .bt-sub { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+                  font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); margin: 6px 0 0; }
+        #bt-clock { color: var(--coral); font-weight: 600; }
+        .bt-how { color: var(--fg-soft); font-size: 0.95rem; margin: 12px 0 18px; }
+
+        #bt-qs { display: grid; gap: 6px; }
+        .bt-q { display: grid; grid-template-columns: 3rem 1fr 64px 1.6rem; align-items: center; gap: 10px;
+                width: 100%; text-align: left; font: inherit; color: var(--fg);
+                background: var(--bg-card); border: 1px solid var(--rule); border-radius: 10px;
+                padding: 10px 12px; cursor: pointer; transition: border-color .15s, background .15s; }
+        .bt-q:hover:not(:disabled) { border-color: var(--coral); }
+        .bt-q:disabled { cursor: default; }
+        .bt-q.on { border-color: var(--coral); background: var(--coral-soft); box-shadow: 0 0 0 1px var(--coral) inset; }
+        .bt-q.asked { border-color: var(--cyan); background: var(--cyan-soft); box-shadow: 0 0 0 1px var(--cyan) inset; }
+        .bt-n { font-family: var(--font-mono); font-weight: 700; color: var(--coral); }
+        .bt-q.asked .bt-n { color: var(--cyan); }
+        .bt-t { font-weight: 600; font-size: 0.95rem; line-height: 1.3; }
+        .bt-bar { height: 6px; border-radius: 3px; background: var(--rule-faint); overflow: hidden; }
+        .bt-bar i { display: block; height: 100%; background: var(--coral); opacity: .55; }
+        .bt-c { font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-soft); text-align: right; }
+
+        #bt-form { display: flex; gap: 8px; margin: 16px 0 0; }
+        #bt-form[hidden] { display: none; }
+        #bt-name { flex: 1; min-width: 0; font: inherit; color: var(--fg); background: var(--bg-card);
+                   border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; }
+        #bt-name:focus { outline: 2px solid var(--coral); outline-offset: 1px; }
+        #bt-go { font: inherit; font-weight: 700; color: #fff; background: var(--coral);
+                 border: none; border-radius: 10px; padding: 10px 18px; cursor: pointer; white-space: nowrap; }
+        #bt-go:disabled { opacity: .4; cursor: default; }
+        #bt-note { font-family: var(--font-mono); font-size: 0.85rem; color: var(--fg); margin: 10px 0 0; }
+        #bt-err:not(:empty) { font-family: var(--font-mono); font-size: 0.8rem; color: var(--red); margin: 6px 0 0; }
+
+        .bt-board { margin: 30px 0 0; }
+        .bt-board h2 { font-size: 1rem; font-weight: 700; color: var(--fg); margin: 0 0 8px;
+                       display: flex; justify-content: space-between; }
+        #bt-count { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; color: var(--fg-soft); }
+        #bt-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule-faint); }
+        #bt-list li { display: grid; grid-template-columns: 1fr auto 5.5rem; gap: 10px; align-items: baseline;
+                      padding: 8px 4px; border-bottom: 1px solid var(--rule-faint); }
+        #bt-list li.won { background: var(--cyan-soft); }
+        #bt-list li.won .bt-at { color: var(--cyan); font-weight: 700; }
+        #bt-list li.half .bt-at { color: var(--coral); }
+        .bt-who { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bt-pair { font-family: var(--font-mono); font-size: 0.85rem; }
+        .bt-at { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-soft); text-align: right; }
+
+        @media (max-width: 520px) {
+            .bt-q { grid-template-columns: 2.4rem 1fr 1.6rem; }
+            .bt-bar { grid-column: 2 / 3; grid-row: 2; }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <a href="/" class="brand-logo" aria-label="linkCS home">
+                    <img src="/assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="/assets/circle.webp" class="circle-img" alt="">
+                </a>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">side pot</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="/" class="pill">
+                    <span class="pill-name">← Home</span>
+                </a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="bt-wrap">
+            <section class="bt-hero">
+                <h1 class="bt-title">Call the quiz</h1>
+                <p class="bt-sub"><span id="bt-label"></span><span id="bt-clock"></span></p>
+            </section>
+            <p class="bt-how">Two of these eleven get asked. Pick the two you think it'll be,
+                put your name on it. One bet per name, no take-backs.</p>
+
+            <div id="bt-qs"></div>
+
+            <form id="bt-form" autocomplete="off">
+                <input id="bt-name" maxlength="32" placeholder="Your name" aria-label="Your name">
+                <button id="bt-go" type="submit" disabled>Lock it in</button>
+            </form>
+            <p id="bt-note"></p>
+            <p id="bt-err"></p>
+
+            <section class="bt-board">
+                <h2>The board <span id="bt-count"></span></h2>
+                <ul id="bt-list"></ul>
+            </section>
+        </div>
+    </main>
+
+    <script src="/js/bets.js"></script>
+</body>
+
+</html>
