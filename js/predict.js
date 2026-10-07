@@ -25,7 +25,7 @@ const ROUND = {
     "Fair split, identical values",
     "Fair split with negative values",
   ],
-  answer: null, // e.g. [3, 7] once the quiz is out
+  answer: [8, 9], // asked in the quiz, Wed 7 Oct
 };
 
 const API = "/api/bets";
