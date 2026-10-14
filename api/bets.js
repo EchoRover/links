@@ -24,6 +24,7 @@ const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TO
 // titles and, after the quiz, the answer.
 const ROUNDS = {
   "acol351-tut5": { questions: 11, closes: "2026-10-07T15:30:00+04:00" },
+  "acol351-tut6": { questions: 7, closes: "2026-10-14T15:30:00+04:00" },
 };
 
 const MAX_NAME = 32;

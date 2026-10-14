@@ -1,5 +1,5 @@
 // ============================================================
-// GET /api/answers?round=acol351-tut5 — model answers for the sheet
+// GET /api/answers?round=acol351-tut6 — model answers for the sheet
 //
 // Served from here rather than shipped in the page so they can be withheld
 // while the quiz is running. A page that hid them with CSS would still carry
@@ -182,6 +182,126 @@ but s→b→a = 6.
     add item j to bundle[i]; value[i] += vj`,
         why: "Conditions: chore c ∈ Aᵢ: v(Aᵢ) + |c| ≥ v(Aₖ); good g ∈ Aₖ: v(Aᵢ) ≥ v(Aₖ) − g. Good g to poorest k: v(Aᵢ) ≥ v(Aₖ old) = v(Aₖ new) − g, and any chore cᵢ in Aᵢ came earlier so |cᵢ| ≥ g. Chore c to richest i: v(Aᵢ new) + |c| = v(Aᵢ old) ≥ v(Aₖ); and for k's smallest good gₖ ≥ |c|: v(Aᵢ new) = v(Aᵢ old) − |c| ≥ v(Aₖ) − gₖ. Everything else only moves in the helpful direction. Order matters: goods-then-chores fails on 10, 1, −100.",
         time: "O(m log m + m log n) with the agents in a balanced BST or two heaps.",
+      },
+    ],
+  },
+  "acol351-tut6": {
+    hideFrom: "2026-10-14T15:30:00+04:00",
+    hideUntil: "2026-10-14T16:30:00+04:00",
+    answers: [
+      {
+        q: 1,
+        verdict: "No: the cheapest edge at s is in both trees",
+        idea: "Let (s, v) be the cheapest edge touching s. Example: s–a 3, s–b 4, a–b 2. Shortest-path tree = {s–a, s–b} (b through a costs 5 > 4). MST = {a–b, s–a}. The trees differ, but both contain s–a.",
+        code: `Claim: (s, v) = cheapest edge at s is in both.
+MST: cut {s} vs the rest. The crossing edges are
+  the edges at s; the cheapest is (s, v), so by
+  the cut property it is in the MST.
+SPT: any other s-v path starts with (s, w), w != v,
+  costing more than c(s, v), plus more positive
+  edges. So the edge (s, v) is the unique shortest
+  s-v path, and every shortest-path tree has it.`,
+        why: "Costs are positive and distinct, so the cut property applies and no other path to v can tie with the single edge.",
+        time: "",
+      },
+      {
+        q: 2,
+        verdict: "Split at the median, recurse on half the edges",
+        idea: "The best bottleneck is the smallest b such that the edges of cost ≤ b connect the graph. Median M: if the cheap half connects G, recurse on it. If not, the answer is > M, every cheap edge is free: keep them, squash each cheap group to one dot, recurse on the expensive half. Example: 1–2 (1), 3–4 (2), 2–4 (3), 1–3 (4), 2–3 (5), 1–4 (6). Median 3: cheap half connects, keep it. Median 2: {1,2} and {3,4} not connected, keep 1–2 and 3–4, squash, recurse on {2–4}. Tree 1–2, 3–4, 2–4, bottleneck 3.",
+        code: `MBST(G)
+  if G has one vertex: return {}
+  if G has one edge: return {that edge}
+  M = FindMedian(edge costs)
+  A = edges with cost <= M;  B = the rest
+  components of (V, A) by BFS/DFS
+  if (V, A) connected: return MBST((V, A))
+  F = spanning forest of (V, A)
+  G' = contract each component, keep B edges
+       between different components
+  return F ∪ MBST(G')`,
+        why: "A tree with bottleneck ≤ b exists iff edges ≤ b connect G. Connected case: the answer is ≤ M, so A edges suffice. Otherwise every tree needs a B edge, the answer is > M; F ∪ T' is a spanning tree whose max is T's max, and any tree's B edges contain a spanning tree of G', so none does better.",
+        time: "One round O(m) (median, split, BFS, contract; n ≤ m + 1). Distinct costs → recursion on ≤ ⌈m/2⌉ edges: T(m) = T(m/2) + O(m) = O(m).",
+      },
+      {
+        q: 3,
+        verdict: "Add e, drop the most expensive edge on the cycle",
+        idea: "T + e has exactly one cycle: the tree path u→v plus e. By the cycle property its most expensive edge is not in the MST. Example: T = a–b (1), b–c (4), c–d (2); add a–c (3). Cycle costs 1, 4, 3: drop b–c. If a–c cost 5, drop a–c itself: T stays.",
+        code: `UpdateMST(T, e = (u, v), c)
+  P = path from u to v in T   // DFS in T
+  f = most expensive edge on P + e
+  if f == e: return T
+  return T + e - f`,
+        why: "Every non-tree edge of G was the most expensive on some cycle of G, still there in G + e, so the new MST lies inside T + e; its only cycle loses its most expensive edge f, leaving the spanning tree T + e − f.",
+        time: "T has n − 1 edges: DFS and the scan of P are O(n). Total O(|V|).",
+      },
+      {
+        q: 4,
+        verdict: "(a) correct, (b) wrong",
+        idea: "A stop has no fixed cost: it takes litres/r. So time = total litres bought / r, and the number of stops does not matter. (a) buys exactly what it burns; (b) fills up and can arrive at B with fuel left. (b) is the fewest-stops greedy, a different problem.",
+        code: `(b) counterexample: C = 10 L, F = 1 L/km,
+  stations 0, 9, 11 (= B), start empty.
+  (a): 9 L + 2 L = 11 L -> 11/r min
+  (b): 10 L, then at 9 has 1 L < 2: +9 L
+       = 19 L -> 19/r min. Worse.
+(a) exchange: optimal O buys o_i, (a) buys a_i.
+  i = first station with o_i != a_i. Same tank at
+  x_i, (a) buys the least that reaches x_{i+1},
+  so o_i > a_i; d = o_i - a_i.
+  O' = O but a_i at x_i and o_{i+1} + d at x_{i+1}
+  (drop d if x_{i+1} = B). Same tank leaving
+  x_{i+1} (<= C), same or less total: still optimal,
+  agrees with (a) one station longer. Repeat.`,
+        why: "Each exchange keeps O' valid and never adds time, and after at most n − 1 exchanges O' is (a), so (a) is optimal. One counterexample is enough to kill (b).",
+        time: "",
+      },
+      {
+        q: 5,
+        verdict: "Cut T at e; the cycle in T' + e crosses back at e'",
+        idea: "Removing e from T splits it into two pieces. Adding e to T' makes one cycle; it crosses between the pieces at e, so it must cross back at another edge e'. Example: square a,b,c,d + diagonal ac; T = {ab, bc, cd}, T' = {ac, ad, bc}, e = ab: pieces {a}, {b,c,d}; cycle a–b–c–a crosses back at ac = e'. T + ac − ab and T' + ab − ac are both trees.",
+        code: `1. T != T', same size -> some e in E \\ E'.
+2. T - e = two pieces S, V\\S; e is the only
+   T edge between them.
+3. T' + e has one cycle Z through e. Z crosses
+   S -> V\\S at e, so it crosses back at e' != e.
+4. e' on Z, e' != e -> e' in E'. e' crosses the
+   cut but only e does in T -> e' not in E.
+5. T + e' - e: e' rejoins the two pieces,
+   n - 1 edges -> spanning tree.
+6. T' + e - e': e' is on the only cycle Z,
+   removing it keeps it connected -> tree.`,
+        why: "Both new graphs are connected with n − 1 edges, so both are spanning trees.",
+        time: "",
+      },
+      {
+        q: 6,
+        verdict: "DP with two numbers per day: bestA, bestB",
+        idea: "Only yesterday's store matters. bestA[i] = most you can earn on days 1..i ending at A; same for B. Example: C = 5, PA = 10, 1, 10, PB = 1, 20, 1. bestA = 10, 11, 30; bestB = 1, 25, 26. Answer 30: A, B, A.",
+        code: `TwoStores(PA, PB, C, n)
+  bestA[1] = PA(1); bestB[1] = PB(1)
+  for i = 2..n:
+    bestA[i] = PA(i) + max(bestA[i-1], bestB[i-1] - C)
+    bestB[i] = PB(i) + max(bestB[i-1], bestA[i-1] - C)
+  answer = max(bestA[n], bestB[n])
+  trace back: at each day repeat the choice
+  that gave the max`,
+        why: "An optimal schedule ending at A on day i was at A or B on day i − 1, and its first i − 1 days must be the best schedule ending there (else swap in a better one). So the max of the two options is right; induction from day 1.",
+        time: "O(n).",
+      },
+      {
+        q: 7,
+        verdict: "Knapsack-style DP over hours",
+        idea: "Max average = max total. best[i][h] = largest total for courses 1..i using at most h hours: try every k hours for course i plus best[i−1][h−k]. Greedy (next hour to the biggest gain) fails: H = 3, f1 = 1, 3, 4, 4, f2 = 1, 1, 5, 6 for 0..3 hours. Greedy ends at 5; course 1 with 1 h + course 2 with 2 h gives 3 + 5 = 8.",
+        code: `Allocate(f[1..n], H)
+  best[0][h] = 0 for all h
+  for i = 1..n:
+    for h = 0..H:
+      best[i][h] = max over k = 0..h of
+                   f[i](k) + best[i-1][h-k]
+      choice[i][h] = the best k
+  trace back from (n, H) for the hours
+  return best[n][H] / n`,
+        why: "In an optimal plan course i gets some k hours and courses 1..i−1 use the rest optimally (else swap). Trying every k gives the right value; induction on i.",
+        time: "n(H + 1) cells × O(H) each = O(nH²). Polynomial, nothing in an exponent.",
       },
     ],
   },

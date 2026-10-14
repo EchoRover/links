@@ -9,23 +9,19 @@
 // ============================================================
 
 const ROUND = {
-  id: "acol351-tut5",
-  label: "ACOL351 · Tutorial 5 quiz · Wed 7 Oct",
-  // Problems 12 and 13 are starred on the sheet: never asked, so not predictable.
+  id: "acol351-tut6",
+  label: "ACOL351 · Tutorial 6 quiz · Wed 14 Oct",
+  // Problems 8, 9 and 10 are starred on the sheet: never asked, so not predictable.
   questions: [
-    "Bottleneck paths (modify Dijkstra)",
-    "One free edge (the voucher)",
-    "Most reliable path",
-    "Longest path: Dijkstra? and on a DAG",
-    "Max lateness: which greedy works",
-    "Total lateness instead",
-    "Interval scheduling: which greedy works",
-    "Degree sequence to a simple graph",
-    "Coins 1, 2, 4, …, 2^1000: is greedy right",
-    "Fair split, identical values",
-    "Fair split with negative values",
+    "Shortest-path tree vs MST: must they share an edge",
+    "Min bottleneck spanning tree in linear time",
+    "Update the MST after adding one edge",
+    "Refuelling: which strategy is right",
+    "Swap edges between two spanning trees",
+    "Two stores: where to be each day",
+    "Split hours between projects",
   ],
-  answer: [8, 9], // asked in the quiz, Wed 7 Oct
+  answer: null, // set to the two asked after the quiz
 };
 
 const API = "/api/bets";
