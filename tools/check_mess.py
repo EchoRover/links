@@ -31,10 +31,13 @@ MEALS = ["breakfast", "lunch", "dinner"]
 # for: a dish that went missing in transcription.
 UNEVEN = {
     ("1", "lunch", "SPECIAL DISH"): (
-        "Thu and Fri print one merged yellow cell across both sub-rows - "
-        "Thu 'Rice Bowl with Rajma Masala or Kadhi Pakora with Papad', "
-        "Fri 'Panjabi Samosa Chat (...)'. Checked against the photograph "
-        "14 Sep 2026."),
+        "Sat and Sun print one merged orange cell across both sub-rows - "
+        "Sat 'Panjabi Samosa Chat (...)', Sun 'Mix Vegetable Pakora with "
+        "Mint Chutney'. Checked against the photograph 19 Oct 2026."),
+    ("2", "lunch", "SPECIAL DISH"): (
+        "Sat prints one merged orange cell across both sub-rows - 'Subway "
+        "Station with Varietu of stuffing (...)', clipped mid-list on the "
+        "sheet itself. Checked against the photograph 19 Oct 2026."),
 }
 
 

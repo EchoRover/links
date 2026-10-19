@@ -19,3 +19,6 @@ data/schedules/room-wise-schedule.xlsx
 .env.*
 *.env
 .vercel
+
+# photos of the mess wall sheets the menu is read off - kept on this Mac, not published
+data/mess/photos/

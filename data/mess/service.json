@@ -30,8 +30,8 @@
     "Sunday"
   ],
   "cycle": {
-    "_note": "The menu alternates Week-1 / Week-2. Confirmed on the ground: the week beginning Monday 14 September 2026 is Week-1. Everything after that follows on its own - count whole weeks from the anchor, even means Week-1 and odd means Week-2 - so this needs changing only if the mess restarts the cycle out of step.",
-    "anchor_monday": "2026-09-14",
+    "_note": "The menu alternates Week-1 / Week-2. From Monday 19 October 2026 the mess went back to its older two-week menu (sheets photographed that day), and that week is its Week-1, confirmed by Evan. Everything after that follows on its own - count whole weeks from the anchor, even means Week-1 and odd means Week-2 - so this needs changing only if the mess restarts the cycle out of step. The September menu is kept at data/mess/saved/menu-2026-09.json, whose anchor was Monday 14 September 2026 = Week-1. To switch back: copy it over menu.json, set the anchor to whichever Monday the mess restarts it on, run tools/build_mess.py.",
+    "anchor_monday": "2026-10-19",
     "anchor_week": 1
   },
   "report": {
