@@ -33,6 +33,7 @@ window.DATA = {
       "prof": "Abhilash Jindal",
       "links": {
         "Course Page": "https://abhilash-jindal.com/teaching/2026-1-acol-331/",
+        "Slides": "https://github.com/codenet/col331/tree/main/slides",
         "Blackboard": "https://iida.blackboard.com/ultra/courses/_157_1/outline"
       }
     },
