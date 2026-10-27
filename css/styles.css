@@ -1677,6 +1677,7 @@ html.halloween .hw-anchor-sit { padding-right: 3.6rem; }
 }
 .hw-counter .hw-face path { fill: #3A1A06; }
 .hw-counter.won { border-color: var(--coral); }
+.hw-counter.won { padding: 0; width: 44px; justify-content: center; }
 .hw-counter.won .hw-face path { fill: #FFE27A; }
 .hw-counter[aria-expanded="true"] { border-color: var(--coral); }
 .hw-count { font-variant-numeric: tabular-nums; }

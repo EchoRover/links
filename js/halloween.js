@@ -267,8 +267,14 @@
     document.body.appendChild(panel);
 
     function paintCounter() {
-        counter.innerHTML = PUMPKIN + '<span class="hw-count">' + caught.length + '/' + GHOSTS.length + '</span>';
-        counter.setAttribute('aria-label', 'Ghost hunt: ' + caught.length + ' of ' + GHOSTS.length + ' caught');
+        // once the hunt is won the score has nothing left to say: just the lit pumpkin
+        if (won()) {
+            counter.innerHTML = PUMPKIN;
+            counter.setAttribute('aria-label', 'Ghost hunt complete: settings');
+        } else {
+            counter.innerHTML = PUMPKIN + '<span class="hw-count">' + caught.length + '/' + GHOSTS.length + '</span>';
+            counter.setAttribute('aria-label', 'Ghost hunt: ' + caught.length + ' of ' + GHOSTS.length + ' caught');
+        }
         counter.classList.toggle('won', won());
     }
 
