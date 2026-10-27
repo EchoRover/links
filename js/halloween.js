@@ -734,10 +734,11 @@
     // ---------- the rare jumpscare on a link click ----------
     // About 1 in 20 link clicks, at most once a day per visitor, never on
     // the first click of a first visit. A ghost face lunges at the screen
-    // for ~700 ms and then the click carries on. One smooth swell, no
-    // flashing, no sound. Same-tab links wait for it; new-tab links open
-    // at once (a delayed window.open gets blocked) and the scare waits
-    // for you on this page when you come back. ?scare=now arms the next click.
+    // for ~640 ms and then the click carries on. One smooth swell, no
+    // flashing, no sound. Every link waits for it, new-tab ones included:
+    // the scare is kept under ~650 ms so the click's user activation is
+    // still alive when window.open runs (Safari keeps it about 1 s).
+    // ?scare=now arms the next click.
     const today = new Date(Date.now() + 4 * 3600e3).toISOString().slice(0, 10);
     try { if (params.get('scare') === 'now') sessionStorage.setItem('hw-scare-now', '1'); } catch (e) {}
     const SCARE =
@@ -766,7 +767,7 @@
         o.setAttribute('aria-hidden', 'true');
         o.innerHTML = '<div class="hw-scare-face">' + SCARE + '</div>';
         document.body.appendChild(o);
-        const dur = 720;
+        const dur = 640;
         o.animate([{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }],
             { duration: dur, easing: 'ease-out', fill: 'forwards' });
         o.firstChild.animate([
@@ -780,7 +781,6 @@
         ], { duration: dur, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
         setTimeout(() => { o.remove(); if (done) done(); }, dur);
     }
-    let scareLater = 0;
     document.addEventListener('click', (e) => {
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         const a = e.target.closest && e.target.closest('a[href]');
@@ -789,19 +789,18 @@
         if (!href || href[0] === '#' || /^(javascript|mailto|tel):/i.test(href)) return;
         if (!scareArmed()) return;
         spendScare();
-        if (a.target && a.target !== '_self') {
-            scareLater = Date.now();           // let the new tab open untouched
-            return;
-        }
         e.preventDefault();
         const to = a.href;
-        playScare(() => location.assign(to));
-    });
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && scareLater && Date.now() - scareLater < 120000) {
-            scareLater = 0;
-            setTimeout(() => playScare(), 250);
-        }
+        const newTab = a.target && a.target !== '_self';
+        playScare(() => {
+            if (!newTab) { location.assign(to); return; }
+            // Not the 'noopener' feature: with it window.open always
+            // returns null, and null is how a blocked popup looks. Cut
+            // the opener by hand instead.
+            const w = window.open(to, '_blank');
+            if (w) { try { w.opener = null; } catch (err) {} }
+            else location.assign(to);          // popup blocked: never lose the click
+        });
     });
 
     // ---------- layout-dependent bits, once the page has settled ----------
