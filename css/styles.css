@@ -1870,8 +1870,17 @@ html.halloween .hero-block { flex-wrap: wrap; }
    threads span catches one (to sweep the web away). */
 .hw-web { position: absolute; z-index: 6; pointer-events: none; line-height: 0; }
 .hw-web svg { display: block; overflow: visible; pointer-events: none; }
-.hw-web-silk { fill: none; stroke: #E6DCFF; stroke-width: 0.8; opacity: 0.32; vector-effect: non-scaling-stroke; }
-[data-theme="light"] .hw-web-silk { stroke: #5B4F72; opacity: 0.4; }
+/* stroke colour and fade come from a radial gradient in each svg:
+   bright lavender-silver at the hub, almost nothing at the rim */
+.hw-web-silk { fill: none; stroke-linecap: round; }
+[data-theme="light"] .hw-web-sway { stroke: #6E6288; opacity: 0.55; }
+.hw-dew { fill: #FBF8FF; opacity: 0.9; }
+.hw-dew-glow { fill: #E9DEFF; opacity: 0.12; animation: hw-glint 9s ease-in-out infinite; }
+@keyframes hw-glint { 0%, 80%, 100% { opacity: 0.12; } 88% { opacity: 0.55; } }
+/* a breath of air: a degree or two from the anchor corner */
+.hw-web-sway { transform-box: view-box; transform-origin: 0 0; animation: hw-web-sway 11s ease-in-out infinite; }
+@keyframes hw-web-sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(1.6deg); } }
+.hw-web-loose { animation: hw-web-sway 6s ease-in-out infinite reverse; transform-box: view-box; }
 .hw-web-hit { fill: transparent; pointer-events: fill; cursor: pointer; }
 .hw-web-tl { top: 0; left: 0; }
 .hw-web-tr { top: 0; right: 0; transform: scaleX(-1); }
@@ -1947,4 +1956,5 @@ html.halloween .topbar .brand { -webkit-touch-callout: none; -webkit-user-select
     .hw-toast,
     .hw-pose-peek svg,
     .hw-web svg { transition: none; }
+    .hw-web-sway, .hw-web-loose, .hw-dew-glow { animation: none; }
 }
