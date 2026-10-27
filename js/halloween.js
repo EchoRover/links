@@ -465,15 +465,15 @@
     }
     const stage = hwDay() - 24;                            // 1..7
 
-    // A corner web in the classic style: a full round web (8 spokes, rings
-    // that scallop deeply in towards the hub between every pair of spokes,
-    // ring spacing widening outwards), with its hub just inside the corner
-    // so the corner crops it and you see a third of it, like the corner of
-    // a room. The svg is the R x R square inside the corner, opening
-    // towards +x/+y; CSS flips it into the other corners. Irregularity
-    // comes from a seeded stream (one seed per web), so a web is the same
-    // on every load, and day N is day N-1 plus more silk: spokes are added
-    // in a fixed order (the visible ones first), rings grow outwards.
+    // A corner web drawn like a friendly icon, not real silk: a round web
+    // (8 spokes, rings that scallop in towards the hub between spokes,
+    // spacing widening outwards), one soft lavender, bold rounded strokes.
+    // Its hub sits just inside the corner, so the corner crops it to about
+    // a third. The svg is the R x R square inside the corner, opening
+    // towards +x/+y; CSS flips it into the other corners. Small wobbles
+    // come from a seeded stream (one seed per web), so a web is the same on
+    // every load, and day N is day N-1 plus more web: spokes are added in a
+    // fixed order (the visible ones first), rings grow outwards (5 at most).
     const SPOKE_ORDER = [1, 0, 2, 7, 3, 6, 4, 5];
     function seeded(seed) {
         let x = seed >>> 0 || 1;
@@ -484,71 +484,36 @@
         const rnd = seeded(seed * 7919 + 13);
         const f = (v) => v.toFixed(1);
         const c = R * 0.1;                                  // hub, just inside the corner
-        const W = R * 1.08;                                 // web radius (the crop does the rest)
+        const W = R * 1.06;                                 // web radius (the crop does the rest)
         const phase = (8 + rnd() * 6) * Math.PI / 180;
         const P = (r, a) => [c + r * Math.cos(a), c + r * Math.sin(a)];
-        // every spoke's jitter is drawn even when unused, so a spoke added
-        // on a later day never reshuffles the ones already there
         const spokes = [];
-        for (let i = 0; i < 8; i++) spokes.push({ i, a: phase + i * Math.PI / 4 + (rnd() - 0.5) * 0.09, l: W * (0.9 + rnd() * 0.1) });
+        for (let i = 0; i < 8; i++) spokes.push({ a: phase + i * Math.PI / 4 + (rnd() - 0.5) * 0.06 });
         const nSp = [3, 4, 5, 6, 7, 8, 8][st - 1];
         const on = SPOKE_ORDER.slice(0, nSp).map((k) => spokes[k]).sort((p, q) => p.a - q.a);
         const full = on.length === 8;
-        const id = 'hw-silk-' + seed;
-        let out = '<defs><radialGradient id="' + id + '" gradientUnits="userSpaceOnUse" cx="' + f(c) + '" cy="' + f(c) + '" r="' + f(W) + '">' +
-            '<stop offset="0" stop-color="#F6F1FF" stop-opacity=".8"/>' +
-            '<stop offset=".5" stop-color="#DCD0F7" stop-opacity=".5"/>' +
-            '<stop offset="1" stop-color="#B9A8E6" stop-opacity=".12"/></radialGradient></defs>' +
-            '<g class="hw-web-sway" stroke="url(#' + id + ')" style="transform-origin:' + f(c) + 'px ' + f(c) + 'px">';
         let d = '';
-        on.forEach((sp) => { const [x, y] = P(sp.l, sp.a); d += 'M' + f(c) + ' ' + f(c) + 'L' + f(x) + ' ' + f(y); });
-        out += '<path class="hw-web-silk" stroke-width="0.9" d="' + d + '"/>';
-        // rings: between each pair of neighbouring spokes a deep inward
-        // scallop (the control point pulled about halfway to the hub, so
-        // each span bows in by roughly a third of its length)
-        const K = 7, rings = st, joints = [];
+        on.forEach((sp) => { const [x, y] = P(W, sp.a); d += 'M' + f(c) + ' ' + f(c) + 'L' + f(x) + ' ' + f(y); });
+        // rings: a deep inward scallop between each pair of neighbouring
+        // spokes (control point pulled about halfway to the hub)
+        const K = 5, rings = [1, 2, 2, 3, 4, 5, 5][st - 1];
         for (let k = 0; k < rings; k++) {
-            const r = W * (0.13 + 0.8 * Math.pow((k + 1) / K, 1.3));
+            const r = W * (0.2 + 0.74 * Math.pow((k + 1) / K, 1.25));
             const pairs = full ? on.length : on.length - 1;
-            let rd = '';
             for (let i = 0; i < pairs; i++) {
                 const s1 = on[i], s2 = on[(i + 1) % on.length];
                 let a2 = s2.a; if (a2 < s1.a) a2 += Math.PI * 2;
                 if (a2 - s1.a > Math.PI * 0.6) continue;    // no span across a gap in the spokes
-                if (s1.l < r || s2.l < r) continue;
                 const [x1, y1] = P(r, s1.a), [x2, y2] = P(r, a2);
-                const pull = 0.5 + (rnd() - 0.5) * 0.08;
                 const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-                rd += 'M' + f(x1) + ' ' + f(y1) + 'Q' + f(c + (mx - c) * pull) + ' ' + f(c + (my - c) * pull) + ' ' + f(x2) + ' ' + f(y2);
-                joints.push([x1, y1]);
-            }
-            if (rd) out += '<path class="hw-web-silk" stroke-width="' + (0.85 - k * 0.06).toFixed(2) + '" d="' + rd + '"/>';
-        }
-        // late in the week a thread or two has come loose and hangs free,
-        // never below the web's own square
-        if (st >= 5) {
-            const loose = st >= 7 ? 2 : 1;
-            for (let i = 0; i < loose; i++) {
-                const sp = on[(i * 3 + 1) % on.length];
-                const [x, y] = P(sp.l * (0.55 + 0.2 * i), sp.a);
-                const len = Math.min(R * (0.16 + rnd() * 0.1), R * 0.95 - y);
-                if (len < R * 0.08 || x < 2 || x > R - 2) continue;
-                out += '<path class="hw-web-silk hw-web-loose" stroke-width="0.6" d="M' + f(x) + ' ' + f(y) +
-                    'c' + f(len * 0.1) + ' ' + f(len * 0.35) + ' ' + f(-len * 0.25) + ' ' + f(len * 0.6) + ' ' + f(-len * 0.05) + ' ' + f(len) + '"/>';
+                d += 'M' + f(x1) + ' ' + f(y1) + 'Q' + f(c + (mx - c) * 0.52) + ' ' + f(c + (my - c) * 0.52) + ' ' + f(x2) + ' ' + f(y2);
             }
         }
-        // dew: a few drops on visible joints, each with a slow glint
-        const seen = joints.filter(([x, y]) => x > 3 && y > 3 && x < R - 3 && y < R - 3);
-        const drops = st < 3 ? 0 : Math.min(5, st - 1);
-        for (let i = 0; i < drops && seen.length; i++) {
-            const [x, y] = seen[Math.floor(rnd() * seen.length)];
-            out += '<circle class="hw-dew-glow" cx="' + f(x) + '" cy="' + f(y) + '" r="2.6" style="animation-delay:-' + (rnd() * 9).toFixed(1) + 's"/>' +
-                '<circle class="hw-dew" cx="' + f(x) + '" cy="' + f(y) + '" r="1"/>';
-        }
-        out += '</g>';
         // hit area: the web's own disc (cropped to the corner square)
-        const hit = '<circle class="hw-web-hit" cx="' + f(c) + '" cy="' + f(c) + '" r="' + f(W * (rings >= 3 ? 0.85 : 0.6)) + '"/>';
-        return '<svg viewBox="0 0 ' + R + ' ' + R + '" width="' + R + '" height="' + R + '">' + hit + out + '</svg>';
+        const hit = '<circle class="hw-web-hit" cx="' + f(c) + '" cy="' + f(c) + '" r="' + f(W * (rings >= 2 ? 0.85 : 0.6)) + '"/>';
+        return '<svg viewBox="0 0 ' + R + ' ' + R + '" width="' + R + '" height="' + R + '">' + hit +
+            '<g class="hw-web-sway" style="transform-origin:' + f(c) + 'px ' + f(c) + 'px">' +
+            '<path class="hw-web-silk" d="' + d + '"/></g></svg>';
     }
 
     function addWeb(host, corner, R) {
@@ -570,8 +535,11 @@
         if (!hit) return;
         const web = hit.closest('.hw-web');
         if (reduce) { web.remove(); return; }
+        const poof = document.createElement('span');
+        poof.className = 'hw-web-poof';
+        web.appendChild(poof);
         web.classList.add('swept');
-        setTimeout(() => web.remove(), 700);
+        setTimeout(() => web.remove(), 650);
     });
 
     function buildWebs() {
@@ -615,35 +583,40 @@
         }
     }
 
-    // ---------- 31 Oct: a spider lowers itself, once per visit ----------
+    // ---------- a small friendly spider, home page, from 29 Oct ----------
+    // It hangs on a short thread from the top-right web, entirely inside
+    // that web's corner square (so never over the header). Tap it and it
+    // climbs back into the web for a few seconds. On 31 Oct it waves.
+    const SPIDER =
+        '<svg viewBox="0 0 40 34" aria-hidden="true">' +
+        '<g class="hw-sp-legs"><path d="M12 15 4 10M11 19H3M12 23l-7 5"/><path d="M28 19h8M28 23l7 5"/>' +
+        '<path class="hw-sp-wave" d="M28 15l8-5"/></g>' +
+        '<circle class="hw-sp-body" cx="20" cy="19" r="9.5"/>' +
+        '<circle class="hw-sp-eye" cx="16.4" cy="17" r="3.2"/><circle class="hw-sp-eye" cx="23.6" cy="17" r="3.2"/>' +
+        '<circle class="hw-sp-pupil" cx="17" cy="17.6" r="1.5"/><circle class="hw-sp-pupil" cx="24.2" cy="17.6" r="1.5"/>' +
+        '<circle class="hw-sp-cheek" cx="13.6" cy="21.6" r="1.5"/><circle class="hw-sp-cheek" cx="26.4" cy="21.6" r="1.5"/>' +
+        '<path class="hw-sp-smile" d="M17.4 22.4q2.6 2.4 5.2 0"/></svg>';
     function spider() {
-        if (stage < 7 || !isHome || reduce || !topbar) return;
-        try {
-            if (sessionStorage.getItem('hw-spider')) return;
-            sessionStorage.setItem('hw-spider', '1');
-        } catch (e) {}
-        const brandEl = topbar.querySelector('.brand');
-        const t = topbar.getBoundingClientRect(), b = brandEl.getBoundingClientRect();
-        const u = topbar.querySelector('.topbar-utils').getBoundingClientRect();
-        const sameRow = u.top < b.bottom - 4;
-        const right = sameRow ? u.left : t.right;
-        if (right - b.right < 90) return;
-        const x = b.right + (right - b.right) * 0.84 + window.scrollX;
-        const depth = b.top + b.height / 2 + window.scrollY;
+        if (stage < 5 || !isHome) return;
+        const web = document.querySelector('body > .hw-web-tr') || document.querySelector('body > .hw-web-tl');
+        if (!web || web.querySelector('.hw-spider')) return;
+        const R = web.offsetWidth;
         const sp = document.createElement('div');
-        sp.className = 'hw-spider';
-        sp.style.left = x + 'px';
-        sp.innerHTML =
-            '<span class="hw-thread"></span>' +
-            '<button type="button" class="hw-bug" aria-label="A spider. Tap to send it back up.">' +
-            '<svg viewBox="0 0 24 24" aria-hidden="true"><g class="hw-legs"><path d="M9 11 3 7M9 13l-6 0M9 14l-5 5M15 11l6-4M15 13h6M15 14l5 5"/></g>' +
-            '<ellipse cx="12" cy="14" rx="4.2" ry="5"/><circle cx="12" cy="8.6" r="2.6"/></svg></button>';
-        document.body.appendChild(sp);
-        requestAnimationFrame(() => requestAnimationFrame(() => sp.style.setProperty('--drop', depth + 'px')));
-        sp.querySelector('.hw-bug').addEventListener('click', () => {
+        sp.className = 'hw-spider' + (stage >= 7 ? ' waves' : '');
+        // hang from a little past the middle, ending inside the square
+        const drop = Math.max(10, R - R * 0.3 - 26);
+        sp.style.left = Math.round(R * 0.6) + 'px';
+        sp.style.top = Math.round(R * 0.3) + 'px';
+        sp.style.setProperty('--drop', drop + 'px');
+        sp.innerHTML = '<span class="hw-thread"></span>' +
+            '<button type="button" class="hw-bug" aria-label="A little spider. Tap it.">' + SPIDER + '</button>';
+        web.appendChild(sp);
+        const bug = sp.querySelector('.hw-bug');
+        bug.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (sp.classList.contains('up')) return;
             sp.classList.add('up');
-            sp.style.setProperty('--drop', '0px');
-            setTimeout(() => sp.remove(), 1800);
+            setTimeout(() => sp.classList.remove('up'), 4000);
         });
     }
 
@@ -804,13 +777,11 @@
     });
 
     // ---------- layout-dependent bits, once the page has settled ----------
-    function layoutBits() { placeMoon(); buildWebs(); }
+    function layoutBits() { placeMoon(); buildWebs(); spider(); }
     if (document.readyState === 'complete') layoutBits();
     else window.addEventListener('load', layoutBits);
     placeMoon();
     let rz;
     window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(layoutBits, 200); });
-    window.addEventListener('load', () => setTimeout(spider, 900));
-    if (document.readyState === 'complete') setTimeout(spider, 900);
     scheduleApparition(params.get('boo') === 'now' ? 400 : 15000);
 })();
