@@ -34,16 +34,23 @@
         }
     };
 
-    // One ghost per page. `spot` is a non-link element the ghost tucks
-    // into the end of, so it sits in the text flow and can never land on
-    // top of a button. The page key is the last path segment, which is
-    // the same locally (/pages/bus.html) and on Vercel (/bus, cleanUrls).
+    // One ghost per page, each with its own hiding place and pose, picked
+    // from that page's layout. `anchor` is a non-link element the ghost is
+    // pinned to (absolutely, from its edge), and the CSS for each pose
+    // keeps it in empty space: above, below or beside the anchor, never on
+    // a link. The page key is the last path segment, which is the same
+    // locally (/pages/bus.html) and on Vercel (/bus, cleanUrls).
+    //   peek  behind the top edge of the class card, rises when you look
+    //   hang  upside down under the last live bus card, swinging
+    //   sink  half sunk into the floor at the end of the menu, bobbing
+    //   drift floating beside the course legend under the timetable
+    //   sit   sitting at the end of the rooms footnote, blinking
     const GHOSTS = [
-        { id: 'index', label: 'Home',       href: '/',                 spot: '.updates-col:last-child .updates-col-title' },
-        { id: 'bus',   label: 'Bus',        href: '/pages/bus.html',   spot: '.bus-sub' },
-        { id: 'mess',  label: 'Mess',       href: '/pages/mess.html',  spot: '.warn-banner' },
-        { id: 'week',  label: 'Timetable',  href: '/pages/week.html',  spot: '.wk-title' },
-        { id: 'rooms', label: 'Free Rooms', href: '/pages/rooms.html', spot: '.rooms-foot' }
+        { id: 'index', label: 'Home',       href: '/',                 anchor: '#tt-card',            pose: 'peek' },
+        { id: 'bus',   label: 'Bus',        href: '/pages/bus.html',   anchor: '#next-wrap',          pose: 'hang' },
+        { id: 'mess',  label: 'Mess',       href: '/pages/mess.html',  anchor: '#mess-body',          pose: 'sink' },
+        { id: 'week',  label: 'Timetable',  href: '/pages/week.html',  anchor: '#wk-legend',          pose: 'drift' },
+        { id: 'rooms', label: 'Free Rooms', href: '/pages/rooms.html', anchor: '.rooms-foot',         pose: 'sit' }
     ];
     const page = location.pathname.split('/').pop().replace(/\.html$/, '') || 'index';
     const isHome = page === 'index';
@@ -71,11 +78,16 @@
         '<path class="hw-sheet" d="M16 2C8 2 4 8 4 15v18l4-3 4 3 4-3 4 3 4-3 4 3V15c0-7-4-13-12-13z"/>' +
         '<ellipse class="hw-eye" cx="12" cy="15" rx="2" ry="3"/><ellipse class="hw-eye" cx="20" cy="15" rx="2" ry="3"/>' +
         '<ellipse class="hw-eye" cx="16" cy="22" rx="2" ry="1.4"/></svg>';
+    // A bat: one wing drawn once and mirrored, so both flap from the
+    // shoulder (46,20) by rotation. Leading edge with a wrist hump, a
+    // scalloped trailing edge between the finger tips, pointed ears.
+    const WING = 'M46 19C40 10 33 5 27 6 19 7 9 10 1 16c4 .5 7 2.5 8 6 3-2.5 7-2.5 10 .5 3-3 8-2.5 11 1 3-2.5 8-2 11 1.5 2-1.5 4-2.5 5-3z';
     const BAT =
-        '<svg viewBox="0 0 60 26" aria-hidden="true">' +
-        '<path class="hw-wing hw-wing-l" d="M30 12C24 4 14 2 2 6c5 2 6 6 5 9 4-2 8-1 10 2 3-3 8-3 13-5z"/>' +
-        '<path class="hw-wing hw-wing-r" d="M30 12c6-8 16-10 28-6-5 2-6 6-5 9-4-2-8-1-10 2-3-3-8-3-13-5z"/>' +
-        '<ellipse cx="30" cy="13" rx="4" ry="6"/><path d="M27 8l1-4 2 3 2-3 1 4z"/></svg>';
+        '<svg viewBox="0 0 100 46" aria-hidden="true">' +
+        '<path class="hw-wing" d="' + WING + '"/>' +
+        '<g transform="matrix(-1 0 0 1 100 0)"><path class="hw-wing" d="' + WING + '"/></g>' +
+        '<path d="M45.5 13.5 44.6 5.2l3.9 5.3h3l3.9-5.3-.9 8.3c1.3 1.6 1.8 3.4 1.6 5.3l-.4 9.5c-.4 5-3.2 8-5.7 8s-5.3-3-5.7-8l-.4-9.5c-.2-1.9.3-3.7 1.6-5.3z"/>' +
+        '</svg>';
 
     // ---------- toast: one line at a time, read out politely ----------
     const toast = document.createElement('div');
@@ -84,7 +96,8 @@
     toast.setAttribute('aria-live', 'polite');
     document.body.appendChild(toast);
     let toastTimer;
-    function say(title, line) {
+    function say(title, line, big) {
+        toast.classList.toggle('big', !!big);
         toast.innerHTML = '<b></b><span></span>';
         toast.querySelector('b').textContent = title;
         toast.querySelector('span').textContent = line || '';
@@ -123,7 +136,7 @@
         const b = document.createElement('div');
         b.className = 'hw-flyby';
         b.setAttribute('aria-hidden', 'true');
-        b.innerHTML = BAT;
+        b.innerHTML = '<span class="hw-bob">' + BAT + '</span>';
         document.body.appendChild(b);
         setTimeout(() => b.remove(), 2800);
     }
@@ -135,10 +148,19 @@
         const sky = document.createElement('div');
         sky.className = 'hw-sky';
         sky.setAttribute('aria-hidden', 'true');
+        // One small scene on the right of the bar: a hill, a crooked house
+        // with a tower and a leaning chimney, two bare trees, a broken
+        // fence, two lit windows. It fades out to the left so it never
+        // runs under the wordmark; the moon hangs above it.
         sky.innerHTML =
             '<span class="hw-moon"></span>' +
-            '<svg class="hw-skyline" viewBox="0 0 600 24" preserveAspectRatio="none">' +
-            '<path d="M0 24V18h30v-6h18v6h22V9h10V4h6v5h10v15h20v-8l12-6 12 6v8h40v-12h26v12h30V14h8l6-8 6 8h8v10h44v-7h34v7h28V11h14v-5h4v5h14v13h36v-9l14-8 14 8v9h42v-5h26v5h34V16h20v8z"/>' +
+            '<svg class="hw-scene" viewBox="0 0 320 64" preserveAspectRatio="xMaxYMax meet">' +
+            '<path d="M0 64C50 58 100 46 160 42c50-3 110 2 160 12v10z"/>' +
+            '<path d="M168 44V17l-4 0 8-13 8 13h-4v6l4-2 21-15 22 16-4 0v22z"/>' +
+            '<path d="M209 14l6-2 3 11h-6z"/>' +
+            '<path class="hw-tree" d="M114 49c1-9 0-17-3-25m3 11c4-3 6-7 6-12m-5 1c-3-3-7-4-10-3m7 8c-4 0-7 2-9 5m10-15c1-4 0-7-2-9M272 51c0-7-1-12-3-17m2 6c3-2 5-5 5-9m-6 1c-2-2-5-3-7-2"/>' +
+            '<path class="hw-tree" d="M232 46v-9m6 10v-8m6 8.5-1-8m7 9 3-7.5M229 41h19"/>' +
+            '<rect class="hw-win" x="184" y="27" width="5" height="6"/><rect class="hw-win" x="201" y="31" width="5" height="5"/>' +
             '</svg>';
         topbar.prepend(sky);
 
@@ -210,9 +232,12 @@
                 : 'One ghost hides on each of these pages. Tap it to catch it.') + '</p>' +
             '<ul class="hw-list">' + rows + '</ul>' +
             '<div class="hw-panel-foot">' +
+            (!reduce ? '<button type="button" class="hw-mini" data-act="boo"></button>' : '') +
             (isHome && !reduce ? '<button type="button" class="hw-mini" data-act="bats"></button>' : '') +
             '<button type="button" class="hw-mini" data-act="close">close</button></div>';
         paintBatsButton();
+        const boo = panel.querySelector('[data-act="boo"]');
+        if (boo) boo.textContent = booOn() ? 'ghosts: on' : 'ghosts: off';
     }
 
     function openPanel(open) {
@@ -226,6 +251,7 @@
         if (!act) return;
         if (act.dataset.act === 'close') openPanel(false);
         if (act.dataset.act === 'bats') setBats(!batsOn());
+        if (act.dataset.act === 'boo') { store.set('hw-boo', !booOn()); paintPanel(); scheduleApparition(); }
     });
     // tap anywhere else closes it, like any other popover on a phone
     document.addEventListener('click', (e) => {
@@ -236,14 +262,32 @@
 
     // ---------- this page's ghost ----------
     const mine = GHOSTS.find((g) => g.id === page);
-    const spot = mine && !caught.includes(mine.id) && document.querySelector(mine.spot);
+    const spot = mine && !caught.includes(mine.id) && document.querySelector(mine.anchor);
     if (spot) {
         const ghost = document.createElement('button');
         ghost.type = 'button';
-        ghost.className = 'hw-ghost';
+        ghost.className = 'hw-ghost hw-pose-' + mine.pose;
         ghost.setAttribute('aria-label', 'A ghost is hiding here. Tap to catch it.');
-        ghost.innerHTML = GHOST;
+        // the art sits in its own box so a pose can clip it (behind an
+        // edge, into the floor) while the button keeps a full hit area
+        ghost.innerHTML = '<span class="hw-ghost-art">' + GHOST + '</span>';
+        spot.classList.add('hw-anchor', 'hw-anchor-' + mine.pose);
         spot.appendChild(ghost);
+        // Some anchors are re-rendered by their page (the mess note is set
+        // with textContent), which would drop the ghost. Put it back.
+        new MutationObserver(() => {
+            if (!ghost.disabled && !spot.contains(ghost)) spot.appendChild(ghost);
+        }).observe(spot, { childList: true });
+        // It notices you: once it has been on screen for a moment it
+        // comes out a little further (the peek and the sink poses use it).
+        if ('IntersectionObserver' in window) {
+            let t;
+            new IntersectionObserver((es) => {
+                const vis = es[0].isIntersecting;
+                clearTimeout(t);
+                if (vis) t = setTimeout(() => ghost.classList.add('seen'), 1400);
+            }, { threshold: 0.9 }).observe(ghost);
+        }
         ghost.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -272,7 +316,7 @@
     function win(x, y) {
         burst(x, y, 24);
         setTimeout(() => burst(window.innerWidth / 2, window.innerHeight / 3, 60), 250);
-        say('Ghostbuster 2026.', 'All five caught. The lantern stays lit.');
+        say('Ghostbuster 2026', 'All five caught. The lantern stays lit.', true);
         paintLantern();
         paintBadge();
     }
@@ -357,13 +401,281 @@
         bats = document.createElement('div');
         bats.className = 'hw-bats';
         bats.setAttribute('aria-hidden', 'true');
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
             const b = document.createElement('span');
             b.className = 'hw-bat hw-bat-' + i;
-            b.innerHTML = BAT;
+            b.innerHTML = '<span class="hw-bob">' + BAT + '</span>';
             bats.appendChild(b);
         }
         document.body.appendChild(bats);
         bats.classList.toggle('paused', !batsOn());
     }
+    // ---------- moon: in the empty sky right of the wordmark ----------
+    // Placed from the real layout, because every page's bar is different:
+    // part way across the gap between the brand and the buttons, never
+    // above the top of the page (it used to get clipped on sub-pages).
+    function placeMoon() {
+        const moon = topbar && topbar.querySelector('.hw-moon');
+        const brandEl = topbar && topbar.querySelector('.brand');
+        const utilsEl = topbar && topbar.querySelector('.topbar-utils');
+        if (!moon || !brandEl) return;
+        const t = topbar.getBoundingClientRect();
+        const b = brandEl.getBoundingClientRect();
+        const u = utilsEl ? utilsEl.getBoundingClientRect() : null;
+        // buttons wrapped onto their own row (home on a phone): the gap
+        // runs from the wordmark to the right edge of the bar
+        const sameRow = u && u.top < b.bottom - 4;
+        const right = sameRow ? u.left : t.right;
+        const gap = right - b.right;
+        moon.hidden = gap < 54;
+        moon.style.left = (b.right - t.left + gap * (sameRow ? 0.5 : 0.62) - 14) + 'px';
+        moon.style.top = Math.max(2, b.top - t.top - 6) + 'px';
+        // The scene stands in the same gap, right up to the buttons, so no
+        // button sits on top of the house. Where the gap is too narrow
+        // (sub-pages on a phone) or the buttons wrap under the wordmark
+        // (home on a phone) there is no ground for it, so it stays away.
+        const scene = topbar.querySelector('.hw-scene');
+        if (scene) {
+            scene.style.display = (sameRow && gap >= 170) ? '' : 'none';
+            scene.style.right = (t.right - right + 10) + 'px';
+            scene.style.width = Math.min(gap - 20, 340) + 'px';
+        }
+    }
+
+    // ---------- the day: webs grow from 25 Oct (stage 1) to 31 Oct (7) ----------
+    // Gulf date, so everyone sees the same stage on the same day.
+    // ?spooky_day=25..31 previews a stage (kept for the visit, like ?spooky).
+    const params = new URLSearchParams(location.search);
+    let forced = params.get('spooky_day');
+    try {
+        if (forced) sessionStorage.setItem('spooky-day', forced);
+        else forced = sessionStorage.getItem('spooky-day');
+    } catch (e) {}
+    function hwDay() {
+        const f = parseInt(forced, 10);
+        if (f >= 25 && f <= 31) return f;
+        const g = new Date(Date.now() + 4 * 3600e3);      // UTC fields now read Gulf time
+        const m = g.getUTCMonth(), d = g.getUTCDate();
+        if (m === 9 && d >= 25) return d;
+        return (m < 9 || (m === 9 && d < 25)) ? 25 : 31;   // previews outside the week
+    }
+    const stage = hwDay() - 24;                            // 1..7
+
+    // A corner web, corner at (0,0), opening towards +x/+y; CSS flips it
+    // into the other corners. Radials are added in a fixed order and
+    // rings grow outwards, so day N is always day N-1 plus more thread.
+    const WEB_ANGLES = [24, 62, 43, 8, 82, 33, 53, 72];
+    const WEB_LEN = [1, 0.93, 0.97, 0.88, 0.9, 0.95, 0.9, 0.94];
+    function webSVG(R, st) {
+        const n = Math.min(8, st + 1);
+        const rings = st - 1;
+        const rad = WEB_ANGLES.slice(0, n).map((a, i) => ({ a: a * Math.PI / 180, l: R * WEB_LEN[i] }))
+            .sort((p, q) => p.a - q.a);
+        const pt = (r, a) => [r * Math.cos(a), r * Math.sin(a)];
+        let d = '';
+        rad.forEach((r) => { const [x, y] = pt(r.l, r.a); d += 'M0 0L' + x.toFixed(1) + ' ' + y.toFixed(1); });
+        for (let k = 0; k < rings; k++) {
+            const rk = R * (0.2 + 0.13 * k);
+            const on = rad.filter((r) => r.l > rk);
+            for (let i = 0; i + 1 < on.length; i++) {
+                const [x1, y1] = pt(rk, on[i].a), [x2, y2] = pt(rk, on[i + 1].a);
+                // each span sags a little towards the corner, like silk does
+                const cx = (x1 + x2) / 2 * 0.86, cy = (y1 + y2) / 2 * 0.86;
+                d += 'M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + 'Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1);
+            }
+        }
+        const lo = rad[0].a, hi = rad[rad.length - 1].a, L = Math.max(...rad.map((r) => r.l));
+        const [ax, ay] = pt(L, lo), [bx, by] = pt(L, hi);
+        // hit area: the wedge the threads span, not the whole corner box
+        const hit = 'M0 0L' + ax.toFixed(1) + ' ' + ay.toFixed(1) + 'A' + L.toFixed(1) + ' ' + L.toFixed(1) + ' 0 0 1 ' + bx.toFixed(1) + ' ' + by.toFixed(1) + 'Z';
+        return '<svg viewBox="0 0 ' + R + ' ' + R + '" width="' + R + '" height="' + R + '">' +
+            '<path class="hw-web-hit" d="' + hit + '"/><path class="hw-web-silk" d="' + d + '"/></svg>';
+    }
+
+    function addWeb(host, corner, R) {
+        if (R < 26) return;
+        const w = document.createElement('div');
+        w.className = 'hw-web hw-web-' + corner;
+        w.setAttribute('aria-hidden', 'true');
+        w.innerHTML = webSVG(Math.round(R), stage);
+        host.appendChild(w);
+    }
+
+    // Tap a web and it is swept away, for this page view only: it grows
+    // back on the next load, at that day's stage.
+    document.addEventListener('click', (e) => {
+        const hit = e.target.closest && e.target.closest('.hw-web-hit');
+        if (!hit) return;
+        const web = hit.closest('.hw-web');
+        if (reduce) { web.remove(); return; }
+        web.classList.add('swept');
+        setTimeout(() => web.remove(), 700);
+    });
+
+    function buildWebs() {
+        document.querySelectorAll('.hw-web').forEach((w) => w.remove());
+        const main = document.querySelector('main') || document.body;
+        // page corners: only as deep as the empty space above the top bar's
+        // content, so a thread can never cross the logo or a button
+        if (topbar) {
+            const tb = topbar.getBoundingClientRect();
+            const pad = parseFloat(getComputedStyle(topbar).paddingTop) || 0;
+            const free = tb.top + window.scrollY + pad - 4;
+            const R = Math.min(free, window.innerWidth < 600 ? 64 : 92);
+            addWeb(document.body, 'tl', R);
+            if (stage >= 2) addWeb(document.body, 'tr', R);
+        }
+        // bottom-right of the page, in the padding under the last content
+        if (stage >= 4) {
+            const last = main.lastElementChild;
+            const docH = document.documentElement.scrollHeight;
+            if (last) {
+                const free = docH - (last.getBoundingClientRect().bottom + window.scrollY) - 8;
+                addWeb(document.body, 'br', Math.min(free, 90));
+            }
+        }
+        // home: the empty bottom-right cell of course cards with an odd
+        // number of links (a lone link leaves that corner bare)
+        if (isHome && stage >= 3) {
+            const bare = [...document.querySelectorAll('#course-grid .course-links')]
+                .filter((l) => l.children.length % 2 === 1)
+                .map((l) => l.parentElement);
+            const take = stage >= 6 ? bare.length : stage >= 5 ? 2 : 1;
+            bare.slice(0, take).forEach((card) => {
+                card.classList.add('hw-web-host');
+                const links = card.querySelector('.course-links');
+                const last = links.lastElementChild.getBoundingClientRect();
+                const c = card.getBoundingClientRect();
+                const R = Math.min(c.right - last.right - 6, c.bottom - last.top - 6, 64);
+                addWeb(card, 'br', R);
+            });
+        }
+    }
+
+    // ---------- 31 Oct: a spider lowers itself, once per visit ----------
+    function spider() {
+        if (stage < 7 || !isHome || reduce || !topbar) return;
+        try {
+            if (sessionStorage.getItem('hw-spider')) return;
+            sessionStorage.setItem('hw-spider', '1');
+        } catch (e) {}
+        const brandEl = topbar.querySelector('.brand');
+        const t = topbar.getBoundingClientRect(), b = brandEl.getBoundingClientRect();
+        const u = topbar.querySelector('.topbar-utils').getBoundingClientRect();
+        const sameRow = u.top < b.bottom - 4;
+        const right = sameRow ? u.left : t.right;
+        if (right - b.right < 90) return;
+        const x = b.right + (right - b.right) * 0.84 + window.scrollX;
+        const depth = b.top + b.height / 2 + window.scrollY;
+        const sp = document.createElement('div');
+        sp.className = 'hw-spider';
+        sp.style.left = x + 'px';
+        sp.innerHTML =
+            '<span class="hw-thread"></span>' +
+            '<button type="button" class="hw-bug" aria-label="A spider. Tap to send it back up.">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><g class="hw-legs"><path d="M9 11 3 7M9 13l-6 0M9 14l-5 5M15 11l6-4M15 13h6M15 14l5 5"/></g>' +
+            '<ellipse cx="12" cy="14" rx="4.2" ry="5"/><circle cx="12" cy="8.6" r="2.6"/></svg></button>';
+        document.body.appendChild(sp);
+        requestAnimationFrame(() => requestAnimationFrame(() => sp.style.setProperty('--drop', depth + 'px')));
+        sp.querySelector('.hw-bug').addEventListener('click', () => {
+            sp.classList.add('up');
+            sp.style.setProperty('--drop', '0px');
+            setTimeout(() => sp.remove(), 1800);
+        });
+    }
+
+    // ---------- apparitions: a big faint ghost, now and then ----------
+    // One at a time, every 30-60 s (the first after ~15 s, or right away
+    // with ?boo=now), behind the content so text stays readable, never
+    // catching a tap. Paused while the tab is hidden; off for reduced
+    // motion; switchable in the pumpkin panel.
+    const booOn = () => store.get('hw-boo', true);
+    const APP =
+        '<svg viewBox="0 0 200 230" aria-hidden="true"><defs>' +
+        '<linearGradient id="hw-app-fade" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#EDE6FF"/><stop offset=".62" stop-color="#EDE6FF" stop-opacity=".85"/>' +
+        '<stop offset="1" stop-color="#EDE6FF" stop-opacity="0"/></linearGradient></defs>' +
+        '<path fill="url(#hw-app-fade)" d="M100 8C52 8 28 46 28 96v84c8-10 17-14 26-4s14 26 24 22 12-24 22-24 14 30 24 30 14-20 24-24 16 4 24 12V96c0-50-24-88-72-88z"/>' +
+        '<g class="hw-app-eyes" fill="#0B0716"><ellipse cx="78" cy="88" rx="9" ry="14"/><ellipse cx="122" cy="88" rx="9" ry="14"/>' +
+        '<ellipse cx="100" cy="128" rx="10" ry="7"/></g></svg>';
+    let appTimer = null, appAnims = [], appEl = null;
+    function scheduleApparition(ms) {
+        clearTimeout(appTimer);
+        if (reduce || !booOn() || document.hidden) return;
+        appTimer = setTimeout(apparition, ms != null ? ms : 30000 + Math.random() * 30000);
+    }
+    function apparition() {
+        if (appEl || document.hidden || !booOn()) { scheduleApparition(); return; }
+        const W = window.innerWidth, H = window.innerHeight;
+        const size = Math.max(W * (0.25 + Math.random() * 0.15), 200);
+        const peak = (0.18 + Math.random() * 0.07).toFixed(2);
+        const kinds = ['rise', 'drift', 'corner', 'look'];
+        const kind = params.get('boo_kind') || kinds[Math.floor(Math.random() * kinds.length)];
+        const el = document.createElement('div');
+        el.className = 'hw-apparition';
+        el.setAttribute('aria-hidden', 'true');
+        el.style.width = size + 'px';
+        el.innerHTML = APP;
+        document.body.appendChild(el);
+        appEl = el;
+        const h = size * 1.15, dur = 4000 + Math.random() * 4000;
+        const rx = Math.random() * (W - size);
+        const left = Math.random() < 0.5;
+        const T = (x, y, r, sc) => 'translate(' + x.toFixed(0) + 'px,' + y.toFixed(0) + 'px) rotate(' + (r || 0) + 'deg) scaleX(' + (sc || 1) + ')';
+        let frames;
+        if (kind === 'rise') {            // up from the bottom edge
+            frames = [
+                { transform: T(rx, H - h * 0.15, -3), opacity: 0 },
+                { transform: T(rx, H - h * 0.7, 2), opacity: peak, offset: 0.45 },
+                { transform: T(rx + 20, H - h * 1.0, -2), opacity: 0 }];
+        } else if (kind === 'drift') {    // across, behind everything
+            const y = H * (0.15 + Math.random() * 0.45);
+            const x0 = left ? -size * 0.9 : W - size * 0.1, x1 = left ? W - size * 0.1 : -size * 0.9;
+            frames = [
+                { transform: T(x0, y, left ? 6 : -6, left ? 1 : -1), opacity: 0 },
+                { transform: T((x0 + x1) / 2, y - 30, 0, left ? 1 : -1), opacity: peak, offset: 0.5 },
+                { transform: T(x1, y + 10, left ? 6 : -6, left ? 1 : -1), opacity: 0 }];
+        } else {                          // in a corner, half off the edge
+            const x = left ? -size * 0.35 : W - size * 0.65;
+            const y = Math.random() < 0.5 ? -h * 0.15 : H - h * 0.8;
+            frames = [
+                { transform: T(x, y + 20, left ? 8 : -8), opacity: 0 },
+                { transform: T(x, y, left ? 4 : -4), opacity: peak, offset: 0.35 },
+                { transform: T(x, y - 6, left ? -2 : 2), opacity: peak, offset: 0.7 },
+                { transform: T(x, y - 14, 0), opacity: 0 }];
+        }
+        appAnims = [el.animate(frames, { duration: dur, easing: 'ease-in-out', fill: 'forwards' })];
+        if (kind === 'look') {            // it turns to look at you, then goes
+            const eyes = el.querySelector('.hw-app-eyes');
+            const dx = left ? 14 : -14;
+            appAnims.push(eyes.animate([
+                { transform: 'translate(0,0)' },
+                { transform: 'translate(0,0)', offset: 0.35 },
+                { transform: 'translate(' + dx + 'px,4px)', offset: 0.5 },
+                { transform: 'translate(' + dx + 'px,4px)', offset: 0.8 },
+                { transform: 'translate(0,0)' }], { duration: dur, fill: 'forwards' }));
+        }
+        appAnims[0].onfinish = () => { el.remove(); appEl = null; appAnims = []; scheduleApparition(); };
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearTimeout(appTimer);
+            appAnims.forEach((a) => a.pause());
+        } else if (appEl) {
+            appAnims.forEach((a) => a.play());
+        } else {
+            scheduleApparition();
+        }
+    });
+
+    // ---------- layout-dependent bits, once the page has settled ----------
+    function layoutBits() { placeMoon(); buildWebs(); }
+    if (document.readyState === 'complete') layoutBits();
+    else window.addEventListener('load', layoutBits);
+    placeMoon();
+    let rz;
+    window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(layoutBits, 200); });
+    window.addEventListener('load', () => setTimeout(spider, 900));
+    if (document.readyState === 'complete') setTimeout(spider, 900);
+    scheduleApparition(params.get('boo') === 'now' ? 400 : 15000);
 })();

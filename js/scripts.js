@@ -367,6 +367,17 @@ addUpdate("quizzes", "ACOL331: OS lab 1 exam, 08/10/2026", "2026-10-08");
 
 addUpdate("assignments", "ACOL333: AI assignment 1, 12/10/2026", "2026-10-12");
 addUpdate("assignments", "AGRL130: Value proposition (FAB table + personas), 12/10/2026", "2026-10-12");
+addUpdate("assignments", "ACOL333: AI assignment 2 (adversarial search), 09/11/2026", "2026-11-09");
+
+// Mid-sem papers from the Year 3 mid-term schedule (24-29 Oct), listed
+// as quizzes so they sit in the same dated list. The time is the start;
+// reporting is 30 min earlier.
+addUpdate("quizzes", "AHUL256: Critical Thinking mid-sem 10:30, 24/10/2026", "2026-10-24");
+addUpdate("quizzes", "ASBL100: Biology mid-sem 11:30, 26/10/2026", "2026-10-26");
+addUpdate("quizzes", "ACOL331: OS mid-sem 08:30, 27/10/2026", "2026-10-27");
+addUpdate("quizzes", "AHUL261: Psychology mid-sem 14:30, 27/10/2026", "2026-10-27");
+addUpdate("quizzes", "ACOL333: AI mid-sem 14:30, 28/10/2026", "2026-10-28");
+addUpdate("quizzes", "ACOL351: Algorithms mid-sem 14:30, 29/10/2026", "2026-10-29");
 
 // ACOL351 runs a quiz in EVERY tutorial (Wed 15:30-16:20, M4-0-019 --
 // moved there in the 7 Sep revision; it was Wed 10:00-10:50 before).
@@ -393,8 +404,12 @@ function addNextAlgoTutQuiz() {
   const [ey, em, ed] = termEnd.split("-").map(Number);
   const last = new Date(ey, em - 1, ed);
 
+  // No tutorial quiz is posted while the mid-sems are on; the papers
+  // themselves fill the quizzes list until they are over.
+  const midsemOver = new Date(2026, 9, 30);
   const d = new Date();
   d.setHours(0, 0, 0, 0);
+  if (d < midsemOver) return;
   d.setDate(d.getDate() + ((3 - d.getDay() + 7) % 7)); // next Wednesday (today if it is one)
 
   // Walk forward over holidays and the mid-sem block; give up rather

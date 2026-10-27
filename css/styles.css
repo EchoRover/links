@@ -1466,7 +1466,7 @@ html.halloween[data-theme="dark"] body {
     background-attachment: fixed;
 }
 
-/* ---------- header: moon + skyline behind the top bar ---------- */
+/* ---------- header: moon + haunted-house scene behind the top bar ---------- */
 html.halloween .topbar { position: relative; }
 html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
 .hw-sky {
@@ -1475,31 +1475,54 @@ html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
     pointer-events: none;
     z-index: 0;
 }
+/* left/top are set by halloween.js from the real layout: in the empty
+   sky right of the wordmark, never above the top of the page */
 .hw-moon {
     position: absolute;
-    top: -0.35rem;
-    right: 38%;
+    top: 0.25rem;
+    left: 50%;
     width: 30px;
     height: 30px;
     border-radius: 50%;
     /* a crescent from an inset shadow: no mask disc to clash with the sky */
-    box-shadow: inset -9px 4px 0 0 #F4E2AE;
+    /* lit edge on the left, opening right: the classic upright crescent */
+    box-shadow: inset 9px 0 0 0 #F4E2AE;
     filter: drop-shadow(0 0 10px rgba(255, 236, 180, 0.45));
-    transform: rotate(-20deg);
     opacity: 0.9;
 }
-.hw-skyline {
+.hw-moon[hidden] { display: none; }
+/* one scene, right-aligned on the bar's bottom rule, fading out to the
+   left so it never runs under the wordmark. Silhouette a shade lighter
+   than the sky; the two windows are the only colour. */
+.hw-scene {
     position: absolute;
-    left: 0;
     right: 0;
     bottom: 0;
-    width: 100%;
-    height: 22px;
-    fill: var(--fg);
-    opacity: 0.07;
+    width: 340px;
+    height: 64px;
+    fill: #2A1F45;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 45%);
+    mask-image: linear-gradient(to right, transparent 0, #000 45%);
 }
+.hw-scene .hw-tree { fill: none; stroke: #2A1F45; stroke-width: 2.2; stroke-linecap: round; }
+.hw-scene .hw-win { fill: #FFB347; filter: drop-shadow(0 0 3px rgba(255, 179, 71, 0.9)); }
+[data-theme="light"] .hw-scene { fill: #CBBFA4; }
+[data-theme="light"] .hw-scene .hw-tree { stroke: #CBBFA4; }
 @media (max-width: 720px) {
-    .hw-moon { right: 6%; top: -1.1rem; width: 24px; height: 24px; box-shadow: inset -7px 3px 0 0 #F4E2AE; }
+    .hw-moon { width: 24px; height: 24px; box-shadow: inset 7px 0 0 0 #F4E2AE; }
+    .hw-scene { height: 46px; }
+}
+
+/* the theme toggle's glyph (a font half-circle) renders thin and lopsided
+   on the night palette; draw the same half-moon icon crisply instead */
+html.halloween #theme-toggle { font-size: 0; }
+html.halloween #theme-toggle::before {
+    content: "";
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1.6px solid currentColor;
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%);
 }
 
 /* ---------- jack-o'-lantern (header) + shared pumpkin art ---------- */
@@ -1525,13 +1548,15 @@ html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
 }
 
 /* ---------- ghosts ---------- */
+/* Every pose is pinned to an anchor element (halloween.js adds
+   .hw-anchor-<pose>) and sits in empty space around it. The button is
+   the hit area (44px), the art inside it can be clipped or moved. */
+.hw-anchor { position: relative; }
 .hw-ghost {
-    display: inline-grid;
-    place-items: center;
-    vertical-align: middle;
-    width: 2rem;
-    height: 2rem;
-    margin: -0.4rem 0 -0.4rem 0.35rem;
+    position: absolute;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
     padding: 0;
     background: none;
     border: 0;
@@ -1539,34 +1564,79 @@ html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
     color: inherit;
     -webkit-tap-highlight-color: transparent;
 }
-.hw-ghost svg {
-    width: 1.15rem;
-    height: 1.3rem;
-    overflow: visible;
-    opacity: 0.6;
-    animation: hw-bob 3.4s ease-in-out infinite;
-    transition: opacity 0.2s;
-}
-.hw-ghost:hover svg, .hw-ghost:focus-visible svg { opacity: 1; }
+.hw-ghost-art { position: absolute; display: block; }
+.hw-ghost svg { display: block; width: 28px; height: 32px; overflow: visible; }
 .hw-ghost:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; border-radius: 8px; }
 .hw-sheet { fill: #F3EEFF; }
 .hw-eye { fill: #1A1230; }
 [data-theme="light"] .hw-sheet { fill: #FFFFFF; stroke: #6B5E85; stroke-width: 1.2; }
-@keyframes hw-bob {
-    0%, 100% { transform: translateY(0) rotate(-3deg); }
-    50% { transform: translateY(-3px) rotate(3deg); }
+.hw-eye { transform-box: fill-box; transform-origin: center; }
+
+/* home: peeks up from behind the top edge of the class card. The art
+   sits in a window that ends at the card's edge, so its lower half is
+   "behind" the card; after a moment in view it rises for a better look. */
+/* a little extra sky above the card so the ghost never reaches the pills */
+html.halloween #tt-card.hw-anchor-peek { margin-top: 2.2rem; }
+.hw-pose-peek { top: -32px; right: 26%; height: 44px; }
+.hw-pose-peek .hw-ghost-art { left: 0; right: 0; top: 0; height: 32px; overflow: hidden; }
+.hw-pose-peek svg { margin: 0 auto; transform: translateY(21px); transition: transform 0.9s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.hw-pose-peek.seen svg { transform: translateY(12px) rotate(-8deg); }
+
+/* bus: hangs upside down under the live cards, swinging a little */
+/* the ghost hangs in extra room under the cards (padding, not margin,
+   so it cannot collapse into the controls' margin) */
+html.halloween #next-wrap.hw-anchor-hang { padding-bottom: 46px; }
+.hw-pose-hang { bottom: 0; right: 16%; }
+.hw-pose-hang .hw-ghost-art { left: 8px; top: 0; transform-origin: 14px 0; animation: hw-swing 3.6s ease-in-out infinite; }
+.hw-pose-hang svg { transform: rotate(180deg); }
+@keyframes hw-swing { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
+
+/* mess: half sunk into the floor at the end of the menu, bobbing up and down */
+html.halloween .hw-anchor-sink { padding-bottom: 50px; }
+.hw-pose-sink { right: 0; bottom: 2px; }
+.hw-pose-sink .hw-ghost-art { left: 0; right: 0; top: 0; height: 36px; overflow: hidden; border-bottom: 1.5px solid var(--rule); }
+.hw-pose-sink svg { margin: 0 auto; transform: translateY(18px); animation: hw-sink 4.2s ease-in-out infinite; }
+@keyframes hw-sink { 0%, 100% { transform: translateY(19px); } 50% { transform: translateY(8px); } }
+.hw-pose-sink.seen svg { animation-duration: 2.6s; }
+
+/* timetable: floats beside the course legend, drifting in a slow loop */
+html.halloween .hw-anchor-drift { padding-right: 3.6rem; min-height: 3rem; }
+.hw-pose-drift { right: 0; top: 50%; margin-top: -22px; }
+.hw-pose-drift .hw-ghost-art { left: 8px; top: 6px; opacity: 0.8; animation: hw-drift-loop 7s ease-in-out infinite; }
+@keyframes hw-drift-loop {
+    0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+    25% { transform: translate(-5px, -6px) rotate(0deg); }
+    50% { transform: translate(0, -2px) rotate(6deg); }
+    75% { transform: translate(4px, 4px) rotate(0deg); }
 }
-.hw-ghost.poof svg { animation: hw-poof 0.6s ease-out forwards; }
+
+/* rooms: sits at the end of the footnote with a shadow under it, blinking */
+html.halloween .hw-anchor-sit { padding-right: 3.6rem; }
+.hw-pose-sit { right: 0; bottom: -6px; }
+.hw-pose-sit .hw-ghost-art { left: 8px; top: 8px; transform: rotate(7deg) scaleY(0.92); transform-origin: bottom; }
+.hw-pose-sit .hw-ghost-art::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: -3px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+}
+.hw-pose-sit .hw-eye { animation: hw-blink 5s infinite; }
+@keyframes hw-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+
+/* caught */
+.hw-ghost.poof .hw-ghost-art { animation: hw-poof 0.6s ease-out forwards; overflow: visible; }
 .hw-ghost.poof::after {
     content: "";
     position: absolute;
-    width: 2rem;
-    height: 2rem;
+    inset: 4px;
     border-radius: 50%;
     border: 2px solid #F3EEFF;
     animation: hw-ring 0.6s ease-out forwards;
 }
-.hw-ghost.poof { position: relative; }
 @keyframes hw-poof {
     to { transform: translateY(-14px) scale(1.6); opacity: 0; }
 }
@@ -1618,9 +1688,11 @@ html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
 }
 .hw-panel[hidden] { display: none; }
 .hw-panel-title {
-    font-family: 'Griffy', var(--font-serif);
-    font-size: 1.35rem;
-    line-height: 1.1;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
     color: var(--coral);
 }
 .hw-panel-sub { margin: 0.25rem 0 0.6rem; font-size: 0.82rem; color: var(--fg-soft); line-height: 1.4; }
@@ -1675,7 +1747,9 @@ html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
     transition: opacity 0.25s ease, transform 0.25s ease;
 }
 .hw-toast.show { opacity: 1; transform: translate(-50%, 0); }
-.hw-toast b { font-family: 'Griffy', var(--font-serif); font-weight: 400; font-size: 1.15rem; color: var(--coral); }
+.hw-toast b { font-family: var(--font-sans); font-weight: 800; font-size: 1rem; color: var(--coral); }
+/* the decorative face only where it is big: the win headline */
+.hw-toast.big b { font-family: 'Griffy', var(--font-serif); font-weight: 400; font-size: 1.9rem; line-height: 1.1; }
 .hw-toast span { font-size: 0.85rem; color: var(--fg-soft); }
 
 /* ---------- candy burst ---------- */
@@ -1706,79 +1780,171 @@ html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
 }
 
 /* ---------- bats ---------- */
-/* moonlit violet, not black: a black bat on a night sky is invisible */
-.hw-bat svg, .hw-flyby svg { width: 100%; height: 100%; display: block; fill: #5A4785; overflow: visible; }
-[data-theme="light"] .hw-bat svg, [data-theme="light"] .hw-flyby svg { fill: #2B2140; }
-.hw-wing { transform-origin: 30px 12px; animation: hw-flap 0.32s ease-in-out infinite alternate; }
-@keyframes hw-flap { to { transform: scaleY(0.35); } }
+/* Near-black with a faint moonlit rim so they read on the night sky.
+   Three nested transforms: the outer box travels, .hw-bob bobs on a
+   sine and banks with its direction, the wings rotate at the shoulder. */
+.hw-bat svg, .hw-flyby svg { width: 100%; height: auto; display: block; fill: #0E0918; overflow: visible; }
+.hw-bob { display: block; filter: drop-shadow(0 0 1px rgba(214, 190, 255, 0.75)) drop-shadow(0 0 7px rgba(150, 110, 255, 0.3)); }
+[data-theme="light"] .hw-bat svg, [data-theme="light"] .hw-flyby svg { fill: #1E1630; }
+.hw-wing { transform-box: view-box; transform-origin: 46px 20px; animation: hw-flap 0.26s ease-in-out infinite alternate; }
+@keyframes hw-flap {
+    from { transform: rotate(26deg) scaleX(0.82); }
+    to { transform: rotate(-16deg) scaleX(1); }
+}
 
-/* home only: a few bats crossing slowly behind the content */
+/* home only: two or three bats crossing slowly behind the content */
 .hw-bats { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 .hw-bat {
     position: absolute;
     left: 0;
-    width: 34px;
-    height: 15px;
-    opacity: 0.55;
-    animation: hw-drift 46s linear infinite;
+    width: 56px;
+    animation: hw-cross 44s linear infinite;
 }
-.hw-bat-0 { top: 14%; animation-delay: -4s; }
-.hw-bat-1 { top: 38%; width: 24px; height: 11px; animation-duration: 62s; animation-delay: -30s; }
-.hw-bat-2 { top: 63%; animation-duration: 54s; animation-delay: -17s; }
-.hw-bat-3 { top: 82%; width: 22px; height: 10px; animation-duration: 70s; animation-delay: -48s; }
-@keyframes hw-drift {
-    0% { transform: translate(-60px, 0); }
-    25% { transform: translate(25vw, -40px); }
-    50% { transform: translate(50vw, 10px); }
-    75% { transform: translate(75vw, -30px); }
-    100% { transform: translate(calc(100vw + 60px), 0); }
+.hw-bat .hw-bob { animation: hw-bank 3.2s ease-in-out infinite; }
+.hw-bat-0 { top: 16%; animation-delay: -6s; }
+.hw-bat-1 { top: 47%; width: 46px; animation-duration: 58s; animation-delay: -34s; }
+.hw-bat-1 .hw-bob { animation-duration: 2.7s; }
+.hw-bat-2 { top: 74%; width: 50px; animation-name: hw-cross-back; animation-duration: 51s; animation-delay: -19s; }
+.hw-bat-2 .hw-bob { animation-duration: 3.6s; }
+.hw-bat-2 .hw-wing, .hw-bat-1 .hw-wing { animation-duration: 0.3s; }
+@keyframes hw-cross {
+    from { transform: translateX(-80px); }
+    to { transform: translateX(calc(100vw + 80px)); }
+}
+/* the third flies the other way: mirror it, so its banking mirrors too */
+@keyframes hw-cross-back {
+    from { transform: translateX(calc(100vw + 80px)) scaleX(-1); }
+    to { transform: translateX(-80px) scaleX(-1); }
+}
+/* sine bob with banking: nose down while descending, up while climbing */
+@keyframes hw-bank {
+    0% { transform: translateY(0) rotate(7deg); }
+    25% { transform: translateY(16px) rotate(0deg); }
+    50% { transform: translateY(0) rotate(-7deg); }
+    75% { transform: translateY(-16px) rotate(0deg); }
+    100% { transform: translateY(0) rotate(7deg); }
 }
 .hw-bats.paused { display: none; }
+@media (max-width: 720px) {
+    .hw-bat { width: 44px; }
+    .hw-bat-1 { width: 36px; }
+    .hw-bat-2 { width: 40px; }
+}
 
 /* the trick: one bat crosses the screen once, above everything, untouchable */
 .hw-flyby {
     position: fixed;
-    top: 30%;
+    top: 28%;
     left: 0;
     z-index: 225;
-    width: 64px;
-    height: 28px;
+    width: 72px;
     pointer-events: none;
-    animation: hw-flyby 2.6s ease-in-out forwards;
+    animation: hw-cross 2.8s cubic-bezier(0.45, 0.1, 0.55, 0.9) forwards;
 }
-.hw-flyby svg { fill: #6B55A0; filter: drop-shadow(0 0 6px rgba(201, 162, 255, 0.5)); }
-@keyframes hw-flyby {
-    0% { transform: translate(-80px, 40px) scale(0.7); }
-    40% { transform: translate(40vw, -30px) scale(1.1); }
-    70% { transform: translate(65vw, 20px) scale(1); }
-    100% { transform: translate(calc(100vw + 80px), -60px) scale(0.8); }
-}
+.hw-flyby .hw-bob { animation: hw-bank 0.9s ease-in-out infinite; }
+.hw-flyby .hw-wing { animation-duration: 0.16s; }
 
 /* ---------- reward badge (home) ---------- */
+/* small, so the site font: the spook comes from the colour and the ghost */
 .hw-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.3rem 0.7rem 0.3rem 0.5rem;
+    padding: 0.32rem 0.75rem 0.32rem 0.55rem;
     border: 1px solid var(--coral);
     border-radius: 999px;
     background: var(--coral-soft);
     color: var(--coral);
-    font-family: 'Griffy', var(--font-serif);
-    font-size: 1rem;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
     line-height: 1;
     white-space: nowrap;
 }
 .hw-badge svg { width: 0.95rem; height: 1.1rem; }
 html.halloween .hero-block { flex-wrap: wrap; }
 
+/* ---------- cobwebs ---------- */
+/* Thin pale silk. The svg itself lets taps through; only the wedge the
+   threads span catches one (to sweep the web away). */
+.hw-web { position: absolute; z-index: 6; pointer-events: none; line-height: 0; }
+.hw-web svg { display: block; overflow: visible; pointer-events: none; }
+.hw-web-silk { fill: none; stroke: #E6DCFF; stroke-width: 0.8; opacity: 0.32; vector-effect: non-scaling-stroke; }
+[data-theme="light"] .hw-web-silk { stroke: #5B4F72; opacity: 0.4; }
+.hw-web-hit { fill: transparent; pointer-events: fill; cursor: pointer; }
+.hw-web-tl { top: 0; left: 0; }
+.hw-web-tr { top: 0; right: 0; transform: scaleX(-1); }
+.hw-web-br { bottom: 0; right: 0; transform: scale(-1, -1); }
+.hw-web-host { position: relative; }
+.hw-web-host > .hw-web-br { bottom: 1px; right: 1px; }
+.hw-web svg { transform-origin: 0 0; transition: transform 0.6s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.6s ease; }
+.hw-web.swept svg { transform: rotate(-24deg) scale(0.25, 0.6) skewX(18deg); opacity: 0; }
+
+/* ---------- the 31 Oct spider ---------- */
+.hw-spider {
+    --drop: 0px;
+    position: absolute;
+    top: 0;
+    z-index: 6;
+    width: 40px;
+    margin-left: -20px;
+    pointer-events: none;
+}
+.hw-thread {
+    display: block;
+    width: 1px;
+    margin: 0 auto;
+    height: var(--drop);
+    background: rgba(230, 220, 255, 0.45);
+    transition: height 7s cubic-bezier(0.3, 0.6, 0.4, 1);
+}
+.hw-spider.up .hw-thread { transition-duration: 1.6s; transition-timing-function: ease-in; }
+.hw-bug {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-top: -8px;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    pointer-events: auto;
+    animation: hw-dangle 3s ease-in-out infinite;
+    transform-origin: 50% -40px;
+}
+.hw-bug svg { width: 22px; height: 22px; fill: #0E0918; filter: drop-shadow(0 0 1px rgba(214, 190, 255, 0.8)); }
+.hw-bug .hw-legs { fill: none; stroke: #0E0918; stroke-width: 1.3; stroke-linecap: round; }
+@keyframes hw-dangle { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+
+/* ---------- apparitions ---------- */
+/* behind the page (z 5) and above the dimming cover (z 2): it shows in the
+   gaps between cards, never over text, and never takes a tap */
+.hw-apparition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    filter: blur(1.5px) drop-shadow(0 0 24px rgba(220, 205, 255, 0.55));
+    will-change: transform, opacity;
+}
+.hw-apparition svg { display: block; width: 100%; height: auto; }
+.hw-app-eyes { transform-box: view-box; }
+
 /* the logo is a long-press target this week: no iOS callout or text pick */
 html.halloween .topbar .brand { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 
 @media (prefers-reduced-motion: reduce) {
     .hw-lantern.lit .hw-face,
+    .hw-ghost-art,
     .hw-ghost svg,
+    .hw-eye,
     .hw-wing,
     .hw-counter.bump { animation: none; }
-    .hw-toast { transition: none; }
+    .hw-toast,
+    .hw-pose-peek svg,
+    .hw-web svg { transition: none; }
 }
