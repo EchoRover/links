@@ -1565,7 +1565,16 @@ html.halloween #theme-toggle::before {
     -webkit-tap-highlight-color: transparent;
 }
 .hw-ghost-art { position: absolute; display: block; }
-.hw-ghost svg { display: block; width: 28px; height: 32px; overflow: visible; }
+.hw-ghost svg { display: block; width: 21px; height: 24px; overflow: visible; }
+/* harder to spot: faint at rest, and every few seconds it all but fades
+   out and back, so it is there about two thirds of the time */
+.hw-ghost { opacity: 0.6; animation: hw-fade 10s ease-in-out infinite; }
+@keyframes hw-fade { 0%, 52%, 100% { opacity: 0.6; } 64%, 80% { opacity: 0.05; } }
+.hw-pose-hang { animation-delay: -3s; }
+.hw-pose-sink { animation-delay: -6s; }
+.hw-pose-drift { animation-delay: -1.5s; }
+.hw-pose-sit { animation-delay: -8s; }
+.hw-ghost:focus-visible, .hw-ghost.poof { animation: none; opacity: 1; }
 .hw-ghost:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; border-radius: 8px; }
 .hw-sheet { fill: #F3EEFF; }
 .hw-eye { fill: #1A1230; }
@@ -1579,15 +1588,15 @@ html.halloween #theme-toggle::before {
 html.halloween #tt-card.hw-anchor-peek { margin-top: 2.2rem; }
 .hw-pose-peek { top: -32px; right: 26%; height: 44px; }
 .hw-pose-peek .hw-ghost-art { left: 0; right: 0; top: 0; height: 32px; overflow: hidden; }
-.hw-pose-peek svg { margin: 0 auto; transform: translateY(21px); transition: transform 0.9s cubic-bezier(0.34, 1.4, 0.64, 1); }
-.hw-pose-peek.seen svg { transform: translateY(12px) rotate(-8deg); }
+.hw-pose-peek svg { margin: 0 auto; transform: translateY(20px); transition: transform 0.9s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.hw-pose-peek.seen svg { transform: translateY(15px) rotate(-8deg); }
 
 /* bus: hangs upside down under the live cards, swinging a little */
 /* the ghost hangs in extra room under the cards (padding, not margin,
    so it cannot collapse into the controls' margin) */
 html.halloween #next-wrap.hw-anchor-hang { padding-bottom: 46px; }
 .hw-pose-hang { bottom: 0; right: 16%; }
-.hw-pose-hang .hw-ghost-art { left: 8px; top: 0; transform-origin: 14px 0; animation: hw-swing 3.6s ease-in-out infinite; }
+.hw-pose-hang .hw-ghost-art { left: 11px; top: 0; transform-origin: 10px 0; animation: hw-swing 3.6s ease-in-out infinite; }
 .hw-pose-hang svg { transform: rotate(180deg); }
 @keyframes hw-swing { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
 
@@ -1595,14 +1604,14 @@ html.halloween #next-wrap.hw-anchor-hang { padding-bottom: 46px; }
 html.halloween .hw-anchor-sink { padding-bottom: 50px; }
 .hw-pose-sink { right: 0; bottom: 2px; }
 .hw-pose-sink .hw-ghost-art { left: 0; right: 0; top: 0; height: 36px; overflow: hidden; border-bottom: 1.5px solid var(--rule); }
-.hw-pose-sink svg { margin: 0 auto; transform: translateY(18px); animation: hw-sink 4.2s ease-in-out infinite; }
-@keyframes hw-sink { 0%, 100% { transform: translateY(19px); } 50% { transform: translateY(8px); } }
+.hw-pose-sink svg { margin: 0 auto; transform: translateY(22px); animation: hw-sink 4.2s ease-in-out infinite; }
+@keyframes hw-sink { 0%, 100% { transform: translateY(24px); } 50% { transform: translateY(15px); } }
 .hw-pose-sink.seen svg { animation-duration: 2.6s; }
 
 /* timetable: floats beside the course legend, drifting in a slow loop */
 html.halloween .hw-anchor-drift { padding-right: 3.6rem; min-height: 3rem; }
 .hw-pose-drift { right: 0; top: 50%; margin-top: -22px; }
-.hw-pose-drift .hw-ghost-art { left: 8px; top: 6px; opacity: 0.8; animation: hw-drift-loop 7s ease-in-out infinite; }
+.hw-pose-drift .hw-ghost-art { left: 11px; top: 10px; animation: hw-drift-loop 7s ease-in-out infinite; }
 @keyframes hw-drift-loop {
     0%, 100% { transform: translate(0, 0) rotate(-6deg); }
     25% { transform: translate(-5px, -6px) rotate(0deg); }
@@ -1613,7 +1622,7 @@ html.halloween .hw-anchor-drift { padding-right: 3.6rem; min-height: 3rem; }
 /* rooms: sits at the end of the footnote with a shadow under it, blinking */
 html.halloween .hw-anchor-sit { padding-right: 3.6rem; }
 .hw-pose-sit { right: 0; bottom: -6px; }
-.hw-pose-sit .hw-ghost-art { left: 8px; top: 8px; transform: rotate(7deg) scaleY(0.92); transform-origin: bottom; }
+.hw-pose-sit .hw-ghost-art { left: 11px; top: 14px; transform: rotate(7deg) scaleY(0.92); transform-origin: bottom; }
 .hw-pose-sit .hw-ghost-art::after {
     content: "";
     position: absolute;
@@ -1686,6 +1695,8 @@ html.halloween .hw-anchor-sit { padding-right: 3.6rem; }
     border-radius: 14px;
     box-shadow: var(--shadow-lg);
 }
+/* a short phone with settings open: scroll inside, never off the top */
+.hw-panel { max-height: calc(100vh - 6rem); max-height: calc(100dvh - 6rem); overflow-y: auto; overscroll-behavior: contain; }
 .hw-panel[hidden] { display: none; }
 .hw-panel-title {
     font-family: var(--font-sans);
@@ -1695,7 +1706,25 @@ html.halloween .hw-anchor-sit { padding-right: 3.6rem; }
     line-height: 1.15;
     color: var(--coral);
 }
+.hw-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.hw-x {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin: -0.45rem -0.55rem 0 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 10px;
+    color: var(--fg-soft);
+    cursor: pointer;
+}
+.hw-x svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.hw-x:hover, .hw-x:focus-visible { color: var(--fg); background: var(--bg-elevated); }
 .hw-panel-sub { margin: 0.25rem 0 0.6rem; font-size: 0.82rem; color: var(--fg-soft); line-height: 1.4; }
+.hw-panel-sub b { color: var(--fg); font-weight: 700; }
 .hw-list { list-style: none; display: grid; gap: 0.15rem; }
 .hw-list li {
     display: grid;
@@ -1703,27 +1732,83 @@ html.halloween .hw-anchor-sit { padding-right: 3.6rem; }
     align-items: center;
     gap: 0.55rem;
     min-height: 2.4rem;
+    padding: 0.3rem 0;
     font-size: 0.9rem;
     border-bottom: 1px solid var(--rule-faint);
 }
 .hw-list a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; padding: 0.4rem 0; }
-.hw-list em { color: var(--fg-soft); font-style: normal; font-size: 0.8rem; }
+.hw-riddle { grid-column: 2 / 4; font-size: 0.84rem; line-height: 1.35; color: var(--fg); font-style: italic; }
 .hw-dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; border: 1.5px solid var(--fg-faint); }
-.hw-list li.got .hw-dot { background: var(--coral); border-color: var(--coral); }
-.hw-state { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-soft); }
-.hw-list li.got .hw-state { color: var(--coral); }
-.hw-panel-foot { display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.6rem; }
-.hw-mini {
-    min-height: 36px;
-    padding: 0 0.8rem;
-    background: var(--bg-elevated);
-    border: 1px solid var(--rule);
-    border-radius: 999px;
-    color: var(--fg);
+.hw-tick { display: grid; place-items: center; width: 1rem; height: 1rem; border-radius: 50%; background: var(--coral); }
+.hw-tick svg { width: 0.7rem; height: 0.7rem; fill: none; stroke: var(--bg); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hw-state { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--coral); }
+
+/* settings: a closed disclosure under the list, one switch per row */
+.hw-settings { margin-top: 0.55rem; }
+.hw-settings summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 40px;
+    list-style: none;
+    cursor: pointer;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-soft);
+}
+.hw-settings summary::-webkit-details-marker { display: none; }
+.hw-chev { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s; }
+.hw-settings[open] .hw-chev { transform: rotate(180deg); }
+.hw-rows { display: grid; }
+.hw-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 44px;
+    font-size: 0.9rem;
+    color: var(--fg);
+    border-top: 1px solid var(--rule-faint);
     cursor: pointer;
 }
+.hw-note { margin: -0.1rem 0 0.2rem; font-size: 0.74rem; line-height: 1.35; color: var(--fg-soft); }
+/* a plain checkbox drawn as a switch: still a real input for keyboards
+   and screen readers (role=switch) */
+.hw-switch {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: none;
+    position: relative;
+    width: 40px;
+    height: 24px;
+    margin: 0;
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.hw-switch::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--fg-soft);
+    transition: transform 0.2s, background 0.2s;
+}
+.hw-switch:checked { background: var(--coral); border-color: var(--coral); }
+.hw-switch:checked::before { transform: translateX(16px); background: #fff; }
+.hw-switch:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+/* theme switched off: a small, plain pumpkin in the normal palette */
+.hw-counter-off { padding: 0; width: 40px; min-height: 40px; height: 40px; justify-content: center; opacity: 0.85; }
+.hw-counter-off svg { width: 1.2rem; height: 1.2rem; }
+.hw-panel-off .hw-row { border-top: 0; }
 
 /* ---------- toast ---------- */
 .hw-toast {
@@ -2015,6 +2100,7 @@ html.halloween .topbar .brand { -webkit-touch-callout: none; -webkit-user-select
 
 @media (prefers-reduced-motion: reduce) {
     .hw-lantern.lit .hw-face,
+    .hw-ghost,
     .hw-ghost-art,
     .hw-ghost svg,
     .hw-eye,

@@ -11,7 +11,11 @@
 //   ?spooky=1  preview it any day      ?spooky=0  switch it off
 //
 // The URL override is kept in sessionStorage so it survives clicking
-// around the site for the rest of the visit.
+// around the site for the rest of the visit. A visitor can also switch
+// the theme off for good from the pumpkin panel (localStorage
+// 'spooky-off'); the URL flags still override that. When the theme is
+// off by that choice during the week, window.HALLOWEEN_OFF is set so
+// halloween.js can leave a small pumpkin to switch it back on.
 // ============================================================
 
 (function () {
@@ -24,9 +28,16 @@
         else flag = sessionStorage.getItem('spooky');
     } catch (e) { /* private window: the URL flag still works for this page */ }
 
+    let optedOut = false;
+    try { optedOut = localStorage.getItem('spooky-off') === '1'; } catch (e) {}
+
     const now = Date.now();
-    const on = flag === '1' || (flag !== '0' && now >= START && now < END);
-    if (!on) return;
+    const week = now >= START && now < END;
+    const on = flag === '1' || (flag !== '0' && !optedOut && week);
+    if (!on) {
+        if (optedOut && flag !== '0' && week) window.HALLOWEEN_OFF = true;
+        return;
+    }
 
     const root = document.documentElement;
     root.classList.add('halloween');

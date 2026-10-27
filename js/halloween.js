@@ -18,7 +18,53 @@
 
 (function () {
     const root = document.documentElement;
-    if (!root.classList.contains('halloween')) return;
+    if (!root.classList.contains('halloween')) {
+        if (window.HALLOWEEN_OFF) themeOffPumpkin();
+        return;
+    }
+
+    // ---------- theme switched off: just a small pumpkin to bring it back ----------
+    // Normal palette, no game: one button bottom left, and a panel with
+    // the single "Halloween theme" switch.
+    function themeOffPumpkin() {
+        const mini = document.createElement('button');
+        mini.type = 'button';
+        mini.className = 'hw-counter hw-counter-off';
+        mini.setAttribute('aria-label', 'Halloween theme is off. Open to turn it back on.');
+        mini.setAttribute('aria-expanded', 'false');
+        mini.innerHTML = '<svg viewBox="0 0 40 40" aria-hidden="true"><path class="hw-stem" d="M19 9c0-3 1-5 4-6l1 2c-2 1-2 2-2 4z"/>' +
+            '<ellipse class="hw-skin" cx="20" cy="23" rx="17" ry="13"/>' +
+            '<path class="hw-rib" d="M20 10c-5 4-5 22 0 26M20 10c5 4 5 22 0 26M11 12c-5 5-5 17 0 22M29 12c5 5 5 17 0 22"/></svg>';
+        const box = document.createElement('div');
+        box.className = 'hw-panel hw-panel-off';
+        box.hidden = true;
+        box.innerHTML =
+            '<div class="hw-panel-head"><p class="hw-panel-title">Halloween</p>' +
+            '<button type="button" class="hw-x" aria-label="Close"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7"/></svg></button></div>' +
+            '<label class="hw-row"><span>Halloween theme</span><input type="checkbox" role="switch" class="hw-switch"></label>' +
+            '<p class="hw-note">Off on this device. Switch it on for ghosts, bats and the hunt.</p>';
+        document.body.appendChild(mini);
+        document.body.appendChild(box);
+        const open = (o) => { box.hidden = !o; mini.setAttribute('aria-expanded', String(o)); };
+        mini.addEventListener('click', () => open(box.hidden));
+        box.querySelector('.hw-x').addEventListener('click', () => open(false));
+        box.querySelector('.hw-switch').addEventListener('change', (e) => {
+            if (!e.target.checked) return;
+            try { localStorage.removeItem('spooky-off'); sessionStorage.removeItem('spooky'); } catch (err) {}
+            reloadWithoutFlag();
+        });
+        document.addEventListener('click', (e) => {
+            if (!box.hidden && !box.contains(e.target) && !mini.contains(e.target)) open(false);
+        });
+    }
+
+    // reload, minus any ?spooky= in the address, which would otherwise
+    // override the choice that was just made
+    function reloadWithoutFlag() {
+        const u = new URL(location.href);
+        u.searchParams.delete('spooky');
+        location.replace(u.toString());
+    }
 
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -45,12 +91,19 @@
     //   sink  half sunk into the floor at the end of the menu, bobbing
     //   drift floating beside the course legend under the timetable
     //   sit   sitting at the end of the rooms footnote, blinking
+    // The panel never names a page until its ghost is caught: each row is
+    // a riddle that hints at the page and, loosely, at the spot.
     const GHOSTS = [
-        { id: 'index', label: 'Home',       href: '/',                 anchor: '#tt-card',            pose: 'peek' },
-        { id: 'bus',   label: 'Bus',        href: '/pages/bus.html',   anchor: '#next-wrap',          pose: 'hang' },
-        { id: 'mess',  label: 'Mess',       href: '/pages/mess.html',  anchor: '#mess-body',          pose: 'sink' },
-        { id: 'week',  label: 'Timetable',  href: '/pages/week.html',  anchor: '#wk-legend',          pose: 'drift' },
-        { id: 'rooms', label: 'Free Rooms', href: '/pages/rooms.html', anchor: '.rooms-foot',         pose: 'sit' }
+        { id: 'index', label: 'Home',       href: '/',                 anchor: '#tt-card',            pose: 'peek',
+          riddle: 'Peeks over the class you have next.' },
+        { id: 'bus',   label: 'Bus',        href: '/pages/bus.html',   anchor: '#next-wrap',          pose: 'hang',
+          riddle: 'Swings under the next ride out.' },
+        { id: 'mess',  label: 'Mess',       href: '/pages/mess.html',  anchor: '#mess-body',          pose: 'sink',
+          riddle: 'Sinks beneath a menu nobody cooks as written.' },
+        { id: 'week',  label: 'Timetable',  href: '/pages/week.html',  anchor: '#wk-legend',          pose: 'drift',
+          riddle: 'Drifts beside the colours of your week.' },
+        { id: 'rooms', label: 'Free Rooms', href: '/pages/rooms.html', anchor: '.rooms-foot',         pose: 'sit',
+          riddle: 'Blinks after the small print on empty rooms.' }
     ];
     const page = location.pathname.split('/').pop().replace(/\.html$/, '') || 'index';
     const isHome = page === 'index';
@@ -88,6 +141,9 @@
         '<g transform="matrix(-1 0 0 1 100 0)"><path class="hw-wing" d="' + WING + '"/></g>' +
         '<path d="M45.5 13.5 44.6 5.2l3.9 5.3h3l3.9-5.3-.9 8.3c1.3 1.6 1.8 3.4 1.6 5.3l-.4 9.5c-.4 5-3.2 8-5.7 8s-5.3-3-5.7-8l-.4-9.5c-.2-1.9.3-3.7 1.6-5.3z"/>' +
         '</svg>';
+
+    const TICK = '<svg viewBox="0 0 12 12"><path d="M2.5 6.4 5 8.8 9.6 3.4"/></svg>';
+    const XICON = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7"/></svg>';
 
     // ---------- toast: one line at a time, read out politely ----------
     const toast = document.createElement('div');
@@ -219,29 +275,40 @@
     function paintPanel() {
         const rows = GHOSTS.map((g) => {
             const got = caught.includes(g.id);
-            const here = g.id === page;
-            return '<li class="' + (got ? 'got' : '') + '">' +
-                '<span class="hw-dot" aria-hidden="true"></span>' +
-                (here ? '<span>' + g.label + ' <em>(this page)</em></span>' : '<a href="' + g.href + '">' + g.label + '</a>') +
-                '<span class="hw-state">' + (got ? 'caught' : 'still out there') + '</span></li>';
+            if (!got) {
+                return '<li><span class="hw-dot" aria-hidden="true"></span><span class="hw-riddle">' + g.riddle + '</span></li>';
+            }
+            const name = g.id === page ? '<span>' + g.label + '</span>' : '<a href="' + g.href + '">' + g.label + '</a>';
+            return '<li class="got"><span class="hw-tick" aria-hidden="true">' + TICK + '</span>' + name +
+                '<span class="hw-state">caught</span></li>';
         }).join('');
+        // settings live in a closed disclosure so the panel stays short;
+        // the motion ones are left out under reduced motion (they do nothing)
+        const sets = (reduce ? [] : [
+            ['boo', 'Floating ghosts', booOn()],
+            ['scare', 'Jumpscares', store.get('hw-scare', true)]
+        ]).concat(isHome && !reduce ? [['bats', 'Bats', batsOn()]] : [])
+            .concat([['theme', 'Halloween theme', true]]);
         panel.innerHTML =
-            '<p class="hw-panel-title">' + (won() ? 'Ghostbuster 2026' : 'Ghost hunt') + '</p>' +
+            '<div class="hw-panel-head"><p class="hw-panel-title">' + (won() ? 'Ghostbuster 2026' : 'Ghost hunt') + '</p>' +
+            '<button type="button" class="hw-x" data-act="close" aria-label="Close">' + XICON + '</button></div>' +
             '<p class="hw-panel-sub">' + (won()
                 ? 'All five caught. The lantern in the header stays lit.'
-                : 'One ghost hides on each of these pages. Tap it to catch it.') + '</p>' +
+                : '<b>' + caught.length + '/' + GHOSTS.length + ' caught.</b> Five ghosts, five pages. Each riddle points to one.') + '</p>' +
             '<ul class="hw-list">' + rows + '</ul>' +
-            '<div class="hw-panel-foot">' +
-            (!reduce ? '<button type="button" class="hw-mini" data-act="boo"></button>' : '') +
-            (!reduce ? '<button type="button" class="hw-mini" data-act="scare"></button>' : '') +
-            (isHome && !reduce ? '<button type="button" class="hw-mini" data-act="bats"></button>' : '') +
-            '<button type="button" class="hw-mini" data-act="close">close</button></div>';
-        paintBatsButton();
-        const boo = panel.querySelector('[data-act="boo"]');
-        if (boo) boo.textContent = booOn() ? 'ghosts: on' : 'ghosts: off';
-        const sc = panel.querySelector('[data-act="scare"]');
-        if (sc) sc.textContent = store.get('hw-scare', true) ? 'jumpscares: on' : 'jumpscares: off';
+            settingsHTML(sets, settingsOpen);
     }
+    let settingsOpen = false;
+    panel.addEventListener('toggle', (e) => { if (e.target.matches('.hw-settings')) settingsOpen = e.target.open; }, true);
+    panel.addEventListener('change', (e) => {
+        const key = e.target.dataset && e.target.dataset.set;
+        if (!key) return;
+        const on = e.target.checked;
+        if (key === 'boo') { store.set('hw-boo', on); scheduleApparition(); }
+        if (key === 'scare') store.set('hw-scare', on);
+        if (key === 'bats') setBats(on);
+        if (key === 'theme' && !on) setThemeOff(true);
+    });
 
     function openPanel(open) {
         panel.hidden = !open;
@@ -253,9 +320,6 @@
         const act = e.target.closest('[data-act]');
         if (!act) return;
         if (act.dataset.act === 'close') openPanel(false);
-        if (act.dataset.act === 'bats') setBats(!batsOn());
-        if (act.dataset.act === 'scare') { store.set('hw-scare', !store.get('hw-scare', true)); paintPanel(); }
-        if (act.dataset.act === 'boo') { store.set('hw-boo', !booOn()); paintPanel(); scheduleApparition(); }
     });
     // tap anywhere else closes it, like any other popover on a phone
     document.addEventListener('click', (e) => {
@@ -312,7 +376,7 @@
                 burst(r.left + r.width / 2, r.top + r.height / 2, 10);
                 const left = GHOSTS.length - caught.length;
                 say('Caught ' + caught.length + '/' + GHOSTS.length + '.',
-                    left + ' more haunt' + (left === 1 ? 's' : '') + ' linkCS. The pumpkin knows where.');
+                    left + ' still loose. The riddles in the pumpkin say where.');
             }
         });
     }
@@ -395,11 +459,6 @@
     function setBats(on) {
         store.set('hw-bats', on);
         if (bats) bats.classList.toggle('paused', !on);
-        paintBatsButton();
-    }
-    function paintBatsButton() {
-        const b = panel.querySelector('[data-act="bats"]');
-        if (b) b.textContent = batsOn() ? 'pause bats' : 'release bats';
     }
     if (isHome && !reduce) {
         bats = document.createElement('div');
@@ -526,6 +585,12 @@
         for (const ch of page) seed = (seed * 33 + ch.charCodeAt(0)) >>> 0;
         w.innerHTML = webSVG(Math.round(R), stage, seed);
         host.appendChild(w);
+        // a web must never sit over this page's ghost (it would eat the tap)
+        const g = document.querySelector('.hw-ghost');
+        if (g) {
+            const a = w.getBoundingClientRect(), b = g.getBoundingClientRect();
+            if (a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) w.remove();
+        }
     }
 
     // Tap a web and it is swept away, for this page view only: it grows
@@ -775,6 +840,28 @@
             else location.assign(to);          // popup blocked: never lose the click
         });
     });
+
+    // ---------- settings pieces, shared with the theme-off pumpkin ----------
+    function settingsHTML(sets, open) {
+        return '<details class="hw-settings"' + (open ? ' open' : '') + '><summary>Settings' +
+            '<svg class="hw-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5"/></svg></summary>' +
+            '<div class="hw-rows">' + sets.map(([key, label, on]) =>
+                '<label class="hw-row"><span>' + label + '</span>' +
+                '<input type="checkbox" role="switch" class="hw-switch" data-set="' + key + '"' + (on ? ' checked' : '') + '></label>' +
+                (key === 'theme' ? '<p class="hw-note">Off switches it off on this device. You can turn it back on from the pumpkin.</p>' : '')
+            ).join('') + '</div></details>';
+    }
+    // Theme off is remembered on this device; on is just forgetting that.
+    // Either way the session's ?spooky flag is dropped so the choice holds,
+    // and the page reloads so the theme is cleanly in or out.
+    function setThemeOff(off) {
+        try {
+            if (off) localStorage.setItem('spooky-off', '1');
+            else localStorage.removeItem('spooky-off');
+            sessionStorage.removeItem('spooky');
+        } catch (e) {}
+        reloadWithoutFlag();
+    }
 
     // ---------- layout-dependent bits, once the page has settled ----------
     function layoutBits() { placeMoon(); buildWebs(); spider(); }
