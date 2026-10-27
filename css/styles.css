@@ -1416,3 +1416,369 @@ a.brand-logo:focus-visible { outline: 2px solid var(--coral); outline-offset: 3p
         letter-spacing: 0.06em;
     }
 }
+
+/* ============================================================
+   HALLOWEEN WEEK. Every rule is scoped to html.halloween, which
+   js/halloween-init.js sets 25-31 Oct (or ?spooky=1). It recolours
+   and adds decorations; it never hides or moves a feature. The
+   playable bits (ghosts, pumpkin counter, bats) come from
+   js/halloween.js. No flashing, and reduced-motion gets the palette
+   and the game without the animation.
+   ============================================================ */
+
+/* Night palette, built on the dark theme: purple-navy sky, pumpkin
+   orange as the main accent, slime green and violet for the rest. */
+html.halloween[data-theme="dark"] {
+    --bg: #0B0716;
+    --bg-card: #161026;
+    --bg-elevated: #221937;
+    --fg: #EEE8F6;
+    --fg-soft: #ABA0C2;
+    --fg-faint: #5F5378;
+    --rule: rgba(238, 232, 246, 0.14);
+    --rule-faint: rgba(238, 232, 246, 0.06);
+
+    --coral: #FF9433;
+    --coral-bright: #FFB46B;
+    --coral-glow: rgba(255, 148, 51, 0.42);
+    --coral-soft: rgba(255, 148, 51, 0.13);
+
+    --cyan: #8FE388;
+    --cyan-bright: #B8F5B2;
+    --cyan-glow: rgba(143, 227, 136, 0.38);
+    --cyan-soft: rgba(143, 227, 136, 0.12);
+
+    --indigo: #B395FF;
+    --indigo-bright: #CDB9FF;
+    --indigo-glow: rgba(179, 149, 255, 0.38);
+    --indigo-soft: rgba(179, 149, 255, 0.13);
+
+    --sky: #C9A2FF;
+    --sky-glow: rgba(201, 162, 255, 0.38);
+}
+
+/* the sky: a faint violet haze at the top, like light from the moon */
+html.halloween[data-theme="dark"] body {
+    background:
+        radial-gradient(900px 520px at 78% -8%, rgba(150, 96, 255, 0.20), transparent 65%),
+        radial-gradient(700px 480px at 0% 105%, rgba(255, 130, 40, 0.07), transparent 60%),
+        var(--bg);
+    background-attachment: fixed;
+}
+
+/* ---------- header: moon + skyline behind the top bar ---------- */
+html.halloween .topbar { position: relative; }
+html.halloween .topbar > :not(.hw-sky) { position: relative; z-index: 1; }
+.hw-sky {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+.hw-moon {
+    position: absolute;
+    top: -0.35rem;
+    right: 38%;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    /* a crescent from an inset shadow: no mask disc to clash with the sky */
+    box-shadow: inset -9px 4px 0 0 #F4E2AE;
+    filter: drop-shadow(0 0 10px rgba(255, 236, 180, 0.45));
+    transform: rotate(-20deg);
+    opacity: 0.9;
+}
+.hw-skyline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 22px;
+    fill: var(--fg);
+    opacity: 0.07;
+}
+@media (max-width: 720px) {
+    .hw-moon { right: 6%; top: -1.1rem; width: 24px; height: 24px; box-shadow: inset -7px 3px 0 0 #F4E2AE; }
+}
+
+/* ---------- jack-o'-lantern (header) + shared pumpkin art ---------- */
+.hw-lantern svg, .hw-counter svg { width: 1.45rem; height: 1.45rem; display: block; overflow: visible; }
+.hw-skin { fill: #E8761C; }
+.hw-rib { fill: none; stroke: #A84A0C; stroke-width: 1.2; opacity: 0.55; }
+.hw-stem { fill: #4E7A2E; }
+.hw-face path { fill: #3A1A06; transition: fill 0.35s ease; }
+.hw-lantern.lit .hw-face path { fill: #FFE27A; }
+.hw-lantern.lit {
+    border-color: var(--coral);
+    box-shadow: 0 0 0 1px var(--coral-glow), 0 0 18px var(--coral-glow);
+}
+.hw-lantern.lit svg { filter: drop-shadow(0 0 6px rgba(255, 200, 80, 0.55)); }
+/* a candle, not a strobe: slow, shallow, uneven */
+.hw-lantern.lit .hw-face { animation: hw-candle 3.2s ease-in-out infinite; }
+@keyframes hw-candle {
+    0%, 100% { opacity: 1; }
+    23% { opacity: 0.82; }
+    41% { opacity: 0.96; }
+    63% { opacity: 0.78; }
+    80% { opacity: 0.92; }
+}
+
+/* ---------- ghosts ---------- */
+.hw-ghost {
+    display: inline-grid;
+    place-items: center;
+    vertical-align: middle;
+    width: 2rem;
+    height: 2rem;
+    margin: -0.4rem 0 -0.4rem 0.35rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+.hw-ghost svg {
+    width: 1.15rem;
+    height: 1.3rem;
+    overflow: visible;
+    opacity: 0.6;
+    animation: hw-bob 3.4s ease-in-out infinite;
+    transition: opacity 0.2s;
+}
+.hw-ghost:hover svg, .hw-ghost:focus-visible svg { opacity: 1; }
+.hw-ghost:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; border-radius: 8px; }
+.hw-sheet { fill: #F3EEFF; }
+.hw-eye { fill: #1A1230; }
+[data-theme="light"] .hw-sheet { fill: #FFFFFF; stroke: #6B5E85; stroke-width: 1.2; }
+@keyframes hw-bob {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-3px) rotate(3deg); }
+}
+.hw-ghost.poof svg { animation: hw-poof 0.6s ease-out forwards; }
+.hw-ghost.poof::after {
+    content: "";
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid #F3EEFF;
+    animation: hw-ring 0.6s ease-out forwards;
+}
+.hw-ghost.poof { position: relative; }
+@keyframes hw-poof {
+    to { transform: translateY(-14px) scale(1.6); opacity: 0; }
+}
+@keyframes hw-ring {
+    from { transform: scale(0.3); opacity: 0.8; }
+    to { transform: scale(1.8); opacity: 0; }
+}
+
+/* ---------- pumpkin counter (bottom left) + panel ---------- */
+.hw-counter {
+    position: fixed;
+    left: max(0.9rem, env(safe-area-inset-left));
+    bottom: max(0.9rem, env(safe-area-inset-bottom));
+    z-index: 210;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0.4rem 0.75rem 0.4rem 0.55rem;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+}
+.hw-counter .hw-face path { fill: #3A1A06; }
+.hw-counter.won { border-color: var(--coral); }
+.hw-counter.won .hw-face path { fill: #FFE27A; }
+.hw-counter[aria-expanded="true"] { border-color: var(--coral); }
+.hw-count { font-variant-numeric: tabular-nums; }
+.hw-counter.bump { animation: hw-bump 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes hw-bump { 50% { transform: scale(1.15); } }
+
+.hw-panel {
+    position: fixed;
+    left: max(0.9rem, env(safe-area-inset-left));
+    bottom: calc(max(0.9rem, env(safe-area-inset-bottom)) + 3.4rem);
+    z-index: 210;
+    width: min(20rem, calc(100vw - 1.8rem));
+    padding: 0.9rem 1rem 0.8rem;
+    background: var(--bg-card);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+}
+.hw-panel[hidden] { display: none; }
+.hw-panel-title {
+    font-family: 'Griffy', var(--font-serif);
+    font-size: 1.35rem;
+    line-height: 1.1;
+    color: var(--coral);
+}
+.hw-panel-sub { margin: 0.25rem 0 0.6rem; font-size: 0.82rem; color: var(--fg-soft); line-height: 1.4; }
+.hw-list { list-style: none; display: grid; gap: 0.15rem; }
+.hw-list li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.4rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--rule-faint);
+}
+.hw-list a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; padding: 0.4rem 0; }
+.hw-list em { color: var(--fg-soft); font-style: normal; font-size: 0.8rem; }
+.hw-dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; border: 1.5px solid var(--fg-faint); }
+.hw-list li.got .hw-dot { background: var(--coral); border-color: var(--coral); }
+.hw-state { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-soft); }
+.hw-list li.got .hw-state { color: var(--coral); }
+.hw-panel-foot { display: flex; justify-content: flex-end; gap: 0.4rem; margin-top: 0.6rem; }
+.hw-mini {
+    min-height: 36px;
+    padding: 0 0.8rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+/* ---------- toast ---------- */
+.hw-toast {
+    position: fixed;
+    left: 50%;
+    top: max(0.9rem, env(safe-area-inset-top));
+    z-index: 220;
+    width: max-content;
+    max-width: calc(100vw - 2rem);
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.6rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--coral);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.hw-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.hw-toast b { font-family: 'Griffy', var(--font-serif); font-weight: 400; font-size: 1.15rem; color: var(--coral); }
+.hw-toast span { font-size: 0.85rem; color: var(--fg-soft); }
+
+/* ---------- candy burst ---------- */
+.hw-burst { position: fixed; inset: 0; z-index: 230; pointer-events: none; overflow: hidden; }
+.hw-burst i {
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    animation: hw-fling 1.3s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+}
+.hw-c-ball-o { background: #FF9433; }
+.hw-c-ball-p { background: #B395FF; }
+.hw-c-ball-g { background: #8FE388; }
+.hw-c-wrap { width: 16px !important; border-radius: 4px !important; background: linear-gradient(90deg, #F3EEFF 0 22%, #E84A6B 22% 78%, #F3EEFF 78%); }
+.hw-c-corn {
+    border-radius: 0 !important;
+    width: 12px !important;
+    height: 14px !important;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(180deg, #FFF4D6 0 30%, #FF9433 30% 65%, #FFD23F 65%);
+}
+@keyframes hw-fling {
+    0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+    70% { opacity: 1; }
+    100% { transform: translate(var(--dx), calc(var(--dy) + 120px)) rotate(var(--r)); opacity: 0; }
+}
+
+/* ---------- bats ---------- */
+/* moonlit violet, not black: a black bat on a night sky is invisible */
+.hw-bat svg, .hw-flyby svg { width: 100%; height: 100%; display: block; fill: #5A4785; overflow: visible; }
+[data-theme="light"] .hw-bat svg, [data-theme="light"] .hw-flyby svg { fill: #2B2140; }
+.hw-wing { transform-origin: 30px 12px; animation: hw-flap 0.32s ease-in-out infinite alternate; }
+@keyframes hw-flap { to { transform: scaleY(0.35); } }
+
+/* home only: a few bats crossing slowly behind the content */
+.hw-bats { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.hw-bat {
+    position: absolute;
+    left: 0;
+    width: 34px;
+    height: 15px;
+    opacity: 0.55;
+    animation: hw-drift 46s linear infinite;
+}
+.hw-bat-0 { top: 14%; animation-delay: -4s; }
+.hw-bat-1 { top: 38%; width: 24px; height: 11px; animation-duration: 62s; animation-delay: -30s; }
+.hw-bat-2 { top: 63%; animation-duration: 54s; animation-delay: -17s; }
+.hw-bat-3 { top: 82%; width: 22px; height: 10px; animation-duration: 70s; animation-delay: -48s; }
+@keyframes hw-drift {
+    0% { transform: translate(-60px, 0); }
+    25% { transform: translate(25vw, -40px); }
+    50% { transform: translate(50vw, 10px); }
+    75% { transform: translate(75vw, -30px); }
+    100% { transform: translate(calc(100vw + 60px), 0); }
+}
+.hw-bats.paused { display: none; }
+
+/* the trick: one bat crosses the screen once, above everything, untouchable */
+.hw-flyby {
+    position: fixed;
+    top: 30%;
+    left: 0;
+    z-index: 225;
+    width: 64px;
+    height: 28px;
+    pointer-events: none;
+    animation: hw-flyby 2.6s ease-in-out forwards;
+}
+.hw-flyby svg { fill: #6B55A0; filter: drop-shadow(0 0 6px rgba(201, 162, 255, 0.5)); }
+@keyframes hw-flyby {
+    0% { transform: translate(-80px, 40px) scale(0.7); }
+    40% { transform: translate(40vw, -30px) scale(1.1); }
+    70% { transform: translate(65vw, 20px) scale(1); }
+    100% { transform: translate(calc(100vw + 80px), -60px) scale(0.8); }
+}
+
+/* ---------- reward badge (home) ---------- */
+.hw-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem 0.3rem 0.5rem;
+    border: 1px solid var(--coral);
+    border-radius: 999px;
+    background: var(--coral-soft);
+    color: var(--coral);
+    font-family: 'Griffy', var(--font-serif);
+    font-size: 1rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+.hw-badge svg { width: 0.95rem; height: 1.1rem; }
+html.halloween .hero-block { flex-wrap: wrap; }
+
+/* the logo is a long-press target this week: no iOS callout or text pick */
+html.halloween .topbar .brand { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .hw-lantern.lit .hw-face,
+    .hw-ghost svg,
+    .hw-wing,
+    .hw-counter.bump { animation: none; }
+    .hw-toast { transition: none; }
+}

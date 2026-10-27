@@ -258,11 +258,8 @@ function renderUpdates() {
 
 const toggleBtn = document.getElementById("theme-toggle");
 
-// Initialize theme from system preference
-const currentTheme = localStorage.getItem("theme");
-if (currentTheme) {
-  document.documentElement.setAttribute("data-theme", currentTheme);
-}
+// The starting theme is set by theme-init.js in <head> (and held dark by
+// halloween-init.js during Halloween week), so it is not re-applied here.
 
 toggleBtn.addEventListener("click", () => {
   const theme = document.documentElement.getAttribute("data-theme");
