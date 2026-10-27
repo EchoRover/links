@@ -465,12 +465,16 @@
     }
     const stage = hwDay() - 24;                            // 1..7
 
-    // A corner web, corner at (0,0), opening towards +x/+y; CSS flips it
-    // into the other corners. Everything irregular comes from a seeded
-    // random stream (one seed per web), so a web looks the same on every
-    // load, and day N is always day N-1 plus more silk: radials are added
-    // in a fixed order, rings grow outwards, dew and loose threads come late.
-    const WEB_ANGLES = [24, 62, 43, 8, 82, 33, 53, 72];
+    // A corner web in the classic style: a full round web (8 spokes, rings
+    // that scallop deeply in towards the hub between every pair of spokes,
+    // ring spacing widening outwards), with its hub just inside the corner
+    // so the corner crops it and you see a third of it, like the corner of
+    // a room. The svg is the R x R square inside the corner, opening
+    // towards +x/+y; CSS flips it into the other corners. Irregularity
+    // comes from a seeded stream (one seed per web), so a web is the same
+    // on every load, and day N is day N-1 plus more silk: spokes are added
+    // in a fixed order (the visible ones first), rings grow outwards.
+    const SPOKE_ORDER = [1, 0, 2, 7, 3, 6, 4, 5];
     function seeded(seed) {
         let x = seed >>> 0 || 1;
         return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 10000) / 10000; };
@@ -479,78 +483,72 @@
     function webSVG(R, st, seed) {
         const rnd = seeded(seed * 7919 + 13);
         const f = (v) => v.toFixed(1);
-        const pt = (r, a) => [r * Math.cos(a), r * Math.sin(a)];
-        const n = Math.min(8, st + 1);
-        // draw every radial's jitter even when unused, so adding one on a
-        // later day never reshuffles the ones already there
-        const all = WEB_ANGLES.map((a) => {
-            const short = rnd() < 0.22;
-            return {
-                a: (a + (rnd() - 0.5) * 9) * Math.PI / 180,
-                l: R * (short ? 0.55 + rnd() * 0.15 : 0.84 + rnd() * 0.16),
-                bend: (rnd() - 0.5) * 0.12
-            };
-        });
-        const rad = all.slice(0, n).sort((p, q) => p.a - q.a);
+        const c = R * 0.1;                                  // hub, just inside the corner
+        const W = R * 1.08;                                 // web radius (the crop does the rest)
+        const phase = (8 + rnd() * 6) * Math.PI / 180;
+        const P = (r, a) => [c + r * Math.cos(a), c + r * Math.sin(a)];
+        // every spoke's jitter is drawn even when unused, so a spoke added
+        // on a later day never reshuffles the ones already there
+        const spokes = [];
+        for (let i = 0; i < 8; i++) spokes.push({ i, a: phase + i * Math.PI / 4 + (rnd() - 0.5) * 0.09, l: W * (0.9 + rnd() * 0.1) });
+        const nSp = [3, 4, 5, 6, 7, 8, 8][st - 1];
+        const on = SPOKE_ORDER.slice(0, nSp).map((k) => spokes[k]).sort((p, q) => p.a - q.a);
+        const full = on.length === 8;
         const id = 'hw-silk-' + seed;
-        let out = '<defs><radialGradient id="' + id + '" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="' + R + '">' +
-            '<stop offset="0" stop-color="#F4EEFF" stop-opacity=".75"/>' +
-            '<stop offset=".55" stop-color="#D9CCF5" stop-opacity=".45"/>' +
-            '<stop offset="1" stop-color="#B9A8E6" stop-opacity=".08"/></radialGradient></defs>' +
-            '<g class="hw-web-sway" stroke="url(#' + id + ')">';
-        // radials: a faint bow each, like silk that is not quite taut
+        let out = '<defs><radialGradient id="' + id + '" gradientUnits="userSpaceOnUse" cx="' + f(c) + '" cy="' + f(c) + '" r="' + f(W) + '">' +
+            '<stop offset="0" stop-color="#F6F1FF" stop-opacity=".8"/>' +
+            '<stop offset=".5" stop-color="#DCD0F7" stop-opacity=".5"/>' +
+            '<stop offset="1" stop-color="#B9A8E6" stop-opacity=".12"/></radialGradient></defs>' +
+            '<g class="hw-web-sway" stroke="url(#' + id + ')" style="transform-origin:' + f(c) + 'px ' + f(c) + 'px">';
         let d = '';
-        rad.forEach((r) => {
-            const [x, y] = pt(r.l, r.a);
-            const [cx, cy] = pt(r.l / 2, r.a + r.bend);
-            d += 'M0 0Q' + f(cx) + ' ' + f(cy) + ' ' + f(x) + ' ' + f(y);
-        });
+        on.forEach((sp) => { const [x, y] = P(sp.l, sp.a); d += 'M' + f(c) + ' ' + f(c) + 'L' + f(x) + ' ' + f(y); });
         out += '<path class="hw-web-silk" stroke-width="0.9" d="' + d + '"/>';
-        // the spiral: each span sags towards the hub; outer turns are finer
-        const rings = st - 1;
-        const spans = [];
+        // rings: between each pair of neighbouring spokes a deep inward
+        // scallop (the control point pulled about halfway to the hub, so
+        // each span bows in by roughly a third of its length)
+        const K = 7, rings = st, joints = [];
         for (let k = 0; k < rings; k++) {
+            const r = W * (0.13 + 0.8 * Math.pow((k + 1) / K, 1.3));
+            const pairs = full ? on.length : on.length - 1;
             let rd = '';
-            const base = R * (0.17 + 0.125 * k);
-            for (let i = 0; i + 1 < rad.length; i++) {
-                const r1 = base + i * R * 0.012, r2 = base + (i + 1) * R * 0.012;
-                if (rad[i].l < r1 || rad[i + 1].l < r2) continue;
-                const [x1, y1] = pt(r1, rad[i].a), [x2, y2] = pt(r2, rad[i + 1].a);
-                const sag = 0.74 + rnd() * 0.1;
-                rd += 'M' + f(x1) + ' ' + f(y1) + 'Q' + f((x1 + x2) / 2 * sag) + ' ' + f((y1 + y2) / 2 * sag) + ' ' + f(x2) + ' ' + f(y2);
-                spans.push([x1, y1]);
+            for (let i = 0; i < pairs; i++) {
+                const s1 = on[i], s2 = on[(i + 1) % on.length];
+                let a2 = s2.a; if (a2 < s1.a) a2 += Math.PI * 2;
+                if (a2 - s1.a > Math.PI * 0.6) continue;    // no span across a gap in the spokes
+                if (s1.l < r || s2.l < r) continue;
+                const [x1, y1] = P(r, s1.a), [x2, y2] = P(r, a2);
+                const pull = 0.5 + (rnd() - 0.5) * 0.08;
+                const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                rd += 'M' + f(x1) + ' ' + f(y1) + 'Q' + f(c + (mx - c) * pull) + ' ' + f(c + (my - c) * pull) + ' ' + f(x2) + ' ' + f(y2);
+                joints.push([x1, y1]);
             }
-            if (rd) out += '<path class="hw-web-silk" stroke-width="' + (0.8 - k * 0.07).toFixed(2) + '" d="' + rd + '"/>';
+            if (rd) out += '<path class="hw-web-silk" stroke-width="' + (0.85 - k * 0.06).toFixed(2) + '" d="' + rd + '"/>';
         }
-        // late in the week a thread or two has come loose and hangs free
+        // late in the week a thread or two has come loose and hangs free,
+        // never below the web's own square
         if (st >= 5) {
             const loose = st >= 7 ? 2 : 1;
             for (let i = 0; i < loose; i++) {
-                const r = rad[rad.length - 1 - i * 2] || rad[0];
-                const [x, y] = pt(r.l * 0.7, r.a);
-                // short, and never hanging below the web's own square, so
-                // a loose thread cannot drift down over the logo
+                const sp = on[(i * 3 + 1) % on.length];
+                const [x, y] = P(sp.l * (0.55 + 0.2 * i), sp.a);
                 const len = Math.min(R * (0.16 + rnd() * 0.1), R * 0.95 - y);
-                if (len < R * 0.08) continue;
+                if (len < R * 0.08 || x < 2 || x > R - 2) continue;
                 out += '<path class="hw-web-silk hw-web-loose" stroke-width="0.6" d="M' + f(x) + ' ' + f(y) +
                     'c' + f(len * 0.1) + ' ' + f(len * 0.35) + ' ' + f(-len * 0.25) + ' ' + f(len * 0.6) + ' ' + f(-len * 0.05) + ' ' + f(len) + '"/>';
             }
         }
-        // dew: a few drops sitting on the spiral, each with a slow glint
+        // dew: a few drops on visible joints, each with a slow glint
+        const seen = joints.filter(([x, y]) => x > 3 && y > 3 && x < R - 3 && y < R - 3);
         const drops = st < 3 ? 0 : Math.min(5, st - 1);
-        for (let i = 0; i < drops && spans.length; i++) {
-            const [x, y] = spans[Math.floor(rnd() * spans.length)];
-            const delay = (rnd() * 9).toFixed(1);
-            out += '<circle class="hw-dew-glow" cx="' + f(x) + '" cy="' + f(y) + '" r="2.6" style="animation-delay:-' + delay + 's"/>' +
+        for (let i = 0; i < drops && seen.length; i++) {
+            const [x, y] = seen[Math.floor(rnd() * seen.length)];
+            out += '<circle class="hw-dew-glow" cx="' + f(x) + '" cy="' + f(y) + '" r="2.6" style="animation-delay:-' + (rnd() * 9).toFixed(1) + 's"/>' +
                 '<circle class="hw-dew" cx="' + f(x) + '" cy="' + f(y) + '" r="1"/>';
         }
         out += '</g>';
-        const lo = rad[0].a, hi = rad[rad.length - 1].a, L = Math.max(...rad.map((r) => r.l));
-        const [ax, ay] = pt(L, lo), [bx, by] = pt(L, hi);
-        // hit area: the wedge the threads span, not the whole corner box
-        const hit = 'M0 0L' + f(ax) + ' ' + f(ay) + 'A' + f(L) + ' ' + f(L) + ' 0 0 1 ' + f(bx) + ' ' + f(by) + 'Z';
-        return '<svg viewBox="0 0 ' + R + ' ' + R + '" width="' + R + '" height="' + R + '">' +
-            '<path class="hw-web-hit" d="' + hit + '"/>' + out + '</svg>';
+        // hit area: the web's own disc (cropped to the corner square)
+        const hit = '<circle class="hw-web-hit" cx="' + f(c) + '" cy="' + f(c) + '" r="' + f(W * (rings >= 3 ? 0.85 : 0.6)) + '"/>';
+        return '<svg viewBox="0 0 ' + R + ' ' + R + '" width="' + R + '" height="' + R + '">' + hit + out + '</svg>';
     }
 
     function addWeb(host, corner, R) {

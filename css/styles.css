@@ -1869,7 +1869,8 @@ html.halloween .hero-block { flex-wrap: wrap; }
 /* Thin pale silk. The svg itself lets taps through; only the wedge the
    threads span catches one (to sweep the web away). */
 .hw-web { position: absolute; z-index: 6; pointer-events: none; line-height: 0; }
-.hw-web svg { display: block; overflow: visible; pointer-events: none; }
+/* the corner crops the round web: the svg is the square inside the corner */
+.hw-web svg { display: block; overflow: hidden; pointer-events: none; }
 /* stroke colour and fade come from a radial gradient in each svg:
    bright lavender-silver at the hub, almost nothing at the rim */
 .hw-web-silk { fill: none; stroke-linecap: round; }
@@ -1878,7 +1879,7 @@ html.halloween .hero-block { flex-wrap: wrap; }
 .hw-dew-glow { fill: #E9DEFF; opacity: 0.12; animation: hw-glint 9s ease-in-out infinite; }
 @keyframes hw-glint { 0%, 80%, 100% { opacity: 0.12; } 88% { opacity: 0.55; } }
 /* a breath of air: a degree or two from the anchor corner */
-.hw-web-sway { transform-box: view-box; transform-origin: 0 0; animation: hw-web-sway 11s ease-in-out infinite; }
+.hw-web-sway { transform-box: view-box; animation: hw-web-sway 11s ease-in-out infinite; }
 @keyframes hw-web-sway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(1.6deg); } }
 .hw-web-loose { animation: hw-web-sway 6s ease-in-out infinite reverse; transform-box: view-box; }
 .hw-web-hit { fill: transparent; pointer-events: fill; cursor: pointer; }
