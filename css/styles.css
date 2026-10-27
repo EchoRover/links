@@ -1943,6 +1943,25 @@ html.halloween .hero-block { flex-wrap: wrap; }
 .hw-apparition svg { display: block; width: 100%; height: auto; }
 .hw-app-eyes { transform-box: view-box; }
 
+/* ---------- the rare jumpscare ---------- */
+/* one smooth swell behind a dark vignette; no flashing, nothing to tap */
+.hw-scare {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(ellipse at center, rgba(6, 3, 14, 0.35) 0, rgba(6, 3, 14, 0.75) 55%, rgba(2, 1, 6, 0.96) 100%);
+}
+.hw-scare-face {
+    width: min(70vw, 61vh);
+    filter: drop-shadow(0 0 30px rgba(220, 205, 255, 0.55));
+    opacity: 0;
+}
+.hw-scare-face svg { display: block; width: 100%; height: auto; }
+
 /* the logo is a long-press target this week: no iOS callout or text pick */
 html.halloween .topbar .brand { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 

@@ -233,11 +233,14 @@
             '<ul class="hw-list">' + rows + '</ul>' +
             '<div class="hw-panel-foot">' +
             (!reduce ? '<button type="button" class="hw-mini" data-act="boo"></button>' : '') +
+            (!reduce ? '<button type="button" class="hw-mini" data-act="scare"></button>' : '') +
             (isHome && !reduce ? '<button type="button" class="hw-mini" data-act="bats"></button>' : '') +
             '<button type="button" class="hw-mini" data-act="close">close</button></div>';
         paintBatsButton();
         const boo = panel.querySelector('[data-act="boo"]');
         if (boo) boo.textContent = booOn() ? 'ghosts: on' : 'ghosts: off';
+        const sc = panel.querySelector('[data-act="scare"]');
+        if (sc) sc.textContent = store.get('hw-scare', true) ? 'jumpscares: on' : 'jumpscares: off';
     }
 
     function openPanel(open) {
@@ -251,6 +254,7 @@
         if (!act) return;
         if (act.dataset.act === 'close') openPanel(false);
         if (act.dataset.act === 'bats') setBats(!batsOn());
+        if (act.dataset.act === 'scare') { store.set('hw-scare', !store.get('hw-scare', true)); paintPanel(); }
         if (act.dataset.act === 'boo') { store.set('hw-boo', !booOn()); paintPanel(); scheduleApparition(); }
     });
     // tap anywhere else closes it, like any other popover on a phone
@@ -726,6 +730,79 @@
             appAnims.forEach((a) => a.play());
         } else {
             scheduleApparition();
+        }
+    });
+
+    // ---------- the rare jumpscare on a link click ----------
+    // About 1 in 20 link clicks, at most once a day per visitor, never on
+    // the first click of a first visit. A ghost face lunges at the screen
+    // for ~700 ms and then the click carries on. One smooth swell, no
+    // flashing, no sound. Same-tab links wait for it; new-tab links open
+    // at once (a delayed window.open gets blocked) and the scare waits
+    // for you on this page when you come back. ?scare=now arms the next click.
+    const today = new Date(Date.now() + 4 * 3600e3).toISOString().slice(0, 10);
+    try { if (params.get('scare') === 'now') sessionStorage.setItem('hw-scare-now', '1'); } catch (e) {}
+    const SCARE =
+        '<svg viewBox="0 0 200 220" aria-hidden="true">' +
+        '<path fill="#EFE8FF" d="M100 6C48 6 22 48 22 100v104l20-16 20 16 19-16 19 16 19-16 19 16 20-16 20 16V100C178 48 152 6 100 6z"/>' +
+        '<g fill="#07040F"><path d="M58 74c6-14 30-14 34 2 3 14-6 30-18 30S52 88 58 74z"/>' +
+        '<path d="M142 74c-6-14-30-14-34 2-3 14 6 30 18 30s22-18 16-32z"/>' +
+        '<path d="M100 120c-16 0-26 14-24 34 2 22 12 30 24 30s22-8 24-30c2-20-8-34-24-34z"/></g></svg>';
+    function scareArmed() {
+        if (reduce || !store.get('hw-scare', true)) return false;
+        let now = false;
+        try { now = sessionStorage.getItem('hw-scare-now') === '1'; } catch (e) {}
+        if (now) return true;
+        if (!store.get('hw-clicked', false)) { store.set('hw-clicked', true); return false; }
+        if (store.get('hw-scare-day', '') === today) return false;
+        return Math.random() < 0.05;
+    }
+    function spendScare() {
+        store.set('hw-clicked', true);
+        store.set('hw-scare-day', today);
+        try { sessionStorage.removeItem('hw-scare-now'); } catch (e) {}
+    }
+    function playScare(done) {
+        const o = document.createElement('div');
+        o.className = 'hw-scare';
+        o.setAttribute('aria-hidden', 'true');
+        o.innerHTML = '<div class="hw-scare-face">' + SCARE + '</div>';
+        document.body.appendChild(o);
+        const dur = 720;
+        o.animate([{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }],
+            { duration: dur, easing: 'ease-out', fill: 'forwards' });
+        o.firstChild.animate([
+            { transform: 'translate(0,0) scale(0.12)', opacity: 0 },
+            { transform: 'translate(0,0) scale(1)', opacity: 1, offset: 0.42 },
+            { transform: 'translate(-6px,3px) scale(1.02)', offset: 0.5 },
+            { transform: 'translate(5px,-4px) scale(1.04)', offset: 0.58 },
+            { transform: 'translate(-3px,2px) scale(1.05)', offset: 0.66 },
+            { transform: 'translate(0,0) scale(1.07)', opacity: 1, offset: 0.82 },
+            { transform: 'translate(0,0) scale(1.12)', opacity: 0 }
+        ], { duration: dur, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
+        setTimeout(() => { o.remove(); if (done) done(); }, dur);
+    }
+    let scareLater = 0;
+    document.addEventListener('click', (e) => {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const a = e.target.closest && e.target.closest('a[href]');
+        if (!a || a.hasAttribute('download') || a.closest('.hw-panel, .hw-counter, .hw-ghost, .hw-badge')) return;
+        const href = a.getAttribute('href');
+        if (!href || href[0] === '#' || /^(javascript|mailto|tel):/i.test(href)) return;
+        if (!scareArmed()) return;
+        spendScare();
+        if (a.target && a.target !== '_self') {
+            scareLater = Date.now();           // let the new tab open untouched
+            return;
+        }
+        e.preventDefault();
+        const to = a.href;
+        playScare(() => location.assign(to));
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && scareLater && Date.now() - scareLater < 120000) {
+            scareLater = 0;
+            setTimeout(() => playScare(), 250);
         }
     });
 
