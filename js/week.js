@@ -197,11 +197,13 @@ function renderWeek() {
     const now = new Date();
     const todayKey = ymd(now);
     const nowMins = now.getHours() * 60 + now.getMinutes();
-    const mon = mondayOf(CURSOR);
-
-    // Day view shows the cursor's own weekday; weekends have no classes, so
-    // landing on Saturday would open an empty grid -- fall forward to Monday.
+    // Weekends have no classes, so on Sat/Sun show the coming week, not the
+    // one that just ended (Sun 1 Nov used to show 26-30 Oct).
     const cd = CURSOR.getDay();
+    const mon = (cd === 0 || cd === 6) ? addDays(mondayOf(CURSOR), 7) : mondayOf(CURSOR);
+
+    // Day view shows the cursor's own weekday; on a weekend that would be an
+    // empty grid, so fall forward to Monday.
     const dayIx = (cd >= 1 && cd <= 5) ? cd : 1;
     const shown = VIEW === "week" ? DAYS : [dayIx];
     SEGS = buildSegs(shown);
@@ -320,12 +322,15 @@ function renderWeek() {
     const bar = document.getElementById("wk-bar");
     if (bar) {
         const a = mon, b = addDays(mon, 4);
+        // Month label follows what is on screen, not the cursor (a Saturday
+        // cursor in late October is showing November's first week).
+        const headDay = VIEW === "week" ? a : addDays(mon, dayIx - 1);
         const range = a.getMonth() === b.getMonth()
             ? `${a.getDate()} – ${b.getDate()} ${MONTH[b.getMonth()].slice(0, 3)} ${b.getFullYear()}`
             : `${a.getDate()} ${MONTH[a.getMonth()].slice(0, 3)} – ${b.getDate()} ${MONTH[b.getMonth()].slice(0, 3)} ${b.getFullYear()}`;
         bar.innerHTML = `
             <div class="wk-bar-l">
-                <h2 class="wk-month">${MONTH[CURSOR.getMonth()]} ${CURSOR.getFullYear()}</h2>
+                <h2 class="wk-month">${MONTH[headDay.getMonth()]} ${headDay.getFullYear()}</h2>
                 <button class="wk-today-btn" data-today>Today</button>
             </div>
             <div class="wk-bar-r">
