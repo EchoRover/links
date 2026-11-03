@@ -1,0 +1,2361 @@
+{
+ "_note": "Two-week rotation, transcribed from photographs of the six sheets on the mess wall (Week-1 and Week-2 x breakfast/lunch/dinner). A course whose rule is 'Choose Any One' lists its alternatives in printed order; 'For ALL' courses have one entry. Checked by tools/check_mess.py, which requires the same courses in both weeks, seven days each, and the same number of choices on every day.",
+ "posted_on": "19 October 2026",
+ "1": {
+  "breakfast": [
+   {
+    "course": "CEREAL",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Tuesday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Wednesday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Thursday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Friday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Saturday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Sunday": [
+      "Corn Flakes & Choco's"
+     ]
+    }
+   },
+   {
+    "course": "EGG PREPARATION",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Scrambled Egg"
+     ],
+     "Tuesday": [
+      "Boiled Egg"
+     ],
+     "Wednesday": [
+      "Egg Burjee"
+     ],
+     "Thursday": [
+      "Vegetable Egg Omelette with Ketchup"
+     ],
+     "Friday": [
+      "Scrambled Egg"
+     ],
+     "Saturday": [
+      "Boiled Egg"
+     ],
+     "Sunday": [
+      "Egg Burjee"
+     ]
+    }
+   },
+   {
+    "course": "MAIN BREAKFAST DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Uthappam with Coconut Chutney",
+      "Khamir with Date Syrup",
+      "Grilled Chicken Sausage"
+     ],
+     "Tuesday": [
+      "Paratha with Chana Masala",
+      "Balaleet with Egg",
+      "Wafel with Syrup"
+     ],
+     "Wednesday": [
+      "Poha with Chutney",
+      "Chicken Liver with Molasses",
+      "Hash Brown Potato"
+     ],
+     "Thursday": [
+      "Rava Upma with Coconut Chutney",
+      "Falafel with Tahina",
+      "Grilled Chicken Sausage"
+     ],
+     "Friday": [
+      "Poori & Chana Masala",
+      "Chicken Nasif",
+      "Pancake with Syrup"
+     ],
+     "Saturday": [
+      "Aloo Paratha with Pickle",
+      "Foul Medamas",
+      "Grilled Chicken Sausage"
+     ],
+     "Sunday": [
+      "Idly with sambar & Coconut Chutney",
+      "Mix Fatayer (Vegetarian only)",
+      "Potato Croquettes"
+     ]
+    }
+   },
+   {
+    "course": "CHEESE",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Labneh with Olives"
+     ],
+     "Tuesday": [
+      "Marinated Olives & Feta Cheese"
+     ],
+     "Wednesday": [
+      "Labneh with Olives"
+     ],
+     "Thursday": [
+      "Marinated Olives & Feta Cheese"
+     ],
+     "Friday": [
+      "Labneh with Olives"
+     ],
+     "Saturday": [
+      "Marinated Olives & Feta Cheese"
+     ],
+     "Sunday": [
+      "Labneh with Olives"
+     ]
+    }
+   },
+   {
+    "course": "PASTRY",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Assorted Danish"
+     ],
+     "Tuesday": [
+      "Assorted Croissant"
+     ],
+     "Wednesday": [
+      "Assorted Muffin"
+     ],
+     "Thursday": [
+      "Assorted Croissant"
+     ],
+     "Friday": [
+      "Assorted Danish"
+     ],
+     "Saturday": [
+      "Assorted Croissant"
+     ],
+     "Sunday": [
+      "Assorted Muffin"
+     ]
+    }
+   },
+   {
+    "course": "BREAD",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Tuesday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Wednesday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Thursday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Friday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Saturday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Sunday": [
+      "Slice Bread & Arabic Bread"
+     ]
+    }
+   },
+   {
+    "course": "YOGHURT",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Fresh Yoghurt"
+     ],
+     "Tuesday": [
+      "Fresh Yoghurt"
+     ],
+     "Wednesday": [
+      "Fresh Yoghurt"
+     ],
+     "Thursday": [
+      "Fresh Yoghurt"
+     ],
+     "Friday": [
+      "Fresh Yoghurt"
+     ],
+     "Saturday": [
+      "Fresh Yoghurt"
+     ],
+     "Sunday": [
+      "Fresh Yoghurt"
+     ]
+    }
+   },
+   {
+    "course": "FRUITS",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Assorted Whole Fruit"
+     ],
+     "Tuesday": [
+      "Fruit Salad"
+     ],
+     "Wednesday": [
+      "Assorted Whole Fruit"
+     ],
+     "Thursday": [
+      "Fruit Salad"
+     ],
+     "Friday": [
+      "Assorted Whole Fruit"
+     ],
+     "Saturday": [
+      "Fruit Salad"
+     ],
+     "Sunday": [
+      "Assorted Whole Fruit"
+     ]
+    }
+   },
+   {
+    "course": "ACCOMPANIMENTS",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Tuesday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Wednesday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Thursday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Friday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Saturday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Sunday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ]
+    }
+   },
+   {
+    "course": "HOT BEVERAGES",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Tuesday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Wednesday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Thursday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Friday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Saturday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Sunday": [
+      "Tea / Coffee with Hot Milk"
+     ]
+    }
+   },
+   {
+    "course": "CHILLED BEVERAGES",
+    "rule": "",
+    "cells": {
+     "Monday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Tuesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Wednesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Thursday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Friday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Saturday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Sunday": [
+      "Tang Juice (Two Variety)"
+     ]
+    }
+   }
+  ],
+  "dinner": [
+   {
+    "course": "SOUP",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Vegetable Noodles Soup"
+     ],
+     "Tuesday": [
+      "Turkish Red Lentil Soup"
+     ],
+     "Wednesday": [
+      "Tomato & Basil Soup"
+     ],
+     "Thursday": [
+      "Mushroom Cream Soup"
+     ],
+     "Friday": [
+      "Lentil Soup"
+     ],
+     "Saturday": [
+      "Broccoli Soup"
+     ],
+     "Sunday": [
+      "Potato Leek Soup"
+     ]
+    }
+   },
+   {
+    "course": "SALAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Chana Chat",
+      "Rocca Salad with Tomatoes Feta Cheese & Sumac",
+      "Mix Green Salad"
+     ],
+     "Tuesday": [
+      "Indian spicy Carrot Salad",
+      "Redkidney beans Salad",
+      "Mix Green Salad"
+     ],
+     "Wednesday": [
+      "Beetroot Carrot Salad",
+      "Greek Salad with Fettacheese",
+      "Mix Green Salad"
+     ],
+     "Thursday": [
+      "Corn Chaat Salad",
+      "Caesar Salad",
+      "Mix Green Salad"
+     ],
+     "Friday": [
+      "Coles Law Salad",
+      "Beetroot And Feta Cheese Salad w green leaves",
+      "Mix Green Salad"
+     ],
+     "Saturday": [
+      "Green Moong Salad",
+      "Fattoush",
+      "Mix Green Salad"
+     ],
+     "Sunday": [
+      "Kachumber Salad",
+      "Tabouleh",
+      "Mix Green Salad"
+     ]
+    }
+   },
+   {
+    "course": "COLD MEZZE",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Hummus"
+     ],
+     "Tuesday": [
+      "Moutable"
+     ],
+     "Wednesday": [
+      "Babaganush"
+     ],
+     "Thursday": [
+      "Muhamara"
+     ],
+     "Friday": [
+      "Hummus"
+     ],
+     "Saturday": [
+      "Moutable"
+     ],
+     "Sunday": [
+      "Babaganush"
+     ]
+    }
+   },
+   {
+    "course": "NON VEG PROTEIN",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Chicken Lasagna",
+      "Chicken Madfoon"
+     ],
+     "Tuesday": [
+      "Chicken Chilly",
+      "Fish Sayadiya"
+     ],
+     "Wednesday": [
+      "Tandoori Chicken with Mint Chutney",
+      "Chicken Mandi"
+     ],
+     "Thursday": [
+      "Chicken Tikka Boneless",
+      "Grilled Chicken"
+     ],
+     "Friday": [
+      "BBQ Chicken",
+      "Tawa Grilled Fish"
+     ],
+     "Saturday": [
+      "Chicken Biryani",
+      "Samak Mashwi"
+     ],
+     "Sunday": [
+      "Teriyaki Chicken",
+      "Lamb Machboos"
+     ]
+    }
+   },
+   {
+    "course": "SPECIAL DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Hara Bhara Kabab"
+     ],
+     "Tuesday": [
+      "Corn Cheese Balls"
+     ],
+     "Wednesday": [
+      "Spring Rolls"
+     ],
+     "Thursday": [
+      "Paneer 65"
+     ],
+     "Friday": [
+      "Manchurian Ball"
+     ],
+     "Saturday": [
+      "Veg Spring Roll"
+     ],
+     "Sunday": [
+      "Veg Cutlet"
+     ]
+    }
+   },
+   {
+    "course": "VEG DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Aloo Methi",
+      "Pasta Arrabiata"
+     ],
+     "Tuesday": [
+      "Gobi Manchurian",
+      "Vegetable Hakka Noodles"
+     ],
+     "Wednesday": [
+      "Aloo Jeera",
+      "Penne Alfredo Pasta"
+     ],
+     "Thursday": [
+      "Kadhai Vegetable",
+      "Pad Thai Noodles with Vegetables"
+     ],
+     "Friday": [
+      "Vegetable Red Thai Curry",
+      "Vegetable Fried Rice"
+     ],
+     "Saturday": [
+      "Paneer Butter Masala",
+      "Baked Macroni Pasta"
+     ],
+     "Sunday": [
+      "Aloo Palak Dry",
+      "Penne Pasta with Cheese Sauce"
+     ]
+    }
+   },
+   {
+    "course": "DAL",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Chole Curry"
+     ],
+     "Tuesday": [
+      "Dal Fry with Tadka"
+     ],
+     "Wednesday": [
+      "Moong Daal"
+     ],
+     "Thursday": [
+      "Sambhar"
+     ],
+     "Friday": [
+      "Garlic Dal"
+     ],
+     "Saturday": [
+      "Dal Makhani"
+     ],
+     "Sunday": [
+      "Yellow Dal"
+     ]
+    }
+   },
+   {
+    "course": "STARCH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Steamed Rice",
+      "Garlic Fried Rice (No Peas)"
+     ],
+     "Tuesday": [
+      "Steamed Rice",
+      "Saffron Rice"
+     ],
+     "Wednesday": [
+      "Steamed Rice",
+      "Vegetarian Penne Alfredo"
+     ],
+     "Thursday": [
+      "Steamed Rice",
+      "Arabic Rice"
+     ],
+     "Friday": [
+      "Steamed Rice",
+      "Baked Macroni Pasta"
+     ],
+     "Saturday": [
+      "Steamed Rice",
+      "Vegetable Hakka Noodles"
+     ],
+     "Sunday": [
+      "Vegetable Biryani",
+      "Pasta Arrabiata"
+     ]
+    }
+   },
+   {
+    "course": "BREAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Chapati",
+      "Arabic Bread"
+     ],
+     "Tuesday": [
+      "Chapati",
+      "Arabic Bread"
+     ],
+     "Wednesday": [
+      "Chapati",
+      "Arabic Bread"
+     ],
+     "Thursday": [
+      "Chapati",
+      "Arabic Bread"
+     ],
+     "Friday": [
+      "Chapati",
+      "Arabic Bread"
+     ],
+     "Saturday": [
+      "Chapati",
+      "Arabic Bread"
+     ],
+     "Sunday": [
+      "Chapati",
+      "Arabic Bread"
+     ]
+    }
+   },
+   {
+    "course": "YOGHURT",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Arabic Bread & Soft Roll"
+     ],
+     "Tuesday": [
+      "Arabic Bread & Soft Roll"
+     ],
+     "Wednesday": [
+      "Arabic Bread & Soft Roll"
+     ],
+     "Thursday": [
+      "Arabic Bread & Soft Roll"
+     ],
+     "Friday": [
+      "Arabic Bread & Soft Roll"
+     ],
+     "Saturday": [
+      "Arabic Bread & Soft Roll"
+     ],
+     "Sunday": [
+      "Arabic Bread & Soft Roll"
+     ]
+    }
+   },
+   {
+    "course": "FRUIT / DESSERT",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Assorted Whole Fruit",
+      "Rice Kheer"
+     ],
+     "Tuesday": [
+      "Fruit Salad",
+      "Rava Halwa"
+     ],
+     "Wednesday": [
+      "Assorted Whole Fruit",
+      "Strawberry Cake"
+     ],
+     "Thursday": [
+      "Fruit Salad",
+      "Cheese Cake"
+     ],
+     "Friday": [
+      "Assorted Whole Fruit",
+      "Shahi Tukda"
+     ],
+     "Saturday": [
+      "Fruit Salad",
+      "Tuffle Pudding"
+     ],
+     "Sunday": [
+      "Assorted Whole Fruit",
+      "Umali"
+     ]
+    }
+   },
+   {
+    "course": "CONDIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Sliced Onion"
+     ],
+     "Tuesday": [
+      "Sliced Onion"
+     ],
+     "Wednesday": [
+      "Sliced Onion"
+     ],
+     "Thursday": [
+      "Sliced Onion"
+     ],
+     "Friday": [
+      "Sliced Onion"
+     ],
+     "Saturday": [
+      "Sliced Onion"
+     ],
+     "Sunday": [
+      "Sliced Onion"
+     ]
+    }
+   },
+   {
+    "course": "ACCOMPANIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Tuesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Wednesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Thursday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Friday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Saturday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Sunday": [
+      "Assorted Indian & Arabic Pickle"
+     ]
+    }
+   },
+   {
+    "course": "CHILLED BEVERAGES",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Tuesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Wednesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Thursday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Friday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Saturday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Sunday": [
+      "Tang Juice (Two Variety)"
+     ]
+    }
+   }
+  ],
+  "lunch": [
+   {
+    "course": "SOUP",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Oriental Lentil Soup"
+     ],
+     "Tuesday": [
+      "Hot & Sour Veg Soup"
+     ],
+     "Wednesday": [
+      "Minestrone's Soup"
+     ],
+     "Thursday": [
+      "Arabic Lentil Soup"
+     ],
+     "Friday": [
+      "Potato & Corn Chowder"
+     ],
+     "Saturday": [
+      "Mushroom Soup"
+     ],
+     "Sunday": [
+      "Creamy Tomato soup"
+     ]
+    }
+   },
+   {
+    "course": "SALAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Indian Black Chana Salad",
+      "Fattoush",
+      "Mix Green Salad"
+     ],
+     "Tuesday": [
+      "Green Moong Salad",
+      "Caesar Salad",
+      "Mix Green Salad"
+     ],
+     "Wednesday": [
+      "Local Rocca &Tomato Salad with Sumac",
+      "Tabouleh",
+      "Mix Green Salad"
+     ],
+     "Thursday": [
+      "Quinoa salad",
+      "Boiled Checkpeas Salad",
+      "Mix Green Salad"
+     ],
+     "Friday": [
+      "Greek Salad",
+      "Greek Salad with Feta Cheese",
+      "Mix Green Salad"
+     ],
+     "Saturday": [
+      "White Beans & Cheese Salad",
+      "Aloo Chana Chat",
+      "Mix Green Salad"
+     ],
+     "Sunday": [
+      "Barley W/ Roasted Vegetables",
+      "Watermelon & Feta Cheese Salad",
+      "Mix Green Salad"
+     ]
+    }
+   },
+   {
+    "course": "COLD MEZZE",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Hummus"
+     ],
+     "Tuesday": [
+      "Moutable"
+     ],
+     "Wednesday": [
+      "Babaganush"
+     ],
+     "Thursday": [
+      "Muhamara"
+     ],
+     "Friday": [
+      "Hummus"
+     ],
+     "Saturday": [
+      "Moutable"
+     ],
+     "Sunday": [
+      "Babaganush"
+     ]
+    }
+   },
+   {
+    "course": "NON VEG PROTEIN",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Goan Fish Curry",
+      "Chicken Mandi"
+     ],
+     "Tuesday": [
+      "Chilli Chicken",
+      "Kebbeh Bil Laban"
+     ],
+     "Wednesday": [
+      "Mutton Curry",
+      "Chicken Machboos"
+     ],
+     "Thursday": [
+      "Chicken Biryani (No Raisins & Cashews)",
+      "Breaded Fish with tarter sauce"
+     ],
+     "Friday": [
+      "Butter Chicken (Boneless)",
+      "Lamb Mandi"
+     ],
+     "Saturday": [
+      "Kadai Chicken",
+      "Charcoal Chicken"
+     ],
+     "Sunday": [
+      "Tandoori Chicken with Mint Chutney",
+      "Lamb Maqlooba"
+     ]
+    }
+   },
+   {
+    "course": "SPECIAL DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Make Your Own Chicken Burger Station (Chicken Burger, Tomato Ketchup, Mayonnaise, Coktail Sauce, Lettuce, Tomatoes, Cucumber, Cheddar Cheese Slice, Eggless Potato Burger Bun)",
+      "Make Your Own Lentil Burger Station. (Vegan Lentil Buger,Tomato Ketchup, Mayonnaise, Coktail Sauce, Lettuce, Tomatoes, Cucumber, Cheddar Cheese Slice, Eggless Potato Burger Bun)"
+     ],
+     "Tuesday": [
+      "Pizza Margarita",
+      "Vegetable Pizza"
+     ],
+     "Wednesday": [
+      "Chicken and Vegetable Burritos (Mexican Chicken, Grilled vegetables, Shredded Cheese, Lettuce, Tomato Julienne, Gherkins, Jalepenos,Sweet Corn Kernal, Kidney Beans, Tortilla Bread)",
+      "Vegetable Burritos (Mexican Grilled vegetables, Shredded Cheese, Lettuce, Tomato Julienne, Gherkins, Jalepenos,Sweet Corn Kernal, Kidney Beans, Tortilla Bread)"
+     ],
+     "Thursday": [
+      "Chicken Sausage Rolls",
+      "Veg Puff Pastry"
+     ],
+     "Friday": [
+      "Panini Station - Chicken (Chicken Mortadella, Grilled Vegetables, Mayonnaise, Coktail Sauce, Lettuce, Tomatoes, Cucumber, Cheddar Cheese Slice, Panini Bread, Gherkins, Jalepenos)",
+      "Panini Station - Vegetable (Grilled Vegetables, Mayonnaise, Coktail Sauce, Lettuce, Tomatoes, Cucumber, Cheddar Cheese Slice, Panini Bread, Gherkins, Jalepenos)"
+     ],
+     "Saturday": [
+      "Panjabi Samosa Chat (Punjabi Samosa, Boiled Chick Peas, Yogurt, Mint Chutney, Tamarind Chutney, Chat Masala)"
+     ],
+     "Sunday": [
+      "Mix Vegetable Pakora with Mint Chutney"
+     ]
+    }
+   },
+   {
+    "course": "VEG DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Dum Aloo",
+      "Grilled Vegetable"
+     ],
+     "Tuesday": [
+      "Kadai Paneer",
+      "Egplant Musaksa"
+     ],
+     "Wednesday": [
+      "Aloo Gobi",
+      "Veg Salona"
+     ],
+     "Thursday": [
+      "Vegetable Biryani (No Raisin & Cashews)",
+      "Roasted Potato"
+     ],
+     "Friday": [
+      "Veg Kofta Curry",
+      "Chickpeas Thareed"
+     ],
+     "Saturday": [
+      "Kadhi with Pakora",
+      "French Fries"
+     ],
+     "Sunday": [
+      "Gobi Manchirian",
+      "Vegetable Ratatouli"
+     ]
+    }
+   },
+   {
+    "course": "DAL",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Masala Yellow Dal/ Rasam"
+     ],
+     "Tuesday": [
+      "Dal Makhani"
+     ],
+     "Wednesday": [
+      "Chole Masala"
+     ],
+     "Thursday": [
+      "Dal Palak"
+     ],
+     "Friday": [
+      "Mix Dal"
+     ],
+     "Saturday": [
+      "Dal Tadka"
+     ],
+     "Sunday": [
+      "Rajma Curry"
+     ]
+    }
+   },
+   {
+    "course": "STARCH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "White Rice",
+      "Pasta Arrabiata"
+     ],
+     "Tuesday": [
+      "White Rice",
+      "Egyptian Rice with Vermicelli"
+     ],
+     "Wednesday": [
+      "White Rice",
+      "Arabic Rice"
+     ],
+     "Thursday": [
+      "White Rice",
+      "Penne Alfredo Pasta"
+     ],
+     "Friday": [
+      "White Rice",
+      "Veg Lasange"
+     ],
+     "Saturday": [
+      "White Rice",
+      "Arabic Rice"
+     ],
+     "Sunday": [
+      "Veg Fried Rice",
+      "Vegetable Hakka Noodles"
+     ]
+    }
+   },
+   {
+    "course": "BREAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Tuesday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Wednesday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Thursday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Friday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Saturday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Sunday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ]
+    }
+   },
+   {
+    "course": "YOGHURT",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Fresh Yoghurt"
+     ],
+     "Tuesday": [
+      "Fresh Yoghurt"
+     ],
+     "Wednesday": [
+      "Fresh Yoghurt"
+     ],
+     "Thursday": [
+      "Raitha"
+     ],
+     "Friday": [
+      "Fresh Yoghurt"
+     ],
+     "Saturday": [
+      "Fresh Yoghurt"
+     ],
+     "Sunday": [
+      "Raitha"
+     ]
+    }
+   },
+   {
+    "course": "FRUIT / DESSERT",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Assorted Whole Fruit",
+      "Assorted French Pastry"
+     ],
+     "Tuesday": [
+      "Fruit Salad",
+      "Caramel Custard"
+     ],
+     "Wednesday": [
+      "Assorted Whole Fruit",
+      "Vermicelli Kheer"
+     ],
+     "Thursday": [
+      "Fruit Salad",
+      "Carrot Halwa"
+     ],
+     "Friday": [
+      "Assorted Whole Fruit",
+      "Suji Halwa"
+     ],
+     "Saturday": [
+      "Fruit Salad",
+      "Muhalabia"
+     ],
+     "Sunday": [
+      "Assorted Whole Fruit",
+      "Gulab Jamun"
+     ]
+    }
+   },
+   {
+    "course": "CONDIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Sliced Onion"
+     ],
+     "Tuesday": [
+      "Sliced Onion"
+     ],
+     "Wednesday": [
+      "Sliced Onion"
+     ],
+     "Thursday": [
+      "Sliced Onion"
+     ],
+     "Friday": [
+      "Sliced Onion"
+     ],
+     "Saturday": [
+      "Sliced Onion"
+     ],
+     "Sunday": [
+      "Sliced Onion"
+     ]
+    }
+   },
+   {
+    "course": "ACCOMPANIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Tuesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Wednesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Thursday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Friday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Saturday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Sunday": [
+      "Assorted Indian & Arabic Pickle"
+     ]
+    }
+   },
+   {
+    "course": "CHILLED BEVERAGES",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Tuesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Wednesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Thursday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Friday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Saturday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Sunday": [
+      "Tang Juice (Two Variety)"
+     ]
+    }
+   }
+  ]
+ },
+ "2": {
+  "breakfast": [
+   {
+    "course": "CEREAL",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Tuesday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Wednesday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Thursday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Friday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Saturday": [
+      "Corn Flakes & Choco's"
+     ],
+     "Sunday": [
+      "Corn Flakes & Choco's"
+     ]
+    }
+   },
+   {
+    "course": "EGG PREPARATION",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Scrambled Egg"
+     ],
+     "Tuesday": [
+      "Boiled Egg"
+     ],
+     "Wednesday": [
+      "Egg Burjee"
+     ],
+     "Thursday": [
+      "Vegetable Egg Omelette with Ketchup"
+     ],
+     "Friday": [
+      "Scrambled Egg"
+     ],
+     "Saturday": [
+      "Boiled Egg"
+     ],
+     "Sunday": [
+      "Egg Burjee"
+     ]
+    }
+   },
+   {
+    "course": "MAIN BREAKFAST DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Uthappam with Tomato Chutney",
+      "Khamir with Date Syrup",
+      "Grilled Chicken Sausage"
+     ],
+     "Tuesday": [
+      "Pav Bhaji",
+      "Balaleet with Egg (Rose Water+Saffron)",
+      "Hash Brown Potato"
+     ],
+     "Wednesday": [
+      "Vegetable Bhaji with Paratha",
+      "Crispy Falafel with Tahina Sauce",
+      "Waffles with Syrup"
+     ],
+     "Thursday": [
+      "Rava Upma with Coconut Chutney",
+      "Turkish Pide with Akkawi Cheese",
+      "Grilled Chicken Sausage"
+     ],
+     "Friday": [
+      "Paratha & Chana Masala",
+      "Chicken Liver with Molasses",
+      "Potato Croquettes"
+     ],
+     "Saturday": [
+      "Aloo Paratha with Pickle",
+      "Foul Medames",
+      "Kofta Laham with Cheese Fetayer"
+     ],
+     "Sunday": [
+      "Poha",
+      "Lamb Arayes",
+      "French Toast with Honey & Syrup"
+     ]
+    }
+   },
+   {
+    "course": "CHEESE",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Labneh with Olives"
+     ],
+     "Tuesday": [
+      "Marinated Olives & Feta Cheese"
+     ],
+     "Wednesday": [
+      "Labneh with Olives"
+     ],
+     "Thursday": [
+      "Marinated Olives & Feta Cheese"
+     ],
+     "Friday": [
+      "Labneh with Olives"
+     ],
+     "Saturday": [
+      "Marinated Olives & Feta Cheese"
+     ],
+     "Sunday": [
+      "Labneh with Olives"
+     ]
+    }
+   },
+   {
+    "course": "PASTRY",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Assorted Danish"
+     ],
+     "Tuesday": [
+      "Assorted Croissant"
+     ],
+     "Wednesday": [
+      "Assorted Muffin"
+     ],
+     "Thursday": [
+      "Assorted Croissant"
+     ],
+     "Friday": [
+      "Assorted Danish"
+     ],
+     "Saturday": [
+      "Assorted Croissant"
+     ],
+     "Sunday": [
+      "Assorted Muffin"
+     ]
+    }
+   },
+   {
+    "course": "BREAD",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Tuesday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Wednesday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Thursday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Friday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Saturday": [
+      "Slice Bread & Arabic Bread"
+     ],
+     "Sunday": [
+      "Slice Bread & Arabic Bread"
+     ]
+    }
+   },
+   {
+    "course": "YOGHURT",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Fresh Yoghurt"
+     ],
+     "Tuesday": [
+      "Fresh Yoghurt"
+     ],
+     "Wednesday": [
+      "Fresh Yoghurt"
+     ],
+     "Thursday": [
+      "Fresh Yoghurt"
+     ],
+     "Friday": [
+      "Fresh Yoghurt"
+     ],
+     "Saturday": [
+      "Fresh Yoghurt"
+     ],
+     "Sunday": [
+      "Fresh Yoghurt"
+     ]
+    }
+   },
+   {
+    "course": "FRUITS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Assorted Whole Fruit"
+     ],
+     "Tuesday": [
+      "Fruit Salad"
+     ],
+     "Wednesday": [
+      "Assorted Whole Fruit"
+     ],
+     "Thursday": [
+      "Fruit Salad"
+     ],
+     "Friday": [
+      "Assorted Whole Fruit"
+     ],
+     "Saturday": [
+      "Fruit Salad"
+     ],
+     "Sunday": [
+      "Assorted Whole Fruit"
+     ]
+    }
+   },
+   {
+    "course": "ACCOMPANIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Tuesday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Wednesday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Thursday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Friday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Saturday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ],
+     "Sunday": [
+      "Jam / Butter (Regualr & Salted) / Honey"
+     ]
+    }
+   },
+   {
+    "course": "HOT BEVERAGES",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Tuesday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Wednesday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Thursday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Friday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Saturday": [
+      "Tea / Coffee with Hot Milk"
+     ],
+     "Sunday": [
+      "Tea / Coffee with Hot Milk"
+     ]
+    }
+   },
+   {
+    "course": "CHILLED BEVERAGES",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Tuesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Wednesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Thursday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Friday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Saturday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Sunday": [
+      "Tang Juice (Two Variety)"
+     ]
+    }
+   }
+  ],
+  "dinner": [
+   {
+    "course": "SOUP",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Pumpkin Soup"
+     ],
+     "Tuesday": [
+      "Mushroom Soup"
+     ],
+     "Wednesday": [
+      "Vegetable Noodle BrothSoup"
+     ],
+     "Thursday": [
+      "Cream Of Potato & Leeks Soup"
+     ],
+     "Friday": [
+      "Tomato Soup"
+     ],
+     "Saturday": [
+      "Minestrone Soup"
+     ],
+     "Sunday": [
+      "Lentil Soup"
+     ]
+    }
+   },
+   {
+    "course": "SALAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Aloo Chana Chaat",
+      "Caesar Salad",
+      "Mix Green Salad"
+     ],
+     "Tuesday": [
+      "Asian Chopped Salad with Cabbage, Carrot, Asian Dressing",
+      "Fattoush Salad",
+      "Mix Green Salad"
+     ],
+     "Wednesday": [
+      "Indian Shirazi Salad with Tomato, Cucumber, Onion and Lemon Dressing",
+      "Greek Salad with Fetta Cheese",
+      "Mix Green Salad"
+     ],
+     "Thursday": [
+      "Grated Carrot Salad with Cucumber, Corriander & Chilli",
+      "Caesar Salad",
+      "Mix Green Salad"
+     ],
+     "Friday": [
+      "Sprouts and Avocado Salad with Mung Bean Sprouts, Tomato and Lemon Dressing",
+      "Fattoush Salad",
+      "Mix Green Salad"
+     ],
+     "Saturday": [
+      "Kachumber Salad",
+      "Greek Salad with Fetta Cheese",
+      "Mix Green Salad"
+     ],
+     "Sunday": [
+      "Indian Inspired Salad with Green Lentils, Quinoa, Capsicum and Tamarind-Date Dressing",
+      "Caesar Salad",
+      "Mix Green Salad"
+     ]
+    }
+   },
+   {
+    "course": "COLD MEZZE",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Hummus"
+     ],
+     "Tuesday": [
+      "Moutable"
+     ],
+     "Wednesday": [
+      "Babaganush"
+     ],
+     "Thursday": [
+      "Muhamara"
+     ],
+     "Friday": [
+      "Hummus"
+     ],
+     "Saturday": [
+      "Moutable"
+     ],
+     "Sunday": [
+      "Babaganush"
+     ]
+    }
+   },
+   {
+    "course": "NON VEG PROTEIN",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Breaded Chicken",
+      "Grilled Fish with Charmoula Sauce"
+     ],
+     "Tuesday": [
+      "Chicken Manchurian",
+      "Chicken Harees"
+     ],
+     "Wednesday": [
+      "Chicken Chettinad",
+      "Mix Grill (Chicken & Lamb)"
+     ],
+     "Thursday": [
+      "Indian Lamb Vindaloo",
+      "Chicken Mandi"
+     ],
+     "Friday": [
+      "Thai Green Fish Curry",
+      "BBQ Chicken"
+     ],
+     "Saturday": [
+      "Chicken Tikka Masala",
+      "Chicken Shish Taouk"
+     ],
+     "Sunday": [
+      "Mutton Do plyaza",
+      "Baked Fish Fillets / Lemon Garlic Butter"
+     ]
+    }
+   },
+   {
+    "course": "SPECIAL DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Vegetarian Lasagna"
+     ],
+     "Tuesday": [
+      "Bread Pakora"
+     ],
+     "Wednesday": [
+      "Vada Pav"
+     ],
+     "Thursday": [
+      "Egyptian Koshari with Chickpeas, Pasta, Rice, Lentils and Tomato Sauce"
+     ],
+     "Friday": [
+      "Spaghetti Pomodoro with fresh basil"
+     ],
+     "Saturday": [
+      "Punjabi Samosa"
+     ],
+     "Sunday": [
+      "Vegetable Club Sandwich (Grill on Site)"
+     ]
+    }
+   },
+   {
+    "course": "VEG DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Butter Paneer Masala",
+      "French Fries"
+     ],
+     "Tuesday": [
+      "Gobi Manchurian",
+      "Eggplant Mussakka"
+     ],
+     "Wednesday": [
+      "Kadhai Vegetble",
+      "Roast vegetables"
+     ],
+     "Thursday": [
+      "Aloo Methi",
+      "Green Beans Salona"
+     ],
+     "Friday": [
+      "Paneer Bhurji",
+      "Mashed Potato"
+     ],
+     "Saturday": [
+      "Soya Chaap Gravy",
+      "Vegetable Thareed"
+     ],
+     "Sunday": [
+      "Aloo Palak",
+      "Vegetable Red Thai Curry"
+     ]
+    }
+   },
+   {
+    "course": "DAL",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Dal Makhani"
+     ],
+     "Tuesday": [
+      "Stir Fried Vegetables with Tofu"
+     ],
+     "Wednesday": [
+      "Dal Fry with Tadka"
+     ],
+     "Thursday": [
+      "Rajma Curry"
+     ],
+     "Friday": [
+      "Masoor Dal"
+     ],
+     "Saturday": [
+      "Chole Masla"
+     ],
+     "Sunday": [
+      "Sambhar"
+     ]
+    }
+   },
+   {
+    "course": "STARCH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Steamed Rice",
+      "Dill Saffron Rice"
+     ],
+     "Tuesday": [
+      "Vgetebale Fried Rice",
+      "Veg Schezwan Noodles"
+     ],
+     "Wednesday": [
+      "Steamed Rice",
+      "Machboose Rice"
+     ],
+     "Thursday": [
+      "Steamed Rice",
+      "Garlic Fried Rice (No Peas)"
+     ],
+     "Friday": [
+      "Steamed Rice",
+      "Vegetable Maqlooba Rice"
+     ],
+     "Saturday": [
+      "Steamed Rice",
+      "Bokhari Rice"
+     ],
+     "Sunday": [
+      "Steamed Rice",
+      "Garlic Rice"
+     ]
+    }
+   },
+   {
+    "course": "BREAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Tuesday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Wednesday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Thursday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Friday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Saturday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Sunday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ]
+    }
+   },
+   {
+    "course": "YOGHURT",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Fresh Yoghurt"
+     ],
+     "Tuesday": [
+      "Fresh Yoghurt"
+     ],
+     "Wednesday": [
+      "Fresh Yoghurt"
+     ],
+     "Thursday": [
+      "Fresh Yoghurt"
+     ],
+     "Friday": [
+      "Fresh Yoghurt"
+     ],
+     "Saturday": [
+      "Fresh Yoghurt"
+     ],
+     "Sunday": [
+      "Fresh Yoghurt"
+     ]
+    }
+   },
+   {
+    "course": "FRUIT / DESSERT",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Assorted Whole Fruit",
+      "Indian Sweet Nankhatai"
+     ],
+     "Tuesday": [
+      "Fruit Salad",
+      "Chocolate Cake Slice"
+     ],
+     "Wednesday": [
+      "Assorted Whole Fruit",
+      "Fruit Trifle"
+     ],
+     "Thursday": [
+      "Fruit Salad",
+      "Orange Cake"
+     ],
+     "Friday": [
+      "Assorted Whole Fruit",
+      "Fruit Custard"
+     ],
+     "Saturday": [
+      "Fruit Salad",
+      "Dates Cake Slice"
+     ],
+     "Sunday": [
+      "Assorted Whole Fruit",
+      "Sheera"
+     ]
+    }
+   },
+   {
+    "course": "CONDIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Sliced Onion"
+     ],
+     "Tuesday": [
+      "Sliced Onion"
+     ],
+     "Wednesday": [
+      "Sliced Onion"
+     ],
+     "Thursday": [
+      "Sliced Onion"
+     ],
+     "Friday": [
+      "Sliced Onion"
+     ],
+     "Saturday": [
+      "Sliced Onion"
+     ],
+     "Sunday": [
+      "Sliced Onion"
+     ]
+    }
+   },
+   {
+    "course": "ACCOMPANIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Tuesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Wednesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Thursday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Friday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Saturday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Sunday": [
+      "Assorted Indian & Arabic Pickle"
+     ]
+    }
+   },
+   {
+    "course": "CHILLED BEVERAGES",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Tuesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Wednesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Thursday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Friday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Saturday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Sunday": [
+      "Tang Juice (Two Variety)"
+     ]
+    }
+   }
+  ],
+  "lunch": [
+   {
+    "course": "SOUP",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Truffled Mushroom Soup"
+     ],
+     "Tuesday": [
+      "Adasi Persian Lentil Soup"
+     ],
+     "Wednesday": [
+      "Cream of Asparagus Soup"
+     ],
+     "Thursday": [
+      "Sweet Corn Vegetables Soup"
+     ],
+     "Friday": [
+      "Vegetable Barley Soup"
+     ],
+     "Saturday": [
+      "Vgeetable Thai Cocounut Soup with"
+     ],
+     "Sunday": [
+      "Vegetable Manchow Soup"
+     ]
+    }
+   },
+   {
+    "course": "SALAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Kuttan Salad with Cucumber, Carrot and Beetroot with Lemon Dressing",
+      "Fattoush",
+      "Mix Green Salad"
+     ],
+     "Tuesday": [
+      "Kachumber Salad with Cucumber, Tomato and Onion with Lemon Vinaigrette",
+      "Caesar Salad",
+      "Mix Green Salad"
+     ],
+     "Wednesday": [
+      "Indian High Protein Salad with Chickpeas, Tofu and Mixed Vegetables with Lemon Dressing",
+      "Tabouleh",
+      "Mix Green Salad"
+     ],
+     "Thursday": [
+      "Kala Chana Chaat with Black Chickpeas, Mango and Onion with Lemon Dressing",
+      "Boiled Checkpeas Salad",
+      "Mix Green Salad"
+     ],
+     "Friday": [
+      "Corn Chaat Kachumber Salad with Corn, Potato and Chickpeas with Coriander Chutney Dressing",
+      "Greek Salad with Feta Cheese",
+      "Mix Green Salad"
+     ],
+     "Saturday": [
+      "Mango Kosambari with Moong Dal, Cucumber and Coconut with Lemon Dressing",
+      "Aloo Chana Chat",
+      "Mix Green Salad"
+     ],
+     "Sunday": [
+      "Indian Style Potato Salad with Mixed Greens and Pomegranate with Yogurt Dressing",
+      "Watermelon & Feta Cheese Salad",
+      "Mix Green Salad"
+     ]
+    }
+   },
+   {
+    "course": "COLD MEZZE",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Hummus"
+     ],
+     "Tuesday": [
+      "Moutable"
+     ],
+     "Wednesday": [
+      "Babaganush"
+     ],
+     "Thursday": [
+      "Muhamara"
+     ],
+     "Friday": [
+      "Hummus"
+     ],
+     "Saturday": [
+      "Moutable"
+     ],
+     "Sunday": [
+      "Babaganush"
+     ]
+    }
+   },
+   {
+    "course": "NON VEG PROTEIN",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Crispy Masala Fried Fish",
+      "Chicken Mandi"
+     ],
+     "Tuesday": [
+      "Chicken Biryani (No Raisens & Cashews)",
+      "Kebbeh Bil Laban"
+     ],
+     "Wednesday": [
+      "Kashmiri Mutton Yakhni",
+      "Moroccan Lamb Tagine with Apricots and Almonds"
+     ],
+     "Thursday": [
+      "Butter Chicken (Boneless)",
+      "Labanese Sayadiya Served with Hammour, Tahini Sauce and Fried"
+     ],
+     "Friday": [
+      "Chicken Bhuna Masala",
+      "Lamb Majboos with Lamb Stewed in Spices and Tomato Broth with Rice"
+     ],
+     "Saturday": [
+      "Mutton Rezalal",
+      "Chicken Freekeh with Arabic Spices"
+     ],
+     "Sunday": [
+      "Tandoori Chicken with Mint Chutney",
+      "Dawood Basha with Meatballs in Spiced Tomato Sauce"
+     ]
+    }
+   },
+   {
+    "course": "SPECIAL DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Chicken Kathi Roll",
+      "Paneer Kathi Roll"
+     ],
+     "Tuesday": [
+      "BBQ Roast Chicken with Garlic Sauce",
+      "Couscous Vegetable with Mixed Vegetables and Chickpeas"
+     ],
+     "Wednesday": [
+      "Chicken Shwarma Station",
+      "Falafel Wrap Station"
+     ],
+     "Thursday": [
+      "Schezwan Noodles with Chili Chicken",
+      "Schezwan Noodles with Chili Paneer"
+     ],
+     "Friday": [
+      "Beef Tacos Stations",
+      "Vegetable Tacos Station"
+     ],
+     "Saturday": [
+      "Subway Station with Varietu of stuffing (Chicken Mortadella, Beef Salami, Grilled Paneer, Grilled Vegetables, Lettuce,"
+     ],
+     "Sunday": [
+      "Pepperoni Pizza",
+      "Vegetable Pizza"
+     ]
+    }
+   },
+   {
+    "course": "VEG DISH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Dum Aloo",
+      "Egyptian Koshari with Chickpeas, Pasta, Rice, Lentils and Tomato Sauce"
+     ],
+     "Tuesday": [
+      "Vegetable Biryani",
+      "Roasted Herbs Sweet Potatoes and Beetroot"
+     ],
+     "Wednesday": [
+      "Aloo Bhujiya",
+      "Vegetable Tian"
+     ],
+     "Thursday": [
+      "Butter Paneer Masala",
+      "Roasted Vegetable Au Gratin"
+     ],
+     "Friday": [
+      "Malai Kofta",
+      "Vegetable Margooga with Mixed Vegetables and Aromatic Spices"
+     ],
+     "Saturday": [
+      "Bhindi Masala",
+      "Roasted Veggie Enchilada Casserole"
+     ],
+     "Sunday": [
+      "Gobi Manchurian",
+      "Red Thai Curry Vegetable Stew"
+     ]
+    }
+   },
+   {
+    "course": "DAL",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Dal Tadka/ Rasam"
+     ],
+     "Tuesday": [
+      "Dal Makhani"
+     ],
+     "Wednesday": [
+      "Rajma curry"
+     ],
+     "Thursday": [
+      "Mix Dal"
+     ],
+     "Friday": [
+      "Rajma Curry"
+     ],
+     "Saturday": [
+      "Kadhi Pakora"
+     ],
+     "Sunday": [
+      "Chole Masala"
+     ]
+    }
+   },
+   {
+    "course": "STARCH",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Steamed White Rice",
+      "Vegetarian Lasagna"
+     ],
+     "Tuesday": [
+      "Steamed White Rice",
+      "Rice with Vermicelli"
+     ],
+     "Wednesday": [
+      "Steamed White Rice",
+      "Garlicky Saffron Rice with Vegetables"
+     ],
+     "Thursday": [
+      "Steamed White Rice",
+      "Sayadiya Rice"
+     ],
+     "Friday": [
+      "Jeera Rice",
+      "Roasted Vegetable Spaghetti Pasta"
+     ],
+     "Saturday": [
+      "Veg Pulao",
+      "Veggies Mexican Rice with Sweet corn & Kidney beans"
+     ],
+     "Sunday": [
+      "Veg Fried Rice",
+      "Vermecilli Rice"
+     ]
+    }
+   },
+   {
+    "course": "BREAD",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Tuesday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Wednesday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Thursday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Friday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Saturday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ],
+     "Sunday": [
+      "Chapati",
+      "Arabic Bread & Soft Roll"
+     ]
+    }
+   },
+   {
+    "course": "YOGHURT",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Fresh Yoghurt"
+     ],
+     "Tuesday": [
+      "Fresh Yoghurt"
+     ],
+     "Wednesday": [
+      "Fresh Yoghurt"
+     ],
+     "Thursday": [
+      "Raitha"
+     ],
+     "Friday": [
+      "Fresh Yoghurt"
+     ],
+     "Saturday": [
+      "Fresh Yoghurt"
+     ],
+     "Sunday": [
+      "Raitha"
+     ]
+    }
+   },
+   {
+    "course": "FRUIT / DESSERT",
+    "rule": "Choose Any One",
+    "cells": {
+     "Monday": [
+      "Assorted Whole Fruit",
+      "Date Pudding"
+     ],
+     "Tuesday": [
+      "Fruit Salad",
+      "Um Ali"
+     ],
+     "Wednesday": [
+      "Assorted Whole Fruit",
+      "Indian Sweet Jalebi"
+     ],
+     "Thursday": [
+      "Fruit Salad",
+      "Cheesecake"
+     ],
+     "Friday": [
+      "Assorted Whole Fruit",
+      "Rice Kheer"
+     ],
+     "Saturday": [
+      "Fruit Salad",
+      "Chocolate Brownie"
+     ],
+     "Sunday": [
+      "Assorted Whole Fruit",
+      "Classic Italian Tiramisu Cake"
+     ]
+    }
+   },
+   {
+    "course": "CONDIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Sliced Onion"
+     ],
+     "Tuesday": [
+      "Sliced Onion"
+     ],
+     "Wednesday": [
+      "Sliced Onion"
+     ],
+     "Thursday": [
+      "Sliced Onion"
+     ],
+     "Friday": [
+      "Sliced Onion"
+     ],
+     "Saturday": [
+      "Sliced Onion"
+     ],
+     "Sunday": [
+      "Sliced Onion"
+     ]
+    }
+   },
+   {
+    "course": "ACCOMPANIMENTS",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Tuesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Wednesday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Thursday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Friday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Saturday": [
+      "Assorted Indian & Arabic Pickle"
+     ],
+     "Sunday": [
+      "Assorted Indian & Arabic Pickle"
+     ]
+    }
+   },
+   {
+    "course": "CHILLED BEVERAGES",
+    "rule": "For ALL",
+    "cells": {
+     "Monday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Tuesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Wednesday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Thursday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Friday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Saturday": [
+      "Tang Juice (Two Variety)"
+     ],
+     "Sunday": [
+      "Tang Juice (Two Variety)"
+     ]
+    }
+   }
+  ]
+ }
+}

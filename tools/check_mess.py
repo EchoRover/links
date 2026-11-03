@@ -29,15 +29,27 @@ MEALS = ["breakfast", "lunch", "dinner"]
 # real thing the mess does and not a dropped dish. Each one is listed here with
 # what the sheet actually shows, so the rule still catches the case it exists
 # for: a dish that went missing in transcription.
-UNEVEN = {
-    ("1", "lunch", "SPECIAL DISH"): (
-        "Sat and Sun print one merged orange cell across both sub-rows - "
-        "Sat 'Panjabi Samosa Chat (...)', Sun 'Mix Vegetable Pakora with "
-        "Mint Chutney'. Checked against the photograph 19 Oct 2026."),
-    ("2", "lunch", "SPECIAL DISH"): (
-        "Sat prints one merged orange cell across both sub-rows - 'Subway "
-        "Station with Varietu of stuffing (...)', clipped mid-list on the "
-        "sheet itself. Checked against the photograph 19 Oct 2026."),
+# Keyed by the menu's posted_on, because the mess swaps between menus and each
+# set of sheets merges different cells. Switching menus is then just copying the
+# saved file back; the allow-list for it is already here.
+UNEVEN_BY_MENU = {
+    "10 September 2026": {
+        ("1", "lunch", "SPECIAL DISH"): (
+            "Thu and Fri print one merged yellow cell across both sub-rows - "
+            "Thu 'Rice Bowl with Rajma Masala or Kadhi Pakora with Papad', "
+            "Fri 'Panjabi Samosa Chat (...)'. Checked against the photograph "
+            "14 Sep 2026."),
+    },
+    "19 October 2026": {
+        ("1", "lunch", "SPECIAL DISH"): (
+            "Sat and Sun print one merged orange cell across both sub-rows - "
+            "Sat 'Panjabi Samosa Chat (...)', Sun 'Mix Vegetable Pakora with "
+            "Mint Chutney'. Checked against the photograph 19 Oct 2026."),
+        ("2", "lunch", "SPECIAL DISH"): (
+            "Sat prints one merged orange cell across both sub-rows - 'Subway "
+            "Station with Varietu of stuffing (...)', clipped mid-list on the "
+            "sheet itself. Checked against the photograph 19 Oct 2026."),
+    },
 }
 
 
@@ -47,6 +59,7 @@ def main():
     menu = json.loads(MENU.read_text())
     service = json.loads(SERVICE.read_text())
     fails, allowed, dishes = [], [], 0
+    uneven = UNEVEN_BY_MENU.get(menu.get("posted_on"), {})
 
     served = {m["meal"] for m in service["meals"]}
     if served != set(MEALS):
@@ -78,7 +91,7 @@ def main():
                     fails.append(f"week {week} {meal} {course['course']}: "
                                  f"empty on {', '.join(empty)}")
                 if len(set(counts.values())) > 1:
-                    known = UNEVEN.get((week, meal, course["course"]))
+                    known = uneven.get((week, meal, course["course"]))
                     if known:
                         allowed.append(f"week {week} {meal} "
                                        f"{course['course']}: {known}")
