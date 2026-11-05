@@ -23,18 +23,15 @@
 //   Mon–Fri  the printed shift poster (photographed 2026-08-19).
 //            A 7-vehicle day rota, then a two-van night shift.
 //
-//   Friday   the SAME poster timetable as Mon–Thu, minus a prayer break.
-//            Campus notice, 2026-08-22, verbatim: "there will be no trips
-//            between Campus and Dorms from 12:30 PM to 1:15 PM for friday."
-//            Read as the break spanning [12:30, 1:15), service resuming
-//            WITH the 1:15 run — so 12:30 / 12:45 / 1:00 are cancelled in
-//            both directions and 1:15 still departs. That boundary reading
-//            is the one judgement call here; it is recorded in the footnote
-//            at the bottom of bus.html, not in prose above the table.
-//            Cancelled runs are NOT deleted from the table: they stay in
-//            place, struck through, keeping the poster's trip numbers, so
-//            someone holding the printed poster can see why 12:30 is gone
-//            instead of wondering whether the page lost a row.
+//   Friday   its OWN day timetable since 2026-11-03: the transport office's
+//            "Friday schedule.xlsx" (see FRIDAY_DIRS). Prayer break 12:30 to
+//            1:15, service resumes WITH the 1:15 run (the sheet prints 1:15
+//            in both directions). The sheet's "Prayer Time" rows stay in
+//            the table struck through, so trip numbers match the sheet.
+//            After 6:30 PM it runs the Mon–Thu night shift (confirmed by
+//            transport, 2026-11-05).
+//            (Until 2026-11-03 Friday was the Mon–Thu poster minus that
+//            break, off the 2026-08-22 campus notice.)
 //
 //   Sat–Sun  the campus notice of 2026-08-22, verbatim: "Saturdays and
 //            Sundays, vehicles will operate between the campus and
@@ -211,6 +208,91 @@ const POSTER_DIRS = {
             },
 };
 
+// Friday. The transport office's "Friday schedule.xlsx" (received 2026-11-03)
+// replaces the old reading of Friday as "the poster minus a 12:30-1:15 gap".
+// It is its own timetable: 10-min runs until 10:00, 15-min until 1:15, then
+// 20-min runs from 1:30 (to Campus) / 1:50 (to Dorms), last run 6:30 PM both
+// ways, and after 3:10 PM only Coaster 2/3/4 and Bus 3 run.
+// The sheet keeps two numbered "Prayer Time" rows in each direction; they sit
+// here as 12:30 and 12:45 inside noService, so they render struck through and
+// the trip numbers still match the sheet (to Campus 13:15 = trip 31, to Dorms
+// 13:15 = trip 29). Every time and vehicle was generated from the workbook,
+// not typed.
+// The sheet prints nothing after 6:30 PM. Transport confirmed on WhatsApp
+// (2026-11-05): "Night shift 7:00 - 12:00 same as mon to thur", so Friday
+// nights reuse the poster's night blocks unchanged.
+const FRIDAY_NIGHT = (b) => b;
+const FRIDAY_DIRS = {
+    toCampus: {
+        ...DIRS.toCampus,
+        blocks: [
+            {
+                title: "Day shift — Friday sheet", tag: "day shift", tagTone: "day",
+                rota: [
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    null, null,
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 2", "Coaster 3", "Coaster 4", "Bus 3",
+                    "Coaster 2", "Coaster 3", "Coaster 4", "Bus 3",
+                    "Coaster 2", "Coaster 3",
+                ],
+                times: [
+                    "07:00", "07:10", "07:20", "07:30", "07:40", "07:50",
+                    "08:00", "08:10", "08:20", "08:30", "08:40", "08:50",
+                    "09:00", "09:10", "09:20", "09:30", "09:40", "09:50",
+                    "10:00", "10:15", "10:30", "10:45",
+                    "11:00", "11:15", "11:30", "11:45",
+                    "12:00", "12:15", "12:30", "12:45",
+                    "13:15", "13:30", "13:50",
+                    "14:10", "14:30", "14:50",
+                    "15:10", "15:30", "15:50",
+                    "16:10", "16:30", "16:50",
+                    "17:10", "17:30", "17:50",
+                    "18:10", "18:30",
+                ],
+            },
+            FRIDAY_NIGHT(POSTER_DIRS.toCampus.blocks[1]),
+        ],
+    },
+    toDorms: {
+        ...DIRS.toDorms,
+        blocks: [
+            {
+                title: "Day shift — Friday sheet", tag: "day shift", tagTone: "day",
+                rota: [
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1",
+                    null, null,
+                    "Bus 2", "Bus 3",
+                    "Coaster 1", "Coaster 2", "Coaster 3", "Coaster 4", "Bus 1", "Bus 2", "Bus 3",
+                    "Coaster 2", "Coaster 3", "Coaster 4", "Bus 3",
+                    "Coaster 2", "Coaster 3", "Coaster 4", "Bus 3",
+                ],
+                times: [
+                    "07:30", "07:40", "07:50",
+                    "08:00", "08:10", "08:20", "08:30", "08:40", "08:50",
+                    "09:00", "09:10", "09:20", "09:30", "09:40", "09:50",
+                    "10:00", "10:00", "10:15", "10:30", "10:45",
+                    "11:00", "11:15", "11:30", "11:45",
+                    "12:00", "12:15", "12:30", "12:45",
+                    "13:15", "13:30", "13:50",
+                    "14:10", "14:30", "14:50",
+                    "15:10", "15:30", "15:50",
+                    "16:10", "16:30", "16:50",
+                    "17:10", "17:30", "17:50",
+                    "18:10", "18:30",
+                ],
+            },
+            FRIDAY_NIGHT(POSTER_DIRS.toDorms.blocks[1]),
+        ],
+    },
+};
+
 const SCHEDULES = {
     // ---------- Mon–Thu: the printed poster ----------
     weekday: {
@@ -221,13 +303,13 @@ const SCHEDULES = {
         dirs: POSTER_DIRS,
     },
 
-    // ---------- Friday: the poster, minus the prayer break ----------
+    // ---------- Friday: the transport office's own Friday sheet ----------
     friday: {
         key: "friday",
         label: "Friday",
         short: "Fri",
         numbering: "perBlock",
-        dirs: POSTER_DIRS,
+        dirs: FRIDAY_DIRS,
         noService: { from: "12:30", to: "13:15", reason: "Friday prayer" },
     },
 
@@ -351,8 +433,8 @@ function to12h(hhmm) {
 }
 
 // Which service runs on a given date. 0 = Sunday, 5 = Friday, 6 = Saturday.
-// Friday is NOT the weekend here — it is a full teaching day at IITD-AD that
-// happens to carry a prayer break, so it runs the poster with a hole in it.
+// Friday is NOT the weekend here — it is a full teaching day at IITD-AD with
+// its own sheet (FRIDAY_DIRS) and a prayer break.
 function dayKey(d) {
     const iso = isoDate(d);
     const dated = Object.values(SCHEDULES).find((s) => s.date === iso);
