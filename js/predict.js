@@ -19,7 +19,8 @@ const ROUND = {
     "Knapsack generalisations: which are poly(n, M)?",
     "String problems: which are O(mn)?",
   ],
-  answer: null, // set to the two asked after the quiz
+  answer: [1], // only one was asked this week
+  twist: "Q1 was asked with negative numbers allowed",
 };
 
 const API = "/api/bets";
@@ -80,7 +81,8 @@ function renderForm() {
   const note = $("bt-note");
   if (ROUND.answer) {
     form.hidden = true;
-    note.textContent = `Asked: Q${ROUND.answer[0]} and Q${ROUND.answer[1]}.`;
+    note.textContent = `Asked: ${ROUND.answer.map((n) => `Q${n}`).join(" and ")}.` +
+      (ROUND.twist ? ` ${ROUND.twist}.` : "");
     return;
   }
   if (mine) {
@@ -113,12 +115,13 @@ function renderBoard() {
   rows.forEach((b) => {
     const li = document.createElement("li");
     const h = hits(b);
-    if (h === 2) li.className = "won";
-    else if (h === 1) li.className = "half";
+    const full = ROUND.answer ? ROUND.answer.length : 2;
+    if (h === full) li.className = "won";
+    else if (h > 0) li.className = "half";
     const t = new Date(b.at);
     li.innerHTML = `<span class="bt-who"></span>
       <span class="bt-pair">Q${b.picks[0]} + Q${b.picks[1]}</span>
-      <span class="bt-at">${h === 2 ? "called it" : h === 1 ? "1 of 2" :
+      <span class="bt-at">${h === full ? "called it" : h > 0 ? `${h} of ${full}` :
         t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>`;
     li.querySelector(".bt-who").textContent = b.name;
     list.appendChild(li);
