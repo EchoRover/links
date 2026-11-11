@@ -34,7 +34,8 @@ window.DATA = {
       "links": {
         "Course Page": "https://abhilash-jindal.com/teaching/2026-1-acol-331/",
         "Slides": "https://github.com/codenet/col331/tree/main/slides",
-        "Blackboard": "https://iida.blackboard.com/ultra/courses/_157_1/outline"
+        "Blackboard": "https://iida.blackboard.com/ultra/courses/_157_1/outline",
+        "Moodle": "http://10.20.204.121:8080"
       }
     },
     "ACOL351": {
