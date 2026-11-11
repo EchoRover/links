@@ -9,17 +9,15 @@
 // ============================================================
 
 const ROUND = {
-  id: "acol351-tut6",
-  label: "ACOL351 · Tutorial 6 quiz · Wed 14 Oct",
-  // Problems 8, 9 and 10 are starred on the sheet: never asked, so not predictable.
+  id: "acol351-tut7",
+  label: "ACOL351 · Tutorial 7 quiz · Wed 11 Nov",
   questions: [
-    "Shortest-path tree vs MST: must they share an edge",
-    "Min bottleneck spanning tree in linear time",
-    "Update the MST after adding one edge",
-    "Refuelling: which strategy is right",
-    "Swap edges between two spanning trees",
-    "Two stores: where to be each day",
-    "Split hours between projects",
+    "Subset Sum in O(nT) time, O(T) space",
+    "Pebbles on a 4 x n checkerboard",
+    "Largest black square in a bit matrix",
+    "Truck inventory (storage C, order fee K, cap S)",
+    "Knapsack generalisations: which are poly(n, M)?",
+    "String problems: which are O(mn)?",
   ],
   answer: null, // set to the two asked after the quiz
 };
