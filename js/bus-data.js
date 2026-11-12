@@ -40,12 +40,10 @@
 //            CONFIRMED by that notice: the 7:30 AM start, the 30-minute
 //            interval, both directions, the same three stops.
 //            NOT in it: a LAST departure, and which vehicle runs which
-//            trip. So the weekend list is split — everything up to
-//            6:30 PM follows the notice, and the later runs are kept in
-//            their own block, labelled as assumed, because a guessed
-//            time that renders like a confirmed one is how someone ends
-//            up standing at a stop at 11 PM for nothing.
-//            When someone reads the actual board: fix WEEKEND_LAST.
+//            trip. The evening was shown as "assumed" until the transport
+//            office confirmed it on 12 Nov 2026: every 30 min through the
+//            evening, last runs 12:00 AM both ways (VAN 1 & 2), plus one
+//            extra 12:45 AM from campus.
 //
 // Times are stored as "HH:MM" 24h for math, rendered as 12h.
 // ------------------------------------------------------------
@@ -68,11 +66,12 @@ function addMins(hhmm, add) {
     return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 }
 
-// Weekend: start + interval are from the notice. The cut and the last
-// departure are not — see the header comment.
+// Weekend: start + interval from the notice, the evening and the last runs
+// from the transport office (12 Nov 2026) — see the header comment.
 const WEEKEND_START = "07:30";
-const WEEKEND_NOTICE_UNTIL = "18:30";   // where the confirmed block ends
-const WEEKEND_LAST = "23:30";           // ASSUMED, not from the notice
+const WEEKEND_NOTICE_UNTIL = "18:30";   // where the notice's block ends
+const WEEKEND_LAST = "24:00";           // 12:00 AM both ways, transport 12 Nov
+const WEEKEND_EXTRA_TO_DORMS = "24:45"; // one extra run from campus, same message
 const WEEKEND_STEP = 30;
 
 // The two directions share their stops across both services.
@@ -335,8 +334,8 @@ const SCHEDULES = {
                         times: everyN(WEEKEND_START, WEEKEND_NOTICE_UNTIL, WEEKEND_STEP),
                     },
                     {
-                        title: "Later runs — assumed, not in the notice", tag: "assumed", tagTone: "soft",
-                        dashed: true, assumed: true,
+                        title: "Evening — every 30 minutes, confirmed by transport", tag: "evening", tagTone: "night",
+                        dashed: true,
                         times: everyN("19:00", WEEKEND_LAST, WEEKEND_STEP),
                     },
                 ],
@@ -349,9 +348,9 @@ const SCHEDULES = {
                         times: everyN(WEEKEND_START, WEEKEND_NOTICE_UNTIL, WEEKEND_STEP),
                     },
                     {
-                        title: "Later runs — assumed, not in the notice", tag: "assumed", tagTone: "soft",
-                        dashed: true, assumed: true,
-                        times: everyN("19:00", WEEKEND_LAST, WEEKEND_STEP),
+                        title: "Evening — every 30 minutes, confirmed by transport", tag: "evening", tagTone: "night",
+                        dashed: true,
+                        times: [...everyN("19:00", WEEKEND_LAST, WEEKEND_STEP), WEEKEND_EXTRA_TO_DORMS],
                     },
                 ],
             },
