@@ -144,6 +144,10 @@ const POSTER_DIRS = {
                             "Coaster 5", "VAN 2",
                             "VAN 1", "Coaster 5", "VAN 2",
                             "VAN 1", "Coaster 5",
+                            // 15-17 from the transport office, 12 Nov 2026
+                            // (WhatsApp screenshot): the night shift now runs
+                            // past midnight.
+                            "VAN 2", "VAN 1", "Coaster 5",
                         ],
                         times: [
                             "19:00", "19:20", "19:40",
@@ -151,6 +155,7 @@ const POSTER_DIRS = {
                             "21:00", "21:20", "21:40",
                             "22:00", "22:20", "22:40",
                             "23:00", "23:20",
+                            "23:40", "24:00", "24:20",
                         ],
                     },
                 ],
@@ -194,6 +199,8 @@ const POSTER_DIRS = {
                             "not available",
                             "Coaster 5", "VAN 2", "VAN 1",
                             "Coaster 5", "VAN 2", "VAN 1", "Coaster 5",
+                            // 17-18 from the transport office, 12 Nov 2026.
+                            "VAN 2", "VAN 1",
                         ],
                         times: [
                             "19:00", "19:20", "19:40",
@@ -201,7 +208,7 @@ const POSTER_DIRS = {
                             "21:00", "21:20", "21:40",
                             "22:00", "22:20", "22:40",
                             "23:00", "23:20", "23:40",
-                            "24:00",
+                            "24:00", "24:20", "24:45",
                         ],
                     },
                 ],
@@ -445,12 +452,24 @@ function dayKey(d) {
     return "weekday";
 }
 
+// The night shift runs past midnight ("24:20", "24:45" belong to the night
+// BEFORE). So until ROLLOVER the service day is still yesterday and the
+// clock reads 24:xx, or at 12:10 AM the page would skip the 12:20 run of
+// last night and point at tomorrow morning's first bus.
+const ROLLOVER = 3 * 60;
+
+function serviceDate() {
+    const d = new Date();
+    if (d.getHours() * 60 + d.getMinutes() < ROLLOVER) d.setDate(d.getDate() - 1);
+    return d;
+}
+
 function todayKey() {
-    return dayKey(new Date());
+    return dayKey(serviceDate());
 }
 
 function tomorrowKey() {
-    const d = new Date();
+    const d = serviceDate();
     d.setDate(d.getDate() + 1);
     return dayKey(d);
 }
@@ -500,9 +519,11 @@ function hasVehicles(dir) {
     return dir.blocks.some((b) => b.rota);
 }
 
+// Minutes on the SERVICE day: 12:10 AM reads as 1450 (see ROLLOVER).
 function nowMinutes() {
     const d = new Date();
-    return d.getHours() * 60 + d.getMinutes();
+    const m = d.getHours() * 60 + d.getMinutes();
+    return m < ROLLOVER ? m + 24 * 60 : m;
 }
 
 // Minutes until departure, accounting for the 24:00 trip and wrap to tomorrow.

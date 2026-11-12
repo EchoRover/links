@@ -158,9 +158,10 @@ function tick(force) {
     const d = new Date();
     renderClock(d);
 
-    const now = d.getHours() * 60 + d.getMinutes();
-    if (!force && now === lastMinute) return;
-    lastMinute = now;
+    const raw = d.getHours() * 60 + d.getMinutes();
+    if (!force && raw === lastMinute) return;
+    lastMinute = raw;               // the watchdog compares wall-clock minutes
+    const now = nowMinutes();       // service-day minutes, 24:xx after midnight
 
     // The board hangs in a campus hall, so the reader is standing ON campus:
     // the bus they need is the one leaving here. Campus -> dorms goes first
