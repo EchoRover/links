@@ -415,6 +415,63 @@ SCHEDULES["exam-2026-10-24"] = {
     },
 };
 
+// Transport office sheet headed "Sunday 15-11-2026", in force for Sat 14 and
+// Sun 15 Nov 2026 (both days). Every 20 min: to Campus 7:00 AM - 6:40 PM
+// (36 trips), to Dorms 7:30 AM - 6:30 PM (34 trips), one 5-vehicle rota in
+// both directions. (The sheet's "To Dorms" BUS 2 rows have the driver and
+// vehicle columns swapped; the vehicle is BUS 2 either way.)
+// The sheet stops at 6:40 PM. The regular weekend evening (every 30 min to
+// 12:00 AM, transport 12 Nov) is kept after it rather than showing no buses
+// at night; that carry-over is the one inference here and the caveat says so.
+const NOV_1415_ROTA = ["Van 1", "Van 2", "Coaster 3", "Coaster 4", "Bus 2"];
+const NOV_1415_DIRS = {
+    toCampus: {
+        ...DIRS.toCampus,
+        blocks: [
+            {
+                title: "Day — 14/15 Nov sheet", tag: "every 20 min", tagTone: "day",
+                rota: NOV_1415_ROTA,
+                times: everyN("07:00", "18:40", 20),
+            },
+            SCHEDULES.weekend.dirs.toCampus.blocks[1],
+        ],
+    },
+    toDorms: {
+        ...DIRS.toDorms,
+        blocks: [
+            {
+                title: "Day — 14/15 Nov sheet", tag: "every 20 min", tagTone: "day",
+                rota: NOV_1415_ROTA,
+                times: everyN("07:30", "18:30", 20),
+            },
+            SCHEDULES.weekend.dirs.toDorms.blocks[1],
+        ],
+    },
+};
+const NOV_1415_CAVEAT = (day) => `<strong>${day}: special weekend timetable.</strong> `
+    + "The transport office's sheet for 14 and 15 Nov: every 20 min, 7:00 AM to 6:40 PM to Campus "
+    + "and 7:30 AM to 6:30 PM to Dorms. The sheet lists nothing later, so the regular weekend "
+    + "evening runs are shown after that.";
+
+SCHEDULES["special-2026-11-14"] = {
+    key: "special-2026-11-14",
+    date: "2026-11-14",
+    label: "Sat 14 Nov",
+    short: "Sat 14 Nov",
+    numbering: "continuous",
+    caveat: NOV_1415_CAVEAT("Sat 14 Nov"),
+    dirs: NOV_1415_DIRS,
+};
+SCHEDULES["special-2026-11-15"] = {
+    key: "special-2026-11-15",
+    date: "2026-11-15",
+    label: "Sun 15 Nov",
+    short: "Sun 15 Nov",
+    numbering: "continuous",
+    caveat: NOV_1415_CAVEAT("Sun 15 Nov"),
+    dirs: NOV_1415_DIRS,
+};
+
 // "2026-10-24" in the device's own timezone, matching getDay() below.
 function isoDate(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
