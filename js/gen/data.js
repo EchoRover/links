@@ -399,7 +399,10 @@ window.DATA = {
       "2026-10-27": "Mid-sem exams",
       "2026-10-28": "Mid-sem exams",
       "2026-10-29": "Mid-sem exams",
-      "2026-10-30": "Mid-sem exams"
+      "2026-10-30": "Mid-sem exams",
+      "2026-12-02": "UAE National Day",
+      "2026-12-03": "UAE National Day",
+      "2026-12-04": "UAE National Day"
     }
   }
 };
@@ -753,5 +756,8 @@ const NO_CLASS = {
   "2026-10-27": "Mid-sem exams",
   "2026-10-28": "Mid-sem exams",
   "2026-10-29": "Mid-sem exams",
-  "2026-10-30": "Mid-sem exams"
+  "2026-10-30": "Mid-sem exams",
+  "2026-12-02": "UAE National Day",
+  "2026-12-03": "UAE National Day",
+  "2026-12-04": "UAE National Day"
 };
