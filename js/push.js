@@ -47,7 +47,7 @@
     // Returns true when notifications are on (asking the phone if needed).
     async function enable() {
         if (!supported) {
-            if (window.linkcsInstall) window.linkcsInstall.show("Notifications need linkCS on your Home Screen (Apple's rule). Add it, then tap Remind me again.");
+            if (window.linkcsInstall) window.linkcsInstall.show("Notifications need linkCS on your Home Screen (Apple's rule). Add it, then tap Remind again.");
             else alertLine("This browser can't do notifications.");
             return false;
         }
@@ -116,7 +116,7 @@
     function busButton(dir, date, time) {
         const on = isOn() && !!reminders()[keyOf(dir, date, time)];
         return `<button type="button" class="push-remind${on ? " on" : ""}" data-remind-bus="${dir}|${date}|${time}"
-            aria-pressed="${on}" title="${on ? "Reminder set: tap to cancel" : "Notify me 10 minutes before this bus"}">${BELL}<span>${on ? "Reminder set" : "Remind me"}</span></button>`;
+            aria-pressed="${on}" title="${on ? "Reminder set: tap to cancel" : "Notify me 10 minutes before this bus"}">${BELL}<span>${on ? "Set" : "Remind"}</span></button>`;
     }
 
     function paint() {
@@ -126,7 +126,7 @@
             b.classList.toggle("on", on);
             b.setAttribute("aria-pressed", String(on));
             const span = b.querySelector("span");
-            if (span) span.textContent = on ? "Reminder set" : "Remind me";
+            if (span) span.textContent = on ? "Set" : "Remind";
         });
         const bell = document.getElementById("push-bell");
         if (bell) bell.classList.toggle("on", isOn());
@@ -157,7 +157,7 @@
                 <button type="button" class="push-x" data-act="close" aria-label="Close">×</button></div>
             <p class="push-status">${!supported
                 ? "On iPhone, notifications work once linkCS is on your Home Screen."
-                : on ? "On for this phone. Tap Remind me on any bus." : "Off. Turn on to get a heads-up 10 minutes before a bus you pick."}</p>
+                : on ? "On for this device. Tap Remind on any bus." : "Off. Turn on to get a heads-up 10 minutes before a bus you pick."}</p>
             ${!supported ? '<button type="button" class="push-main" data-act="install">How to add linkCS</button>'
                 : on ? '<button type="button" class="push-ghost" data-act="off">Turn off</button>'
                     : '<button type="button" class="push-main" data-act="on">Turn on</button>'}

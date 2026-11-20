@@ -1183,6 +1183,12 @@ a.brand-logo:focus-visible { outline: 2px solid var(--coral); outline-offset: 3p
     animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
+/* Installed iPhone app: the status bar is see-through (black-translucent),
+   so the page continues up under the clock; keep content below it. */
+@media (display-mode: standalone) {
+    body { padding-top: env(safe-area-inset-top); }
+}
+
 /* notifications (js/push.js): bell, panel, Remind me buttons, toast */
 .push-bell svg, .push-remind svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .push-bell { display: inline-flex; align-items: center; justify-content: center; }
@@ -1234,7 +1240,10 @@ a.brand-logo:focus-visible { outline: 2px solid var(--coral); outline-offset: 3p
 .hb-from { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-soft); }
 .hb-time { font-weight: 700; font-size: 1.05rem; color: var(--fg); font-variant-numeric: tabular-nums; }
 .hb-in { font-family: var(--font-mono); font-size: 0.7rem; color: var(--coral); font-weight: 600; }
-@media (min-width: 760px) { .hb-body { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 760px) { .hb-body { grid-template-columns: 1fr 1fr; } .hb-foot { grid-column: 1 / -1; } }
+.hb-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; padding: 0.1rem 0.15rem 0; }
+.hb-note { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-soft); }
+.hb-link { font: 600 0.74rem var(--font-sans); color: var(--coral); background: none; border: 0; padding: 0.3rem 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
 .tt-head {
     display: flex;

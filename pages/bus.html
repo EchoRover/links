@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
     <title>Bus Schedule — linkCS</title>
     <meta name="description" content="Shuttle schedule between KCA 1&2, KCA 3 and Campus — IIT Delhi Abu Dhabi.">
     <link rel="icon" type="image/webp" href="/assets/hacker.webp">
@@ -15,6 +15,7 @@
     <link rel="apple-touch-icon" href="/assets/app/icon-180.png">
     <meta name="apple-mobile-web-app-title" content="linkCS">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#F2EBDB" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#060814" media="(prefers-color-scheme: dark)">
@@ -269,6 +270,12 @@
             color: var(--fg-soft);
             cursor: pointer;
         }
+
+        /* a bell per run in today's timetable (js/push.js) */
+        .sched .c-bell { width: 1%; padding-left: 0.25rem; text-align: right; }
+        .sched .push-remind { padding: 0.2rem 0.4rem; min-height: 26px; }
+        .sched .push-remind span { display: none; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
         /* selected = the site blue (light blue on dark), not a block of ink */
         .seg button.on {

@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       const id = subIdOf(sub.endpoint);
       await redis("HSET", "push:subs", id, JSON.stringify({ endpoint: sub.endpoint, keys: sub.keys }));
       const r = await send(sub, { title: "linkCS notifications are on",
-        body: "Tap Remind me on a bus and you'll get a heads-up 10 minutes before.", url: "/" });
+        body: "Tap Remind on a bus and you'll get a heads-up 10 minutes before.", url: "/" });
       return res.status(200).json({ ok: true, id, test: r });
     }
     if (req.method === "DELETE") {

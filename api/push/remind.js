@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   const id = String(q.id || "").slice(0, 40);
   if (!/^[0-9a-f]{20}$/.test(id)) return res.status(400).json({ ok: false, error: "need id" });
   try {
-    if (!(await redis("HEXISTS", "push:subs", id))) return res.status(404).json({ ok: false, error: "notifications are off on this phone" });
+    if (!(await redis("HEXISTS", "push:subs", id))) return res.status(404).json({ ok: false, error: "notifications are off on this device" });
 
     if (req.method === "GET") {
       const flat = (await redis("HGETALL", `push:mine:${id}`)) || [];

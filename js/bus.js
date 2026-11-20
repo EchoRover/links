@@ -91,7 +91,9 @@ function renderNext(dirId, now) {
 // was wrong and showed: at 10:21 on a Saturday the second block happily
 // labelled 7:00 PM as the next departure, because it was the first upcoming
 // row *within that block*. Only one row in a direction is next.
-function renderTable(dir, block, now, showVeh, nextMins) {
+// bellDate: the service date for today's table (bells on runs still to come),
+// null when previewing another day's table.
+function renderTable(dir, block, now, showVeh, nextMins, bellDate) {
 
     return `
     <div class="sched-block${block.dashed ? " sched-dashed" : ""}">
@@ -105,6 +107,7 @@ function renderTable(dir, block, now, showVeh, nextMins) {
                         <th class="c-time">Departs ${dir.from}</th>
                         <th class="c-route">Route</th>
                         ${showVeh ? '<th class="c-veh">Vehicle</th>' : ""}
+                        ${bellDate ? '<th class="c-bell"><span class="sr-only">Remind</span></th>' : ""}
                     </tr>
                 </thead>
                 <tbody>
@@ -119,6 +122,8 @@ function renderTable(dir, block, now, showVeh, nextMins) {
                             <td class="c-time">${to12h(t.time)}</td>
                             <td class="c-route">${(block.stops || dir.stops).join(" → ")}</td>
                             ${showVeh ? `<td class="c-veh">${t.cancelled ? "no trip" : (t.vehicle || "")}</td>` : ""}
+                            ${bellDate ? `<td class="c-bell">${!t.cancelled && t.mins > now + 1 && window.linkcsPush
+                                ? window.linkcsPush.busButton(dir.id, bellDate, t.time) : ""}</td>` : ""}
                         </tr>`;
                     }).join("")}
                 </tbody>
@@ -155,6 +160,7 @@ function renderTables(now) {
     if (!elSched) return;
     const sched = SCHEDULES[viewKey];
     const markNext = viewKey === todayKey();
+    const bellDate = markNext ? isoDate(serviceDate()) : null;
 
     elSched.innerHTML = ["toCampus", "toDorms"]
         .map((id) => {
@@ -169,7 +175,7 @@ function renderTables(now) {
                     <h2 class="sched-h2">${dir.label}</h2>
                     <p class="sched-route">${dir.stops.join("  →  ")}</p>
                 </header>
-                ${data.blocks.map((b) => renderTable(dir, b, now, showVeh, nextMins)).join("")}
+                ${data.blocks.map((b) => renderTable(dir, b, now, showVeh, nextMins, bellDate)).join("")}
             </section>`;
         })
         .join("");
