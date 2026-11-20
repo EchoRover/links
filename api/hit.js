@@ -7,10 +7,10 @@
 //
 // What is NOT kept: no IP, no cookie, no user agent, no name. The only
 // per-device thing is `d`, a random id the page made up and keeps in
-// localStorage, and it is never stored as itself: it goes into a Redis
-// HyperLogLog, which can answer "how many different devices" and nothing
-// else (the ids cannot be read back out of it). Clear site data and you are a
-// new device, which is fine.
+// localStorage. It goes into Redis HyperLogLogs, which can answer "how many
+// different devices" and nothing else, and as a short hash into hits:first
+// (first day seen), which is how "returning devices" are told apart from new
+// ones. Clear site data and you are a new device.
 //
 // Every key carries the day (Abu Dhabi time) and expires after 400 days, so
 // the store holds about a year of counts and never grows past that.
@@ -79,13 +79,31 @@ function pairs(flat) {
   return o;
 }
 
+// ---------- storage (since 20 Nov 2026, evening) ----------
+// One hash per Abu Dhabi day, hits:d:<day>, fields by prefix:
+//   v:<page>            views of a page
+//   h:<hour>            views in an hour (0-23)
+//   ph:<page>|<hour>    views of a page in an hour   (when is Bus checked?)
+//   k:<kind>            phone / tablet / desktop
+//   r:<source>          where the visit came from
+//   m:<app|browser>     installed app or browser tab
+//   c:<page> <label>    taps on a link
+//   ch:<label>|<hour>   taps on a link in an hour
+// plus two HyperLogLogs per day: hits:dev:<day> (distinct devices) and
+// hits:ret:<day> (distinct RETURNING devices: seen on an earlier day too),
+// and hits:first, device-hash -> first day seen (a hash of the random id, so
+// the id itself is not kept there either).
+// Days counted before this layout keep their old keys (hits:views:<day> ...);
+// report() reads both.
+const DAY = (day) => `hits:d:${day}`;
+const devHash = (d) => createHash("sha256").update(d).digest("hex").slice(0, 16);
+
 async function record(q) {
   const t = q.t === "click" ? "click" : "view";
   const page = pageName(q.p);
   const dev = clean(q.d, 40);
   const { day, hour } = abuDhabi();
-  const cmds = [];
-  const touch = (key) => cmds.push(["EXPIRE", key, TTL]);
+  const D = DAY(day);
 
   if (t === "view") {
     const w = Number(q.w) || 0;
@@ -97,67 +115,85 @@ async function record(q) {
         ref = h.endsWith("linkcs.vercel.app") ? "internal" : clean(h, 40) || "direct";
       }
     } catch { /* not a URL: leave it as direct */ }
-
-    cmds.push(["HINCRBY", `hits:views:${day}`, page, 1]); touch(`hits:views:${day}`);
-    cmds.push(["HINCRBY", `hits:hours:${day}`, String(hour), 1]); touch(`hits:hours:${day}`);
-    cmds.push(["HINCRBY", `hits:kind:${day}`, kind, 1]); touch(`hits:kind:${day}`);
-    cmds.push(["HINCRBY", `hits:ref:${day}`, ref, 1]); touch(`hits:ref:${day}`);
-    // Installed app (home-screen icon) vs a browser tab.
     const mode = q.a ? "app" : "browser";
-    cmds.push(["HINCRBY", `hits:mode:${day}`, mode, 1]); touch(`hits:mode:${day}`);
+    const cmds = [
+      ["HINCRBY", D, `v:${page}`, 1], ["HINCRBY", D, `h:${hour}`, 1], ["HINCRBY", D, `ph:${page}|${hour}`, 1],
+      ["HINCRBY", D, `k:${kind}`, 1], ["HINCRBY", D, `r:${ref}`, 1], ["HINCRBY", D, `m:${mode}`, 1],
+      ["EXPIRE", D, TTL],
+    ];
     if (dev) {
-      cmds.push(["PFADD", `hits:dev:${day}`, dev]); touch(`hits:dev:${day}`);
-      cmds.push(["PFADD", `hits:dev:${day}:${page}`, dev]); touch(`hits:dev:${day}:${page}`);
+      cmds.push(["PFADD", `hits:dev:${day}`, dev], ["EXPIRE", `hits:dev:${day}`, TTL],
+                ["HSETNX", "hits:first", devHash(dev), day]);
     }
-  } else {
-    const label = clean(q.l, MAX_LABEL);
-    if (!label) return;
+    const res = await pipeline(cmds);
     if (dev) {
-      const cap = `hits:cap:${day}:${dev}`;
-      const [n] = await pipeline([["INCR", cap], ["EXPIRE", cap, 26 * 3600]]);
-      if (n > MAX_CLICKS_PER_DEVICE) return;
+      const newToday = res[7] === 1;           // first view from this device today
+      const brandNew = res[9] === 1;           // never seen before at all
+      const more = [];
+      if (newToday && !brandNew) more.push(["PFADD", `hits:ret:${day}`, dev], ["EXPIRE", `hits:ret:${day}`, TTL]);
+      if (brandNew) more.push(["EXPIRE", "hits:first", TTL]);
+      if (more.length) await pipeline(more);
     }
-    const key = `hits:clicks:${day}`;
-    cmds.push(["HINCRBY", key, `${page} ${label}`, 1]); touch(key);
+    return;
   }
-  await pipeline(cmds);
+
+  const label = clean(q.l, MAX_LABEL);
+  if (!label) return;
+  if (dev) {
+    const cap = `hits:cap:${day}:${dev}`;
+    const [n] = await pipeline([["INCR", cap], ["EXPIRE", cap, 26 * 3600]]);
+    if (n > MAX_CLICKS_PER_DEVICE) return;
+  }
+  await pipeline([["HINCRBY", D, `c:${page} ${label}`, 1], ["HINCRBY", D, `ch:${label}|${hour}`, 1], ["EXPIRE", D, TTL]]);
 }
 
 async function report(days) {
   const out = [];
   const now = Date.now();
-  for (let i = 0; i < days; i++) {
-    const { day } = abuDhabi(now - i * 24 * 3600 * 1000);
-    out.push(day);
-  }
+  for (let i = 0; i < days; i++) out.push(abuDhabi(now - i * 24 * 3600 * 1000).day);
+  const PER = 10;
   const cmds = [];
   for (const day of out) {
-    cmds.push(["HGETALL", `hits:views:${day}`], ["HGETALL", `hits:hours:${day}`],
-              ["HGETALL", `hits:kind:${day}`], ["HGETALL", `hits:ref:${day}`],
-              ["HGETALL", `hits:clicks:${day}`], ["PFCOUNT", `hits:dev:${day}`],
-              ["HGETALL", `hits:mode:${day}`]);
+    cmds.push(["HGETALL", DAY(day)], ["PFCOUNT", `hits:dev:${day}`], ["PFCOUNT", `hits:ret:${day}`],
+              // the old layout, for days counted before the switch
+              ["HGETALL", `hits:views:${day}`], ["HGETALL", `hits:hours:${day}`], ["HGETALL", `hits:kind:${day}`],
+              ["HGETALL", `hits:ref:${day}`], ["HGETALL", `hits:clicks:${day}`], ["HGETALL", `hits:mode:${day}`],
+              ["EXISTS", DAY(day)]);
   }
   const res = await pipeline(cmds);
-  const perPage = [];
+  const add = (o, k, n) => { o[k] = (o[k] || 0) + n; };
   const rows = out.map((day, i) => {
-    const [views, hours, kind, ref, clicks, devices, mode] = res.slice(i * 7, i * 7 + 7);
-    const v = pairs(views);
-    for (const p of Object.keys(v)) perPage.push([day, p]);
-    return { day, devices: Number(devices) || 0, views: v, hours: pairs(hours),
-             kind: pairs(kind), ref: pairs(ref), clicks: pairs(clicks), mode: pairs(mode) };
-  });
-  // Distinct devices per page: one PFCOUNT per page that had any views.
-  if (perPage.length) {
-    const counts = await pipeline(perPage.map(([day, p]) => ["PFCOUNT", `hits:dev:${day}:${p}`]));
-    const byDay = Object.fromEntries(rows.map((r) => [r.day, r]));
-    perPage.forEach(([day, p], i) => {
-      (byDay[day].pageDevices ||= {})[p] = Number(counts[i]) || 0;
+    const r = res.slice(i * PER, i * PER + PER);
+    const row = { day, devices: Number(r[1]) || 0, returning: Number(r[2]) || 0,
+                  views: {}, hours: {}, kind: {}, ref: {}, clicks: {}, mode: {}, pageHours: {}, clickHours: {} };
+    const f = pairs(r[0]);
+    for (const [k, n] of Object.entries(f)) {
+      const i2 = k.indexOf(":"), pre = k.slice(0, i2), rest = k.slice(i2 + 1);
+      if (pre === "v") add(row.views, rest, n);
+      else if (pre === "h") add(row.hours, rest, n);
+      else if (pre === "k") add(row.kind, rest, n);
+      else if (pre === "r") add(row.ref, rest, n);
+      else if (pre === "m") add(row.mode, rest, n);
+      else if (pre === "c") add(row.clicks, rest, n);
+      else if (pre === "ph" || pre === "ch") {
+        const bar = rest.lastIndexOf("|");
+        const name = rest.slice(0, bar), hr = rest.slice(bar + 1);
+        const tgt = pre === "ph" ? row.pageHours : row.clickHours;
+        add((tgt[name] ||= {}), hr, n);
+      }
+    }
+    [["views", 3], ["hours", 4], ["kind", 5], ["ref", 6], ["clicks", 7], ["mode", 8]].forEach(([name, j]) => {
+      for (const [k, n] of Object.entries(pairs(r[j]))) add(row[name], k, n);
     });
-  }
-  // Devices across the whole window, not the sum of days (one person on
-  // five days is one device, not five).
-  const [total] = await pipeline([["PFCOUNT", ...out.map((d) => `hits:dev:${d}`)]]);
-  return { ok: true, days: rows, devicesInWindow: Number(total) || 0 };
+    return row;
+  });
+  // Across the whole window, not the sum of days (one person on five days is
+  // one device, not five).
+  const [total, returning] = await pipeline([
+    ["PFCOUNT", ...out.map((d) => `hits:dev:${d}`)],
+    ["PFCOUNT", ...out.map((d) => `hits:ret:${d}`)],
+  ]);
+  return { ok: true, days: rows, devicesInWindow: Number(total) || 0, returningInWindow: Number(returning) || 0 };
 }
 
 // Compare hashes so the comparison takes the same time whatever was typed.

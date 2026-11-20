@@ -72,7 +72,8 @@ def main():
         mode.update(d.get("mode", {}))
 
     print(f"linkCS, last {days} days: {sum(views.values())} views, "
-          f"{data['devicesInWindow']} distinct devices")
+          f"{data.get('returningInWindow', 0)} returning devices, "
+          f"at most {data['devicesInWindow']} devices")
 
     print("\nper day            views  devices")
     top = max((sum(d["views"].values()) for d in rows), default=0) or 1

@@ -248,11 +248,26 @@
         const hours = merge(rows, "hours");
         const modeTotal = sum(mode);
         const phones = (kind.phone || 0) + (kind.tablet || 0);
+        // nested {name: {hour: n}} across days
+        const merge2 = (field) => {
+            const out = {};
+            for (const r of rows) for (const [name, hrs] of Object.entries(r[field] || {}))
+                for (const [h, n] of Object.entries(hrs)) { (out[name] ||= {})[h] = (out[name][h] || 0) + Number(n); }
+            return out;
+        };
+        const pageHours = merge2("pageHours");
+        const clickHours = merge2("clickHours");
+        const hourName = (h) => `${(Number(h) % 12) || 12} ${Number(h) < 12 ? "AM" : "PM"}`;
+        const peak = (hrs) => {
+            const e = Object.entries(hrs || {}).sort((a, b) => b[1] - a[1])[0];
+            return e ? hourName(e[0]) : "";
+        };
 
         const kpis = `
             <div class="st-kpis">
                 <div class="st-card st-kpi"><div class="n">${fmt(totalViews)}</div><div class="l">page views</div></div>
-                <div class="st-card st-kpi"><div class="n">${fmt(data.devicesInWindow)}</div><div class="l">different devices</div></div>
+                <div class="st-card st-kpi"><div class="n">${fmt(data.returningInWindow || 0)}</div><div class="l">returning devices (came back another day)</div></div>
+                <div class="st-card st-kpi"><div class="n">${fmt(data.devicesInWindow)}</div><div class="l">devices, at most (some counted twice)</div></div>
                 <div class="st-card st-kpi"><div class="n">${totalViews ? Math.round((phones / totalViews) * 100) : 0}%</div><div class="l">on phones</div></div>
                 <div class="st-card st-kpi"><div class="n">${modeTotal ? Math.round(((mode.app || 0) / modeTotal) * 100) : 0}%</div><div class="l">from the installed app</div></div>
             </div>`;
@@ -261,39 +276,52 @@
             const v = sum(r.views);
             return { v, tip: `${dayLabel(r.day)}: ${fmt(v)} views, ${fmt(r.devices)} devices` };
         });
-        const perHour = Array.from({ length: 24 }, (_, h) => {
-            const v = Number(hours[String(h)] || 0);
-            const h12 = (h % 12) || 12;
-            return { v, tip: `${h12} ${h < 12 ? "AM" : "PM"}: ${fmt(v)} views` };
-        });
+        // time of day for all pages, or one page (chips above the chart)
+        const hourCols = (src, what) => colsHTML(Array.from({ length: 24 }, (_, h) => {
+            const v = Number((src || {})[String(h)] || 0);
+            return { v, tip: `${hourName(h)}: ${fmt(v)} ${what}` };
+        }), "12 AM", "11 PM");
+        const chipPages = Object.keys(pageHours).sort((a, b) => (views[b] || 0) - (views[a] || 0)).slice(0, 6);
+        const timeCard = `<div class="st-chips" id="st-chips">
+                <button type="button" data-page="" aria-pressed="true">All</button>
+                ${chipPages.map((pg) => `<button type="button" data-page="${esc(pg)}" aria-pressed="false">${esc(PAGE_NAMES[pg] || pg)}</button>`).join("")}
+            </div><div id="st-hours">${hourCols(hours, "views")}</div>`;
 
         const linkName = (k) => {
             const i = k.indexOf(" ");
             const page = k.slice(0, i), label = k.slice(i + 1);
-            return `${label}  ·  on ${PAGE_NAMES[page] || page}`;
+            const pk = peak(clickHours[label]);
+            return `${label}  ·  on ${PAGE_NAMES[page] || page}${pk ? `  ·  mostly ${pk}` : ""}`;
         };
         const kindName = (k) => ({ phone: "Phone", tablet: "Tablet", desktop: "Laptop / desktop", unknown: "Unknown" }[k] || k);
         const modeName = (k) => ({ app: "Installed app", browser: "Browser tab" }[k] || k);
         const refName = (k) => ({ direct: "Typed / bookmark / app", internal: "Another linkCS page" }[k] || k);
 
         const table = `<details class="st-card st-full"><summary>Table: per day</summary>
-            <table class="st-table"><thead><tr><th>Day</th><th>Views</th><th>Devices</th></tr></thead><tbody>` +
-            data.days.map((r) => `<tr><td>${esc(dayLabel(r.day))}</td><td>${fmt(sum(r.views))}</td><td>${fmt(r.devices)}</td></tr>`).join("") +
+            <table class="st-table"><thead><tr><th>Day</th><th>Views</th><th>Devices</th><th>Returning</th></tr></thead><tbody>` +
+            data.days.map((r) => `<tr><td>${esc(dayLabel(r.day))}</td><td>${fmt(sum(r.views))}</td><td>${fmt(r.devices)}</td><td>${fmt(r.returning || 0)}</td></tr>`).join("") +
             `</tbody></table></details>`;
 
         $("st-body").innerHTML = kpis + `<div class="st-grid">` +
             card("Views per day", colsHTML(perDay, rows.length ? dayLabel(rows[0].day) : "", rows.length ? dayLabel(rows[rows.length - 1].day) : ""), true) +
             card("Pages", rowsHTML(views, (k) => PAGE_NAMES[k] || k, 15)) +
-            card("Time of day (Abu Dhabi)", colsHTML(perHour, "12 AM", "11 PM")) +
+            card("Time of day (Abu Dhabi)", timeCard) +
             card("Device", rowsHTML(kind, kindName)) +
             card("Installed app or browser", modeTotal ? rowsHTML(mode, modeName) : '<p class="st-empty">Counted from 20 Nov 2026 on.</p>') +
             card("Most tapped links", rowsHTML(clicks, linkName, 25), true) +
             card("Came from", rowsHTML(ref, refName)) +
             table + `</div>
             <p class="st-foot">Your own visits are not counted once you open any page with
-            <code>?notrack=1</code>. Counting started Fri 20 Nov 2026 (installed-app
-            counts the same evening); days are Abu Dhabi time. <button type="button" id="st-forget">Forget password on this browser</button></p>`;
+            <code>?notrack=1</code>. Counting started Fri 20 Nov 2026; installed-app,
+            returning-device and per-page/per-link time counts from that evening. Days are Abu Dhabi time. <button type="button" id="st-forget">Forget password on this browser</button></p>`;
         $("st-body").hidden = false;
+        $("st-chips").addEventListener("click", (e) => {
+            const b = e.target.closest("button[data-page]");
+            if (!b) return;
+            const pg = b.getAttribute("data-page");
+            $("st-chips").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+            $("st-hours").innerHTML = pg ? hourCols(pageHours[pg], `views of ${PAGE_NAMES[pg] || pg}`) : hourCols(hours, "views");
+        });
         $("st-forget").addEventListener("click", () => {
             try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
             key = "";

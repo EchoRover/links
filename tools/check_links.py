@@ -39,7 +39,8 @@ def served(path):
     """True if Vercel serves something at this repo path. With cleanUrls on,
     "pages/predict" is pages/predict.html, and rewrite destinations are
     written that way (vercel.json says /pages/predict, not .html)."""
-    return path in have or path + ".html" in have
+    # /api/x is the serverless function api/x.js
+    return path in have or path + ".html" in have or (path.startswith("api/") and path + ".js" in have)
 
 
 ATTR = re.compile(r'(?:href|src)\s*=\s*["\']([^"\']+)["\']')

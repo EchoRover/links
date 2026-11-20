@@ -7,6 +7,11 @@
 // Not counted: localhost, automated browsers, and any browser that opened a
 // page with ?notrack=1 once (?notrack=0 undoes it). That is how the site's own
 // maintainers keep their checking out of the numbers.
+//
+// iPhone Home Screen apps get storage of their own, so the installed app would
+// be a second "device" next to the Safari tab it came from. To merge them, the
+// page's manifest link points at /api/manifest with this tab's id (and the
+// notrack choice); the app's first launch opens /?lcid=<id> and adopts it.
 (function () {
   "use strict";
   if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return;
@@ -15,11 +20,39 @@
   let store = null;
   try { store = window.localStorage; } catch { /* blocked: count without an id */ }
 
+  const params = new URLSearchParams(location.search);
+  let standalone = false;
   try {
-    const flag = new URLSearchParams(location.search).get("notrack");
+    standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  } catch { /* old browser */ }
+  // First launch of the installed app: take over the Safari tab's id, unless
+  // this app already has one of its own (only ever adopt once).
+  try {
+    const given = params.get("lcid");
+    if (standalone && store && given && /^[a-z0-9]{8,40}$/.test(given) && !store.getItem("linkcs:device")) {
+      store.setItem("linkcs:device", given);
+    }
+    if (given && history.replaceState) {
+      params.delete("lcid");
+      const q = params.toString();
+      history.replaceState(history.state, "", location.pathname + (q ? "?" + q : "") + location.hash);
+    }
+  } catch { /* keep going */ }
+
+  // Point the manifest at /api/manifest so a later "Add to Home Screen" carries
+  // this tab's id (or its notrack choice) into the app.
+  function linkManifest(query) {
+    try {
+      const m = document.querySelector('link[rel="manifest"]');
+      if (m && !standalone) m.href = "/api/manifest?" + query;
+    } catch { /* ignore */ }
+  }
+
+  try {
+    const flag = params.get("notrack");
     if (flag === "1") store && store.setItem("linkcs:notrack", "1");
     if (flag === "0") store && store.removeItem("linkcs:notrack");
-    if (store && store.getItem("linkcs:notrack") === "1") return;
+    if (store && store.getItem("linkcs:notrack") === "1") { linkManifest("n=1"); return; }
   } catch { /* storage refused: just count */ }
 
   let id = "";
@@ -30,6 +63,7 @@
       store.setItem("linkcs:device", id);
     }
   } catch { id = ""; }
+  if (id) linkManifest("d=" + encodeURIComponent(id));
 
   function send(body) {
     const json = JSON.stringify(body);
@@ -46,10 +80,7 @@
   }
 
   // Opened from the home-screen icon rather than a browser tab.
-  let app = false;
-  try {
-    app = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-  } catch { /* old browser: count it as a tab */ }
+  const app = standalone;
 
   send({ t: "view", p: location.pathname, w: window.innerWidth, d: id,
          r: document.referrer || "", a: app ? 1 : 0 });
