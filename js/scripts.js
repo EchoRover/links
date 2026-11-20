@@ -42,7 +42,7 @@ const linksDataSem4 = {
     Teams: "https://teams.microsoft.com/",
     Outlook: "https://outlook.office.com/",
     Blackboard: "https://iida.blackboard.com/ultra/course",
-    Website: "https://abudhabi.iitd.ac.in/",
+    Website: "https://iitdabudhabi.ac.ae/",
     "Acd Cal":
       "https://iitdabudhabi.ac.ae/uploaded_files/AcademicCalendar-AY2025-2026Sem2.pdf",
     TimeTable:
@@ -445,8 +445,8 @@ const linksDataSem3 = {
     Outlook: "https://outlook.office.com/",
     Blackboard: "https://iida.blackboard.com/ultra/course",
     TimeTable:
-      "https://abudhabi.iitd.ac.in/uploaded_files/B.Tech.%202nd%20year%20CSE%20Sem%201_2025-26.pdf",
-    Website: "https://abudhabi.iitd.ac.in/",
+      "https://iitdabudhabi.ac.ae/uploaded_files/B.Tech.%202nd%20year%20CSE%20Sem%201_2025-26.pdf",
+    Website: "https://iitdabudhabi.ac.ae/",
   },
 
   courses: {

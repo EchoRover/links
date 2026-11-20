@@ -34,6 +34,14 @@ if vj.exists():
     for r in json.loads(vj.read_text()).get("rewrites", []):
         rewrites[r["source"].lstrip("/")] = r["destination"].lstrip("/")
 
+
+def served(path):
+    """True if Vercel serves something at this repo path. With cleanUrls on,
+    "pages/predict" is pages/predict.html, and rewrite destinations are
+    written that way (vercel.json says /pages/predict, not .html)."""
+    return path in have or path + ".html" in have
+
+
 ATTR = re.compile(r'(?:href|src)\s*=\s*["\']([^"\']+)["\']')
 # page URLs that live in js as bare strings, e.g. Bus: "/pages/bus.html"
 STR = re.compile(r'["\'](/[\w./-]+\.(?:html|js|css|json|pdf|png|jpg|jpeg|webp|svg))["\']')
@@ -56,7 +64,7 @@ for f in sorted(files):
         else:
             cand = posixpath.normpath(posixpath.join(posixpath.dirname(rel), target))
         checked += 1
-        if cand in have or cand in rewrites and rewrites[cand] in have:
+        if served(cand):
             continue
         # a bare directory link ("/" or "pages/") wants that folder's index
         if cand in ("", ".") and "index.html" in have:
@@ -64,7 +72,7 @@ for f in sorted(files):
         if posixpath.join(cand, "index.html") in have:
             continue
         # cleanUrls: /bus may be served as pages/bus.html via a rewrite
-        if cand in rewrites and rewrites[cand] in have:
+        if cand in rewrites and served(rewrites[cand]):
             continue
         broken.append((rel, raw, cand))
 
