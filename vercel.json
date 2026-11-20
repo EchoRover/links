@@ -48,6 +48,10 @@
     {
       "source": "/predict",
       "destination": "/pages/predict"
+    },
+    {
+      "source": "/stats",
+      "destination": "/pages/stats"
     }
   ]
 }

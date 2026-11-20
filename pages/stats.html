@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Stats · linkCS</title>
+    <link rel="icon" type="image/webp" href="/assets/hacker.webp">
+    <script src="/js/theme-init.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .st-wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 56px; }
+        .st-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 22px 0 18px; }
+        .st-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--fg); margin: 0; }
+        .st-title em { color: var(--coral); }
+        .st-sub { font-size: 0.8rem; color: var(--fg-soft); margin: 4px 0 0; max-width: 560px; line-height: 1.45; }
+
+        .st-range { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--bg-elevated); }
+        .st-range button { font: 600 0.82rem var(--font-sans); color: var(--fg-soft); background: transparent; border: 0; padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+        .st-range button[aria-pressed="true"] { background: var(--bg-card); color: var(--fg); box-shadow: var(--shadow-sm); }
+
+        .st-card { background: var(--bg-card); border: 1px solid var(--rule-faint); border-radius: 16px; padding: 18px 18px 16px; box-shadow: var(--shadow-sm); }
+        .st-card h2 { font: 600 0.7rem var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-soft); margin: 0 0 14px; }
+        .st-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .st-full { grid-column: 1 / -1; }
+        @media (max-width: 760px) { .st-grid { grid-template-columns: 1fr; } }
+
+        /* headline numbers */
+        .st-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+        @media (max-width: 760px) { .st-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        .st-kpi .n { font: 700 clamp(1.6rem, 4vw, 2.2rem) var(--font-sans); color: var(--fg); line-height: 1.05; font-variant-numeric: tabular-nums; }
+        .st-kpi .l { font-size: 0.78rem; color: var(--fg-soft); margin-top: 4px; }
+
+        /* vertical bars: views per day, hour of day */
+        .st-cols { position: relative; display: flex; align-items: flex-end; gap: 2px; height: 160px; border-bottom: 1px solid var(--rule); }
+        .st-col { flex: 1 1 0; height: 100%; display: flex; align-items: flex-end; position: relative; cursor: default; }
+        .st-col i { display: block; width: 100%; min-height: 0; background: var(--coral); border-radius: 4px 4px 0 0; }
+        .st-col.zero i { background: transparent; }
+        .st-col:hover i, .st-col:focus i { background: var(--coral-bright); }
+        .st-axis { display: flex; justify-content: space-between; font: 500 0.7rem var(--font-mono); color: var(--fg-faint); margin-top: 6px; }
+
+        /* horizontal bars: pages, links, sources */
+        .st-rows { display: grid; gap: 8px; }
+        .st-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+        .st-row .k { font-size: 0.86rem; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .st-row .v { font: 600 0.82rem var(--font-mono); color: var(--fg); font-variant-numeric: tabular-nums; text-align: right; }
+        .st-row .v small { font-weight: 500; color: var(--fg-faint); }
+        .st-row .b { grid-column: 1 / -1; height: 6px; border-radius: 4px; background: var(--rule-faint); overflow: hidden; }
+        .st-row .b i { display: block; height: 100%; border-radius: 4px; background: var(--coral); }
+        .st-empty { font-size: 0.85rem; color: var(--fg-faint); margin: 4px 0; }
+
+        /* tooltip */
+        .st-tip { position: fixed; z-index: 50; pointer-events: none; background: var(--fg); color: var(--bg); font: 600 0.78rem var(--font-sans); padding: 6px 9px; border-radius: 8px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); }
+
+        /* password gate */
+        .st-gate { max-width: 380px; margin: 40px auto; }
+        .st-gate form { display: grid; gap: 10px; }
+        .st-gate input { font: 500 0.95rem var(--font-mono); padding: 11px 12px; border-radius: 10px; border: 1px solid var(--rule); background: var(--bg-card); color: var(--fg); }
+        .st-gate button { font: 700 0.95rem var(--font-sans); padding: 11px; border-radius: 10px; border: 0; background: var(--coral); color: #fff; cursor: pointer; }
+        .st-err { color: var(--red); font-size: 0.85rem; min-height: 1.2em; margin: 0; }
+        .st-foot { font-size: 0.75rem; color: var(--fg-faint); margin-top: 18px; line-height: 1.5; }
+        .st-foot button { font: inherit; color: var(--coral); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+        .st-table { width: 100%; border-collapse: collapse; font: 500 0.8rem var(--font-mono); }
+        .st-table th, .st-table td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--rule-faint); }
+        .st-table th:first-child, .st-table td:first-child { text-align: left; }
+        details.st-card summary { cursor: pointer; font: 600 0.7rem var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-soft); }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <a href="/" class="brand-logo" aria-label="linkCS home">
+                    <img src="/assets/text.webp" class="text-img" alt="IIT Delhi Abu Dhabi">
+                    <img src="/assets/circle.webp" class="circle-img" alt="">
+                </a>
+                <span class="brand-name">
+                    <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
+                </span>
+                <span class="brand-meta">stats · private</span>
+            </div>
+            <div class="topbar-utils">
+                <a href="/" class="pill"><span class="pill-name">← Home</span></a>
+                <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+            </div>
+        </header>
+
+        <div class="st-wrap">
+            <section class="st-hero">
+                <div>
+                    <h1 class="st-title">How linkCS is <em>used</em></h1>
+                    <p class="st-sub">Counts only: no names, IPs or cookies. "Devices" are distinct
+                        browsers, so one person on a phone and a laptop counts twice.</p>
+                </div>
+                <div class="st-range" id="st-range" role="group" aria-label="Time range" hidden>
+                    <button type="button" data-days="1">Today</button>
+                    <button type="button" data-days="7">7d</button>
+                    <button type="button" data-days="14" aria-pressed="true">14d</button>
+                    <button type="button" data-days="30">30d</button>
+                    <button type="button" data-days="90">90d</button>
+                </div>
+            </section>
+
+            <section class="st-gate st-card" id="st-gate" hidden>
+                <h2>Password</h2>
+                <form id="st-form">
+                    <input type="password" id="st-key" autocomplete="current-password" placeholder="stats password" required>
+                    <button type="submit">Open stats</button>
+                    <p class="st-err" id="st-err" role="alert"></p>
+                </form>
+            </section>
+
+            <div id="st-body" hidden></div>
+        </div>
+    </main>
+    <script src="/js/stats.js"></script>
+</body>
+
+</html>
