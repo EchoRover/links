@@ -34,14 +34,30 @@
   // Hidden door to /admin: 10 quick taps on the "linkCS" wordmark (the text,
   // not the logo image, which is a link home and would reset the count).
   // /admin still asks for the password; this only saves typing the address.
+  // iPhone only reports taps on elements it treats as tappable, so the
+  // listener sits on the wordmark itself (not delegated from document), with
+  // cursor:pointer and touch-action:manipulation (no double-tap zoom eating
+  // the fast taps).
   let taps = 0, tapTimer = null;
-  document.addEventListener("click", function (e) {
-    if (!e.target.closest || !e.target.closest(".brand-name")) return;
+  function onWordmark() {
     taps++;
     clearTimeout(tapTimer);
     tapTimer = setTimeout(function () { taps = 0; }, 1500);   // a pause resets it
     if (taps >= 10) { taps = 0; location.href = "/admin"; }
-  });
+  }
+  function wireWordmark() {
+    document.querySelectorAll(".brand-name").forEach(function (el) {
+      if (el.dataset.door) return;
+      el.dataset.door = "1";
+      el.style.cursor = "pointer";
+      el.style.touchAction = "manipulation";
+      el.style.webkitUserSelect = "none";
+      el.style.userSelect = "none";
+      el.addEventListener("click", onWordmark);
+    });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wireWordmark);
+  else wireWordmark();
 
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", function () {
