@@ -377,11 +377,20 @@ addUpdate("assignments", "AHUL261: Portfolio entry 4 (23:59 on Blackboard), 30/1
 addUpdate("assignments", "AHUL261: Portfolio entry 5 (23:59 on Blackboard), 07/12/2026", "2026-12-07");
 addUpdate("assignments", "AHUL261: Final revised portfolio, 15/12/2026", "2026-12-15");
 
+// ACOL333 Assignment 3 (Piazza @49, 12 Nov: on the class resources page
+// under Homework), due Wed 9 Dec.
+addUpdate("assignments", "ACOL333: AI assignment 3, 09/12/2026", "2026-12-09");
+
+// ACOL331 Lab 4 (page replacement), out on Moodle 19 Nov. Dates from the
+// course page schedule (abhilash-jindal.com/teaching/2026-1-acol-331/):
+// submission Wed 9 Dec, lab exam Thu 10 Dec (Thu lab block 15:30-17:30).
+addUpdate("assignments", "ACOL331: OS lab 4 (page replacement) on Moodle, 09/12/2026", "2026-12-09");
+
 // Lab exam 3 (the scheduler lab) moved from Thu 19 Nov to "next
 // Wednesday's lab" because of convocation (Blackboard, Abhilash): the Wed
-// ACOL331 lab block. Lab 4 (page replacement) is out on Moodle; its exam
-// date isn't announced yet.
-addUpdate("quizzes", "ACOL331: OS lab exam 3 (scheduler), Wed lab slot, 25/11/2026", "2026-11-25");
+// ACOL331 lab block, 8-10am (course page schedule agrees: 25 Nov).
+addUpdate("quizzes", "ACOL331: OS lab exam 3 (scheduler), Wed lab 8am, 25/11/2026", "2026-11-25");
+addUpdate("quizzes", "ACOL331: OS lab exam 4 (page replacement), Thu lab 3:30pm, 10/12/2026", "2026-12-10");
 
 // The intelligence quiz set for Tue 17 Nov was postponed, and the next topic
 // is in scope too. Expected in the next lecture (Tue 24 Nov 14:00, M4-0-011);
