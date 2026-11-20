@@ -45,8 +45,14 @@
     } catch { /* counting must never break the page */ }
   }
 
+  // Opened from the home-screen icon rather than a browser tab.
+  let app = false;
+  try {
+    app = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  } catch { /* old browser: count it as a tab */ }
+
   send({ t: "view", p: location.pathname, w: window.innerWidth, d: id,
-         r: document.referrer || "" });
+         r: document.referrer || "", a: app ? 1 : 0 });
 
   // What a tapped link is called in the counts. A course card's links all
   // say BLACKBOARD, so the card's course code goes in front. data-hit on any

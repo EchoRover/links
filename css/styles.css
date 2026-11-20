@@ -1950,6 +1950,11 @@ html.halloween .hw-anchor-sit { padding-right: 3.6rem; }
 }
 .hw-badge svg { width: 0.95rem; height: 1.1rem; }
 html.halloween .hero-block { flex-wrap: wrap; }
+/* after the week: the badge stays for whoever caught all five, as a link
+   that replays Halloween */
+.hero-block:has(.hw-badge-keep) { flex-wrap: wrap; }
+a.hw-badge-keep { text-decoration: none; cursor: pointer; }
+a.hw-badge-keep:hover { background: var(--coral); color: var(--bg); }
 
 /* ---------- cobwebs ---------- */
 /* Drawn like a friendly icon: one soft lavender, bold rounded strokes.

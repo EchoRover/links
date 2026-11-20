@@ -99,6 +99,9 @@ async function record(q) {
     cmds.push(["HINCRBY", `hits:hours:${day}`, String(hour), 1]); touch(`hits:hours:${day}`);
     cmds.push(["HINCRBY", `hits:kind:${day}`, kind, 1]); touch(`hits:kind:${day}`);
     cmds.push(["HINCRBY", `hits:ref:${day}`, ref, 1]); touch(`hits:ref:${day}`);
+    // Installed app (home-screen icon) vs a browser tab.
+    const mode = q.a ? "app" : "browser";
+    cmds.push(["HINCRBY", `hits:mode:${day}`, mode, 1]); touch(`hits:mode:${day}`);
     if (dev) {
       cmds.push(["PFADD", `hits:dev:${day}`, dev]); touch(`hits:dev:${day}`);
       cmds.push(["PFADD", `hits:dev:${day}:${page}`, dev]); touch(`hits:dev:${day}:${page}`);
@@ -128,16 +131,17 @@ async function report(days) {
   for (const day of out) {
     cmds.push(["HGETALL", `hits:views:${day}`], ["HGETALL", `hits:hours:${day}`],
               ["HGETALL", `hits:kind:${day}`], ["HGETALL", `hits:ref:${day}`],
-              ["HGETALL", `hits:clicks:${day}`], ["PFCOUNT", `hits:dev:${day}`]);
+              ["HGETALL", `hits:clicks:${day}`], ["PFCOUNT", `hits:dev:${day}`],
+              ["HGETALL", `hits:mode:${day}`]);
   }
   const res = await pipeline(cmds);
   const perPage = [];
   const rows = out.map((day, i) => {
-    const [views, hours, kind, ref, clicks, devices] = res.slice(i * 6, i * 6 + 6);
+    const [views, hours, kind, ref, clicks, devices, mode] = res.slice(i * 7, i * 7 + 7);
     const v = pairs(views);
     for (const p of Object.keys(v)) perPage.push([day, p]);
     return { day, devices: Number(devices) || 0, views: v, hours: pairs(hours),
-             kind: pairs(kind), ref: pairs(ref), clicks: pairs(clicks) };
+             kind: pairs(kind), ref: pairs(ref), clicks: pairs(clicks), mode: pairs(mode) };
   });
   // Distinct devices per page: one PFCOUNT per page that had any views.
   if (perPage.length) {

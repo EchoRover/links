@@ -44,10 +44,11 @@ def main():
         sys.exit(f"endpoint said: {data}")
 
     rows = data["days"]
-    views, hours, kind, ref, clicks = (collections.Counter() for _ in range(5))
+    views, hours, kind, ref, clicks, mode = (collections.Counter() for _ in range(6))
     for d in rows:
         views.update(d["views"]); hours.update(d["hours"]); kind.update(d["kind"])
         ref.update(d["ref"]); clicks.update(d["clicks"])
+        mode.update(d.get("mode", {}))
 
     print(f"linkCS, last {days} days: {sum(views.values())} views, "
           f"{data['devicesInWindow']} distinct devices")
@@ -60,6 +61,7 @@ def main():
 
     table("pages", views)
     table("phone / tablet / desktop", kind)
+    table("installed app / browser tab", mode)
     table("came from", ref)
     print("\nhour of day (Abu Dhabi)")
     top = max(hours.values(), default=0) or 1
