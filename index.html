@@ -151,6 +151,7 @@
                     <span class="pill-quote pill-quote-bot" aria-hidden="true">if your laptop dies, blame them</span>
                 </a>
                 <a class="archive-link" href="/archive/" title="Year 2 Archive"><img src="/assets/box.webp" alt="Archive"></a>
+                <button class="button push-bell" id="push-bell" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
                 <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
             </div>
         </header>
@@ -218,6 +219,17 @@
             </a>
         </section>
 
+        <!-- BUS — next run each way, off js/bus-data.js (same data as /bus) -->
+        <section class="tt-card hb-card" id="hb-card">
+            <div class="tt-head">
+                <span class="tt-title">Bus</span>
+                <div class="tt-tools">
+                    <a href="/pages/bus.html" class="tt-pdf">full schedule</a>
+                </div>
+            </div>
+            <div class="hb-body" id="hb-body"></div>
+        </section>
+
         <!-- CLASS NOW / NEXT — live off the Sem 5 timetable -->
         <section class="tt-card" id="tt-card">
             <div class="tt-head">
@@ -229,16 +241,6 @@
             <div class="tt-body" id="tt-body"></div>
         </section>
 
-        <!-- BUS — next run each way, off js/bus-data.js (same data as /bus) -->
-        <section class="tt-card hb-card" id="hb-card">
-            <div class="tt-head">
-                <span class="tt-title">Bus</span>
-                <div class="tt-tools">
-                    <a href="/pages/bus.html" class="tt-pdf">full schedule</a>
-                </div>
-            </div>
-            <div class="hb-body" id="hb-body"></div>
-        </section>
 
         <!-- COURSES — 2-column grid, compact -->
         <section id="course-grid" class="course-list"></section>
@@ -264,6 +266,7 @@
     <script src="/js/gen/data.js"></script>
     <script src="/js/scripts.js"></script>
     <script src="/js/timetable.js" defer></script>
+    <script src="/js/push.js" defer></script>
     <script src="/js/bus-data.js" defer></script>
     <script src="/js/home-bus.js" defer></script>
     <script src="/js/halloween.js" defer></script>

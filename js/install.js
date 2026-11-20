@@ -28,14 +28,18 @@
   } catch (e) { /* old browser */ }
   if (standalone) return;
 
+  // Other scripts (notifications) can open the same screen on demand, e.g.
+  // when an iPhone taps "Remind me" before installing.
+  let why = "";
+  window.linkcsInstall = { show: (reason) => { why = reason || ""; render(); } };
+
   const q = new URLSearchParams(location.search).get("install");
-  if (q === "0") return;
-  const forced = q === "1";
-  if (!forced) {
-    if (!(iOS || android)) return;
+  let auto = q !== "0";
+  if (auto && q !== "1") {
+    if (!(iOS || android)) auto = false;
     try {
       const until = Number(localStorage.getItem(KEY) || 0);
-      if (until && Date.now() < until) return;
+      if (until && Date.now() < until) auto = false;
     } catch (e) { /* storage blocked: show it */ }
   }
 
@@ -43,7 +47,7 @@
   const count = (l) => { try { window.linkcsCount && window.linkcsCount("install: " + l); } catch (e) { /* ignore */ } };
 
   let deferred = null;
-  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; render(); });
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; if (box) render(); });
   window.addEventListener("appinstalled", () => { count("installed"); render(true); });
 
   const css = `
@@ -87,26 +91,28 @@
       document.documentElement.style.overflow = "hidden";
       count("shown");
     }
-    const why = `<ul>
-        <li><b>1</b><span>Opens in one tap from your Home Screen, full screen, no browser bar.</span></li>
-        <li><b>2</b><span>Bus times, the mess menu and your timetable still load with no signal.</span></li>
+    const reason = why ? `<p><b>${why}</b></p>` : "";
+    const whyList = reason + `<ul>
+        <li><b>1</b><span>Bus reminders: a notification 10 minutes before your bus.</span></li>
+        <li><b>2</b><span>Opens in one tap from your Home Screen, full screen, no browser bar.</span></li>
+        <li><b>3</b><span>Bus times, the mess menu and your timetable still load with no signal.</span></li>
       </ul>`;
     let body;
     if (installed) {
       body = `<p>Installed. Open <b>linkCS</b> from your Home Screen from now on.</p>`;
     } else if (inApp) {
-      body = why + `<p>This app browser can't install anything. Open linkCS in ${iOS ? "Safari" : "Chrome"}:</p>
+      body = whyList + `<p>This app browser can't install anything. Open linkCS in ${iOS ? "Safari" : "Chrome"}:</p>
         <button type="button" class="lc-go" data-act="copy">Copy link</button>`;
     } else if (iOS) {
-      body = why + `<ol>
+      body = whyList + `<ol>
           <li>Tap <b>Share</b> ${SHARE} (bottom of Safari, or top right in Chrome).</li>
           <li>Scroll down and tap <b>Add to Home Screen</b> ${PLUS}.</li>
           <li>Open <b>linkCS</b> from your Home Screen.</li>
         </ol>`;
     } else if (deferred) {
-      body = why + `<button type="button" class="lc-go" data-act="install">Install linkCS</button>`;
+      body = whyList + `<button type="button" class="lc-go" data-act="install">Install linkCS</button>`;
     } else {
-      body = why + `<ol>
+      body = whyList + `<ol>
           <li>Tap the browser menu ${DOTS}.</li>
           <li>Tap <b>Install app</b> or <b>Add to Home screen</b>.</li>
           <li>Open <b>linkCS</b> from your Home Screen.</li>
@@ -144,6 +150,8 @@
     }
   });
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => render());
-  else render();
+  if (auto) {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => render());
+    else render();
+  }
 })();

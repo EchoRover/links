@@ -189,7 +189,7 @@
 
         .next-then li {
             display: grid;
-            grid-template-columns: 5.5rem 1fr auto;
+            grid-template-columns: 5.5rem 1fr auto auto;
             align-items: baseline;
             gap: 0.5rem;
             font-family: var(--font-mono);
@@ -752,6 +752,7 @@
                 <a href="/" class="pill">
                     <span class="pill-name">← Home</span>
                 </a>
+                <button class="button push-bell" id="push-bell" aria-label="Notifications" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>
                 <button class="button" id="theme-toggle" aria-label="Toggle theme">◐</button>
             </div>
         </header>
@@ -820,6 +821,7 @@
         </div>
     </main>
 
+    <script src="/js/push.js" defer></script>
     <script src="/js/bus-data.js" defer></script>
     <script src="/js/bus.js" defer></script>
     <script src="/js/halloween.js" defer></script>

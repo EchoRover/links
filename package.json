@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Only for the api/ serverless functions (push notifications). The site itself has no build step.",
+  "dependencies": {
+    "web-push": "3.6.7"
+  }
+}

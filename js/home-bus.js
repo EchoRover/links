@@ -1,9 +1,8 @@
 // Home page bus card: the next bus each way and a countdown. Times and the
 // "which schedule runs today" logic come from js/bus-data.js, the same file
 // the Bus page and the hall screen use, so the three can never disagree.
-// (No "remind me" here yet: a calendar file freezes the time and the bus
-// schedule changes often; reminders will be linkCS notifications that read
-// the live schedule when they fire.)
+// "Remind me" comes from js/push.js (a linkCS notification 10 min before,
+// re-checked against the timetable when it fires).
 (function () {
     "use strict";
     if (typeof SCHEDULES === "undefined" || typeof trips !== "function") return;
@@ -52,6 +51,8 @@
                     <span class="hb-time">${to12h(run.t.time)}</span>
                     <span class="hb-in">${inLabel}</span>
                 </div>
+                ${window.linkcsPush && run.t.mins > now + 1 - (run.tomorrow ? 24 * 60 : 0)
+                    ? window.linkcsPush.busButton(dirId, isoDate(run.day), run.t.time) : ""}
             </div>`;
         }
         box.innerHTML = html || '<p class="tt-quiet">No buses listed.</p>';

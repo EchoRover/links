@@ -22,7 +22,7 @@
 //
 // Bump VERSION when the list or the logic changes; old caches are deleted.
 
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = `linkcs-${VERSION}`;
 // Both spellings: the home page links to /pages/bus.html (Vercel redirects
 // that to /pages/bus), while bookmarks and typed URLs use /bus.
@@ -132,4 +132,29 @@ self.addEventListener("fetch", (event) => {
       return res;
     })());
   }
+});
+
+// ---------- notifications (api/push/*) ----------
+self.addEventListener("push", (event) => {
+  let msg = {};
+  try { msg = event.data ? event.data.json() : {}; } catch { msg = { title: "linkCS", body: event.data && event.data.text() }; }
+  event.waitUntil(self.registration.showNotification(msg.title || "linkCS", {
+    body: msg.body || "",
+    icon: "/assets/app/icon-192.png",
+    badge: "/assets/app/icon-192.png",
+    data: { url: msg.url || "/" },
+    tag: msg.tag || undefined,
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || "/", self.location.origin).href;
+  event.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const w of wins) {
+      if (w.url.startsWith(self.location.origin)) { await w.focus(); return w.navigate ? w.navigate(url) : null; }
+    }
+    return self.clients.openWindow(url);
+  })());
 });

@@ -46,6 +46,10 @@ function renderNext(dirId, now) {
             : `${skipped.map((t) => to12h(t.time)).join(", ")} cancelled · ${skipped[0].why}`;
 
     const etaText = tomorrow ? "tomorrow" : (isEnRoute ? "en route" : untilLabel(head.mins, now));
+    // "Remind me" (js/push.js) on runs that have not left yet.
+    const runDate = (() => { const d = serviceDate(); if (tomorrow) d.setDate(d.getDate() + 1); return isoDate(d); })();
+    const bell = (t) => window.linkcsPush && (tomorrow || t.mins > now + 1)
+        ? window.linkcsPush.busButton(dir.id, runDate, t.time) : "";
     const fromText = isEnRoute ? `left ${dir.from} at ${to12h(head.time)}` : `from ${dir.from} · ${sched.label}`;
 
     return `
@@ -61,6 +65,7 @@ function renderNext(dirId, now) {
         <div class="next-meta">
             ${head.tag ? `<span class="tag tag-${head.tagTone}">${head.tag}</span>` : ""}
             ${head.vehicle ? `<span class="next-veh">${head.vehicle}</span>` : ""}
+            ${bell(head)}
         </div>
         ${gapNote ? `<p class="next-gap">${gapNote}</p>` : ""}
         ${dir.id === "toCampus" ? `<p class="next-kca3">
@@ -74,6 +79,7 @@ function renderNext(dirId, now) {
                     <span class="then-time">${to12h(t.time)}</span>
                     <span class="then-eta">${tomorrow ? "&nbsp;" : untilLabel(t.mins, now)}</span>
                     <span class="then-veh">${t.vehicle || (t.assumed ? "assumed" : "")}</span>
+                    ${bell(t)}
                 </li>`).join("")}
         </ul>
     </article>`;
