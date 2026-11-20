@@ -161,6 +161,44 @@
         a.dead-hint {
             position: relative;
         }
+
+        /* Halloween 2026: the hunt's result and the switch to bring it back */
+        .hw-card {
+            max-width: 38rem;
+            margin: 0 auto 2.5rem;
+            padding: 1.1rem 1.25rem;
+            background: var(--background-50);
+            border: 2px solid var(--primary-300);
+            border-radius: 16px;
+            color: var(--text-800);
+        }
+        .hw-card .era-eyebrow {
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.25em;
+            color: var(--accent-500); text-transform: uppercase;
+        }
+        .hw-card h2 { margin: 0.2rem 0 0.35rem; font-size: 1.35rem; color: var(--text-900); font-weight: 800; }
+        .hw-card p { margin: 0 0 0.8rem; line-height: 1.45; font-size: 0.95rem; }
+        .hw-card .hw-won { font-weight: 700; color: var(--primary-600); }
+        .hw-toggle {
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            padding: 0.7rem 0.9rem; border-radius: 10px; background: var(--background-200);
+            font-weight: 600; color: var(--text-900); cursor: pointer;
+        }
+        .hw-toggle input {
+            appearance: none; -webkit-appearance: none; flex: none;
+            width: 46px; height: 28px; border-radius: 999px; margin: 0;
+            background: var(--text-300); position: relative; cursor: pointer; transition: background 0.2s;
+        }
+        .hw-toggle input::after {
+            content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px;
+            border-radius: 50%; background: #fff; transition: transform 0.2s;
+        }
+        .hw-toggle input:checked { background: #E8761A; }
+        .hw-toggle input:checked::after { transform: translateX(18px); }
+        .hw-toggle input:focus-visible { outline: 2px solid var(--primary-500); outline-offset: 2px; }
+        .hw-card .hw-status { font-size: 0.85rem; color: var(--text-600); margin: 0.6rem 0 0; }
+        /* links on this page are buttons (styles.css); keep that look, centred */
+        .hw-card .hw-status a { color: var(--text-50); text-align: center; margin: 0.7rem 0 0; }
     </style>
 </head>
 
@@ -181,6 +219,19 @@
             A treasury of every link this site has carried.
             <em>Some are now dead — kept as-is, on purpose.</em>
         </div>
+
+        <!-- Halloween 2026: the ghost hunt, kept. The switch is stored on this
+             device (localStorage hw-replay) and read by js/halloween-init.js. -->
+        <section class="hw-card" id="hw-card">
+            <div class="era-eyebrow">Event · 25 to 31 Oct 2026</div>
+            <h2>Halloween 2026</h2>
+            <p id="hw-result">Five ghosts hid on five pages, with a riddle for each.</p>
+            <label class="hw-toggle">
+                <span>Halloween theme on linkCS</span>
+                <input type="checkbox" role="switch" id="hw-switch">
+            </label>
+            <p class="hw-status" id="hw-status"></p>
+        </section>
 
         <!-- ============================================== -->
         <!-- ERA: Year 2 Semester 1 (Sem 3) — Aug-Nov 2025  -->
@@ -316,6 +367,42 @@
     </div>
 
     <script src="archive.js"></script>
+    <script>
+        // Halloween 2026 card: the hunt result plus an on/off switch that
+        // keeps the theme on across the site until it is switched off.
+        (function () {
+            const sw = document.getElementById('hw-switch');
+            const status = document.getElementById('hw-status');
+            const result = document.getElementById('hw-result');
+            const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+            let caught = [];
+            try { caught = JSON.parse(get('hw-caught') || '[]'); } catch (e) {}
+            const n = Array.isArray(caught) ? new Set(caught).size : 0;
+            if (n >= 5) result.innerHTML = '<span class="hw-won">Ghostbuster 2026.</span> You caught all five ghosts.';
+            else if (n > 0) result.textContent = n + ' of 5 ghosts caught on this device. Switch the theme on to finish the hunt.';
+            else result.textContent = 'Five ghosts hid on five pages, with a riddle for each. Switch the theme on to play.';
+            function paint() {
+                const on = get('hw-replay') === '1';
+                sw.checked = on;
+                status.innerHTML = on
+                    ? 'On. The whole site is in Halloween mode on this device.<a href="/">Open linkCS →</a>'
+                    : 'Off. linkCS looks normal.';
+            }
+            sw.addEventListener('change', () => {
+                try {
+                    if (sw.checked) {
+                        localStorage.setItem('hw-replay', '1');
+                        localStorage.removeItem('spooky-off');
+                    } else {
+                        localStorage.removeItem('hw-replay');
+                    }
+                    sessionStorage.removeItem('spooky');
+                } catch (e) { status.textContent = 'This browser is blocking storage, so the switch cannot be saved.'; return; }
+                paint();
+            });
+            paint();
+        })();
+    </script>
 </body>
 
 </html>

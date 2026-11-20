@@ -20,40 +20,7 @@
     const root = document.documentElement;
     if (!root.classList.contains('halloween')) {
         if (window.HALLOWEEN_OFF) themeOffPumpkin();
-        else keepsake();
         return;
-    }
-
-    // ---------- after Halloween week: the keepsake ----------
-    // Whoever caught all five keeps the "Ghostbuster 2026" badge on the home
-    // page for good, and tapping it replays the week (?spooky=1, which lasts
-    // for that visit; the pumpkin panel's theme switch ends it). The ids are
-    // repeated here rather than read from GHOSTS below, which this early
-    // return never reaches.
-    function keepsake() {
-        const page = location.pathname.split('/').pop().replace(/\.html$/, '') || 'index';
-        if (page !== 'index') return;
-        let caught = [];
-        try { caught = JSON.parse(localStorage.getItem('hw-caught') || '[]'); } catch (e) {}
-        const all = ['index', 'bus', 'mess', 'week', 'rooms'];
-        if (!Array.isArray(caught) || !all.every((id) => caught.includes(id))) return;
-        // switched off from the replay's pumpkin panel (Settings > Ghostbuster badge)
-        try { if (localStorage.getItem('hw-badge-off') === 'true') return; } catch (e) {}
-        const paint = () => {
-            const block = document.querySelector('.hero-block');
-            if (!block || block.querySelector('.hw-badge')) return;
-            const a = document.createElement('a');
-            a.className = 'hw-badge hw-badge-keep';
-            a.href = '/?spooky=1';
-            a.title = 'Play Halloween 2026 again';
-            a.innerHTML = '<svg viewBox="0 0 32 36" aria-hidden="true">' +
-                '<path class="hw-sheet" d="M16 2C8 2 4 8 4 15v18l4-3 4 3 4-3 4 3 4-3 4 3V15c0-7-4-13-12-13z"/>' +
-                '<ellipse class="hw-eye" cx="12" cy="15" rx="2" ry="3"/><ellipse class="hw-eye" cx="20" cy="15" rx="2" ry="3"/>' +
-                '<ellipse class="hw-eye" cx="16" cy="22" rx="2" ry="1.4"/></svg><span>Ghostbuster 2026</span>';
-            block.appendChild(a);
-        };
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint);
-        else paint();
     }
 
     // ---------- theme switched off: just a small pumpkin to bring it back ----------
@@ -327,7 +294,6 @@
             ['boo', 'Floating ghosts', booOn()],
             ['scare', 'Jumpscares', store.get('hw-scare', true)]
         ]).concat(isHome && !reduce ? [['bats', 'Bats', batsOn()]] : [])
-            .concat(won() ? [['badge', 'Ghostbuster badge on home', !store.get('hw-badge-off', false)]] : [])
             .concat([['theme', 'Halloween theme', true]]);
         panel.innerHTML =
             '<div class="hw-panel-head"><p class="hw-panel-title">' + (won() ? 'Ghostbuster 2026' : 'Ghost hunt') + '</p>' +
@@ -348,11 +314,6 @@
         if (key === 'scare') store.set('hw-scare', on);
         if (key === 'bats') setBats(on);
         if (key === 'theme' && !on) setThemeOff(true);
-        if (key === 'badge') {
-            store.set('hw-badge-off', !on);
-            if (on) paintBadge();
-            else document.querySelectorAll('.hw-badge').forEach((b) => b.remove());
-        }
     });
 
     function openPanel(open) {
@@ -436,7 +397,10 @@
 
     // ---------- the reward badge (home page only) ----------
     function paintBadge() {
-        if (!isHome || !won() || store.get('hw-badge-off', false) || document.querySelector('.hw-badge')) return;
+        // the badge belonged to Halloween week; afterwards the win lives in
+        // Archive > Halloween 2026, not on the home page
+        if (Date.now() >= Date.parse('2026-11-01T00:00:00+04:00')) return;
+        if (!isHome || !won() || document.querySelector('.hw-badge')) return;
         const block = document.querySelector('.hero-block');
         if (!block) return;
         const badge = document.createElement('span');
@@ -894,7 +858,7 @@
                 '<label class="hw-row"><span>' + label + '</span>' +
                 '<input type="checkbox" role="switch" class="hw-switch" data-set="' + key + '"' + (on ? ' checked' : '') + '></label>' +
                 (key === 'theme' ? '<p class="hw-note">' + (Date.now() >= Date.parse('2026-11-01T00:00:00+04:00')
-                    ? 'Off ends the replay. The Halloween \'26 pill on the home page brings it back.'
+                    ? 'Off turns Halloween off. Archive > Halloween 2026 switches it back on.'
                     : 'Off switches it off on this device. You can turn it back on from the pumpkin.') + '</p>' : '')
             ).join('') + '</div></details>';
     }
@@ -903,7 +867,7 @@
     // and the page reloads so the theme is cleanly in or out.
     function setThemeOff(off) {
         try {
-            if (off) localStorage.setItem('spooky-off', '1');
+            if (off) { localStorage.setItem('spooky-off', '1'); localStorage.removeItem('hw-replay'); }
             else localStorage.removeItem('spooky-off');
             sessionStorage.removeItem('spooky');
         } catch (e) {}

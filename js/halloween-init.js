@@ -31,9 +31,14 @@
     let optedOut = false;
     try { optedOut = localStorage.getItem('spooky-off') === '1'; } catch (e) {}
 
+    // After the week, Archive > Halloween 2026 has an on/off switch that
+    // keeps the theme on across visits until it is switched off again.
+    let replay = false;
+    try { replay = localStorage.getItem('hw-replay') === '1'; } catch (e) {}
+
     const now = Date.now();
     const week = now >= START && now < END;
-    const on = flag === '1' || (flag !== '0' && !optedOut && week);
+    const on = flag === '1' || (flag !== '0' && !optedOut && (week || replay));
     if (!on) {
         if (optedOut && flag !== '0' && week) window.HALLOWEEN_OFF = true;
         return;
