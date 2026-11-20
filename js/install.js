@@ -55,7 +55,7 @@
     padding:max(20px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));
     background:var(--bg,#F2EBDB);color:var(--fg,#0E1726);font-family:var(--font-sans,system-ui,-apple-system,sans-serif);overflow:auto}
   #lc-install .lc-box{width:100%;max-width:380px}
-  #lc-install .lc-icon{width:72px;height:72px;border-radius:17px;display:block;margin:0 0 18px;box-shadow:0 6px 18px rgba(14,23,38,.18)}
+  #lc-install .lc-icon{width:72px;height:72px;border-radius:17px;display:block;margin:0 0 18px;box-shadow:0 0 0 1px var(--rule,rgba(14,23,38,.2)),0 6px 18px rgba(14,23,38,.18)}
   #lc-install h1{font-size:1.55rem;line-height:1.15;margin:0 0 10px;font-weight:800;letter-spacing:-.01em}
   #lc-install p{margin:0 0 14px;color:var(--fg-soft,#3B4659);line-height:1.45;font-size:.98rem}
   #lc-install ul{margin:0 0 18px;padding:0;list-style:none}
@@ -91,12 +91,10 @@
       document.documentElement.style.overflow = "hidden";
       count("shown");
     }
-    const reason = why ? `<p><b>${why}</b></p>` : "";
-    const whyList = reason + `<ul>
-        <li><b>1</b><span>Bus reminders: a notification 10 minutes before your bus.</span></li>
-        <li><b>2</b><span>Opens in one tap from your Home Screen, full screen, no browser bar.</span></li>
-        <li><b>3</b><span>Bus times, the mess menu and your timetable still load with no signal.</span></li>
-      </ul>`;
+    // One line, like linkEEN's: what it is and how long it takes. When another
+    // script opened this (e.g. Remind on an iPhone tab), its reason goes first.
+    const whyList = (why ? `<p><b>${why}</b></p>` : "") +
+      `<p>linkCS runs as an app on your phone, with bus reminders. It takes 10 seconds.</p>`;
     let body;
     if (installed) {
       body = `<p>Installed. Open <b>linkCS</b> from your Home Screen from now on.</p>`;
@@ -120,7 +118,7 @@
     }
     box.innerHTML = `<div class="lc-box">
         <img class="lc-icon" src="/assets/app/icon-192.png" alt="">
-        <h1>Get linkCS on your Home Screen</h1>
+        <h1>Add linkCS to your Home Screen</h1>
         ${body}
         <button type="button" class="lc-later" data-act="later">${installed ? "Close" : "Remind me later"}</button>
       </div>`;
