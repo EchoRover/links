@@ -403,6 +403,10 @@ window.DATA = {
       "2026-12-02": "UAE National Day",
       "2026-12-03": "UAE National Day",
       "2026-12-04": "UAE National Day"
+    },
+    "makeup": {
+      "2026-11-30": "Thursday",
+      "2026-12-01": "Friday"
     }
   }
 };
@@ -761,3 +765,27 @@ const NO_CLASS = {
   "2026-12-03": "UAE National Day",
   "2026-12-04": "UAE National Day"
 };
+const MAKEUP = {
+  "2026-11-30": 4,
+  "2026-12-01": 5
+};
+
+// THE way to ask which classes a date has. Returns the weekday whose
+// timetable runs that date (1 = Monday ... 5 = Friday), or null when no
+// classes run (weekend, holiday). A make-up day runs another weekday's
+// timetable: Mon 30 Nov 2026 returns 4, Thursday. Never use getDay() to pick
+// a day's classes. Term bounds are NOT checked here; callers do that.
+function classDay(d) {
+  const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  if (NO_CLASS[k]) return null;
+  if (k in MAKEUP) return MAKEUP[k];
+  const w = d.getDay();
+  return w >= 1 && w <= 5 ? w : null;
+}
+
+// "Thursday timetable" on a make-up day, "" on any other date.
+function makeupNote(d) {
+  const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  return k in MAKEUP ? `${names[MAKEUP[k]]} timetable` : "";
+}

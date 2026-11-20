@@ -372,9 +372,10 @@ const SLOTS = (() => {
 
 function liveState(room) {
     const now = new Date();
-    if (now.getDay() < 1 || now.getDay() > 5 || NO_CLASS[ymd(now)]) return null;
+    const run = classDay(now);   // a make-up Monday runs Thursday's rooms
+    if (!run) return null;
     const mins = now.getHours() * 60 + now.getMinutes();
-    return SLOTS.find(s => s.room === room && s.day === now.getDay() && mins >= s.from && mins < s.to) || false;
+    return SLOTS.find(s => s.room === room && s.day === run && mins >= s.from && mins < s.to) || false;
 }
 
 let labelling = false;

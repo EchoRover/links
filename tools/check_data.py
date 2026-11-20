@@ -83,6 +83,14 @@ start, end = cal["term"]["start"], cal["term"]["end"]
 for day in cal["noClass"]:
     if not (start <= day <= end):
         bad(f"calendar.json: no-class day {day} falls outside the term ({start}..{end})")
+WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+for day, runs in cal.get("makeup", {}).items():
+    if not (start <= day <= end):
+        bad(f"calendar.json: make-up day {day} falls outside the term ({start}..{end})")
+    if day in cal["noClass"]:
+        bad(f"calendar.json: {day} is both a make-up day and a no-class day")
+    if runs not in WEEKDAYS:
+        bad(f"calendar.json: make-up day {day} runs {runs!r}, not a weekday name")
 
 # a generated file that has drifted from its source is worse than no generator
 gen = ROOT / "js" / "gen" / "data.js"

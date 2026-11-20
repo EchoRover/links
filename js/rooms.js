@@ -112,13 +112,20 @@ let viewDay = null;
 
 function defaultDay(now) {
     const today = ymd(now);
-    const dow = now.getDay();
-    if (dow >= 1 && dow <= 5 && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end) return dow;
+    const run = classDay(now);   // a make-up Monday opens on Thursday's rooms
+    if (run && today >= TERM.start && today <= TERM.end) return run;
     for (let i = 1; i <= 8; i++) {
         const d = new Date(now); d.setDate(d.getDate() + i);
-        if (d.getDay() >= 1 && d.getDay() <= 5 && !NO_CLASS[ymd(d)]) return d.getDay();
+        if (classDay(d)) return classDay(d);
     }
     return 1;
+}
+
+// True when the wall clock is inside a teaching day: in term, not a holiday,
+// and a weekday or a make-up day.
+function teachingNow(now) {
+    const today = ymd(now);
+    return !!classDay(now) && today >= TERM.start && today <= TERM.end;
 }
 
 function offNote(now) {
@@ -126,6 +133,7 @@ function offNote(now) {
     if (today < TERM.start) return `classes start ${TERM.start.split("-").reverse().join("/")}`;
     if (today > TERM.end) return "semester's over";
     if (NO_CLASS[today]) return `today: ${NO_CLASS[today]}, no classes`;
+    if (makeupNote(now)) return `today is a make-up day: ${makeupNote(now)}`;
     const dow = now.getDay();
     if (dow === 0 || dow === 6) return "weekend, all rooms free today";
     return "";
@@ -134,13 +142,10 @@ function offNote(now) {
 // ---------- live status line (always wall-clock, regardless of viewDay) ----------
 
 function statusHTML(room, now) {
-    const today = ymd(now);
-    const dow = now.getDay();
-    const teaching = dow >= 1 && dow <= 5 && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end;
-    if (!teaching) return `<span class="st-free">free</span>`;
+    if (!teachingNow(now)) return `<span class="st-free">free</span>`;
 
     const mins = now.getHours() * 60 + now.getMinutes();
-    const list = roomSlots(room, dow);
+    const list = roomSlots(room, classDay(now));
     const cur = list.find(x => mins >= x.from && mins < x.to);
     const nxt = list.filter(x => x.from > mins).sort((a, b) => a.from - b.from)[0];
 
@@ -182,10 +187,7 @@ function renderRooms() {
     const open = new Set([...document.querySelectorAll(".room-card.open")].map(c => c.dataset.room));
 
     const mins = now.getHours() * 60 + now.getMinutes();
-    const today = ymd(now);
-    const dow = now.getDay();
-    const teaching = dow >= 1 && dow <= 5 && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end;
-    const isToday = dow === viewDay && teaching;
+    const isToday = teachingNow(now) && classDay(now) === viewDay;
 
     // building -> floor -> rooms, so neither is ever repeated on a card
     const tree = {};
@@ -200,7 +202,7 @@ function renderRooms() {
             const rooms = tree[bldg][floor];
             const busyRooms = [], freeRooms = [];
             for (const room of rooms) {
-                (teaching && roomSlots(room, dow).some(x => mins >= x.from && mins < x.to)
+                (teachingNow(now) && roomSlots(room, classDay(now)).some(x => mins >= x.from && mins < x.to)
                     ? busyRooms : freeRooms).push(room);
             }
 
@@ -471,12 +473,9 @@ function centroid(pts) {
 // free / busy for the colour fill. Always wall-clock now, like the cards -
 // the point of this view is "what can I walk into right now".
 function liveState(room, now) {
-    const today = ymd(now);
-    const dow = now.getDay();
-    const teaching = dow >= 1 && dow <= 5 && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end;
-    if (!teaching) return "free";
+    if (!teachingNow(now)) return "free";
     const mins = now.getHours() * 60 + now.getMinutes();
-    return roomSlots(room, dow).some(x => mins >= x.from && mins < x.to) ? "busy" : "free";
+    return roomSlots(room, classDay(now)).some(x => mins >= x.from && mins < x.to) ? "busy" : "free";
 }
 
 function poly(pts) {
@@ -560,8 +559,7 @@ function openRoom(room) {
     const now = new Date();
     const daySlots = roomSlots(room, viewDay);
     const mins = now.getHours() * 60 + now.getMinutes();
-    const today = ymd(now);
-    const isToday = now.getDay() === viewDay && !NO_CLASS[today] && today >= TERM.start && today <= TERM.end;
+    const isToday = teachingNow(now) && classDay(now) === viewDay;
 
     const rows = daySlots.length
         ? daySlots.map((x) => {

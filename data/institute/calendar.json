@@ -18,6 +18,11 @@
     "2026-12-03": "UAE National Day",
     "2026-12-04": "UAE National Day"
   },
+  "makeup": {
+    "2026-11-30": "Thursday",
+    "2026-12-01": "Friday"
+  },
+  "_makeupNote": "A make-up day is a working day that runs ANOTHER weekday's timetable. Keyed by date, value = the weekday whose timetable runs. js/gen/data.js turns this into MAKEUP + classDay(date), which every page uses to pick a day's classes. National Day 2026: Mon 30 Nov runs Thursday, Tue 1 Dec runs Friday.",
   "_noClassNote": "The calendar printed 26/08 with a star ('government may move it'). It moved: confirmed 2026-08-24 that the holiday is Friday the 28th.",
-  "_nationalDayNote": "The printed PDF lists Commemoration + UAE National Day as 30/11-3/12. REVISED: holidays are 2-4 Dec (Wed-Fri); 30 Nov (Mon) + 1 Dec (Tue) become working make-up days running Thursday's and Friday's timetables. Source: institute announcement, mirrored from linkEEN (links2, Sumedh) 2026-11-17. Make-up days are NOT representable in noClass - they need a separate follows/makeup map (cf. linkEEN MAKEUP_DAYS)."
+  "_nationalDayNote": "The printed PDF lists Commemoration + UAE National Day as 30/11-3/12. REVISED: holidays are 2-4 Dec (Wed-Fri); 30 Nov (Mon) + 1 Dec (Tue) become working make-up days running Thursday's and Friday's timetables. Source: institute announcement, mirrored from linkEEN (links2, Sumedh) 2026-11-17. The make-up days live in `makeup` above."
 }

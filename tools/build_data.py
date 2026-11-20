@@ -79,6 +79,11 @@ def main():
         for key in [code] + list(r.get("aliases", [])):
             legacy_rooms[key] = entry
 
+    # ---- MAKEUP: {"YYYY-MM-DD": dow} - a working day that runs another
+    # weekday's timetable. The JSON says "Thursday" so a human can read it.
+    names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    makeup = {d: names.index(day) for d, day in cal.get("makeup", {}).items()}
+
     payload = {
         "courses": strip_notes(courses),
         "timetable": strip_notes(tt),
@@ -108,6 +113,27 @@ const WEEK = {json.dumps(legacy_week, indent=2)};
 const ROOMS = {json.dumps(legacy_rooms, indent=2)};
 const TERM = {json.dumps({"start": cal["term"]["start"], "end": cal["term"]["end"]})};
 const NO_CLASS = {json.dumps(cal["noClass"], indent=2, ensure_ascii=False)};
+const MAKEUP = {json.dumps(makeup, indent=2)};
+
+// THE way to ask which classes a date has. Returns the weekday whose
+// timetable runs that date (1 = Monday ... 5 = Friday), or null when no
+// classes run (weekend, holiday). A make-up day runs another weekday's
+// timetable: Mon 30 Nov 2026 returns 4, Thursday. Never use getDay() to pick
+// a day's classes. Term bounds are NOT checked here; callers do that.
+function classDay(d) {{
+  const k = `${{d.getFullYear()}}-${{String(d.getMonth() + 1).padStart(2, "0")}}-${{String(d.getDate()).padStart(2, "0")}}`;
+  if (NO_CLASS[k]) return null;
+  if (k in MAKEUP) return MAKEUP[k];
+  const w = d.getDay();
+  return w >= 1 && w <= 5 ? w : null;
+}}
+
+// "Thursday timetable" on a make-up day, "" on any other date.
+function makeupNote(d) {{
+  const k = `${{d.getFullYear()}}-${{String(d.getMonth() + 1).padStart(2, "0")}}-${{String(d.getDate()).padStart(2, "0")}}`;
+  const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  return k in MAKEUP ? `${{names[MAKEUP[k]]}} timetable` : "";
+}}
 """
     GEN.parent.mkdir(parents=True, exist_ok=True)
     GEN.write_text(body)

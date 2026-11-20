@@ -197,8 +197,9 @@ const SLOTS = (() => {
 })();
 function today() {
     const n = new Date();
-    if (n.getDay() < 1 || n.getDay() > 5 || NO_CLASS[ymd(n)]) return null;
-    return { day: n.getDay(), mins: n.getHours() * 60 + n.getMinutes() };
+    const run = classDay(n);   // a make-up Monday runs Thursday's rooms
+    if (!run) return null;
+    return { day: run, mins: n.getHours() * 60 + n.getMinutes() };
 }
 function liveState(code) {
     const t = today();

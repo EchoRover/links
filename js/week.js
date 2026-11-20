@@ -241,13 +241,18 @@ function renderWeek() {
         const isToday = key === todayKey;
         const off = NO_CLASS[key];
         const inTerm = key >= TERM.start && key <= TERM.end;
+        // The column is this date; its classes are whichever weekday the
+        // date runs. A make-up Monday shows Thursday's classes, and says so.
+        const run = classDay(date);
+        const mk = makeupNote(date);
 
         heads += `<div class="wk-head-day${isToday ? " on" : ""}">
             <span class="wk-hd-name">${VIEW === "day" ? DAY_FULL[d] : DAY_LABEL[d]}</span>
             <span class="wk-hd-num">${date.getDate()}</span>
+            ${mk ? `<span class="wk-hd-mk">${VIEW === "day" ? mk : `runs ${DAY_LABEL[run]}`}</span>` : ""}
         </div>`;
 
-        const rawEntries = dayEntries(d).filter((x) => x.kind !== "free");
+        const rawEntries = run ? dayEntries(run).filter((x) => x.kind !== "free") : [];
         const filtered = GROUP === 0 ? rawEntries : rawEntries.filter((x) => x.grp === 0 || x.grp === GROUP);
         const items = (off || !inTerm) ? [] : lay(filtered);
 

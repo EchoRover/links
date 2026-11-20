@@ -158,8 +158,9 @@ function nextDayWithClass(after) {
         const d = new Date(after);
         d.setDate(d.getDate() + i);
         if (ymd(d) > TERM.end) return null;
-        if (NO_CLASS[ymd(d)]) continue;
-        const list = dayEntries(d.getDay()).filter((x) => x.kind !== "free");
+        const run = classDay(d);
+        if (!run) continue;
+        const list = dayEntries(run).filter((x) => x.kind !== "free");
         if (list.length) return { date: d, list };
     }
     return null;
@@ -223,7 +224,15 @@ function renderTimetable() {
     }
 
     const off = NO_CLASS[today];
-    const list = off ? [] : dayEntries(now.getDay()).filter((x) => x.kind !== "free");
+    const run = classDay(now);   // a make-up Monday runs Thursday's classes
+    const list = run ? dayEntries(run).filter((x) => x.kind !== "free") : [];
+
+    // On a make-up day the card shows another weekday's classes, which looks
+    // like a bug unless it says why. Same for the next day shown, if it is one.
+    const makeupLine = (d, who) => {
+        const m = makeupNote(d);
+        return m ? `<p class="tt-quiet tt-makeup">${who} is a make-up day: ${m}.</p>` : "";
+    };
 
     // Both groups are on screen, so more than one thing can be running
     // or starting next — G1 and G2 diverge on three tutorials a week.
@@ -260,9 +269,12 @@ function renderTimetable() {
                     sub: (Number(hh) < 12 ? "am" : "pm"),
                 }, false);
             }
+            html += makeupLine(nd.date, dn === "tomorrow" ? "Tomorrow" : DAY_NAME[nd.date.getDay()]);
         } else {
             html += `<p class="tt-quiet">${why}.</p>`;
         }
+    } else {
+        html += makeupLine(now, "Today");
     }
 
     box.innerHTML = html;
