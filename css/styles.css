@@ -1183,6 +1183,20 @@ a.brand-logo:focus-visible { outline: 2px solid var(--coral); outline-offset: 3p
     animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
+/* bus card on home: next run each way */
+.hb-body { display: grid; gap: 0.5rem; }
+.hb-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    padding: 0.6rem 0.75rem; border-radius: 10px; background: var(--bg-elevated);
+}
+.hb-main, .hb-when { display: flex; flex-direction: column; min-width: 0; }
+.hb-when { align-items: flex-end; text-align: right; }
+.hb-dir { font-weight: 700; font-size: 0.98rem; color: var(--fg); }
+.hb-from { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-soft); }
+.hb-time { font-weight: 700; font-size: 1.05rem; color: var(--fg); font-variant-numeric: tabular-nums; }
+.hb-in { font-family: var(--font-mono); font-size: 0.7rem; color: var(--coral); font-weight: 600; }
+@media (min-width: 760px) { .hb-body { grid-template-columns: 1fr 1fr; } }
+
 .tt-head {
     display: flex;
     align-items: center;

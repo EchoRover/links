@@ -10,6 +10,7 @@
     <script src="/js/theme-init.js"></script>
     <script src="/js/hit.js" defer></script>
     <script src="/js/app.js" defer></script>
+    <script src="/js/install.js" defer></script>
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/assets/app/icon-180.png">
     <meta name="apple-mobile-web-app-title" content="linkCS">
@@ -269,11 +270,13 @@
             cursor: pointer;
         }
 
+        /* selected = the site blue (light blue on dark), not a block of ink */
         .seg button.on {
-            background: var(--fg);
-            border-color: var(--fg);
-            color: var(--bg);
+            background: var(--coral);
+            border-color: var(--coral);
+            color: #fff;
         }
+        [data-theme="dark"] .seg button.on { color: #060814; }
 
         .link-btn {
             font-family: var(--font-mono);

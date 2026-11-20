@@ -76,4 +76,10 @@
     if (!a) return;
     send({ t: "click", p: location.pathname, d: id, l: label(a) });
   }, true);
+
+  // For things that are not links (the install banner's buttons): counted in
+  // the same "taps" table under the given label.
+  window.linkcsCount = function (l) {
+    send({ t: "click", p: location.pathname, d: id, l: String(l || "").slice(0, 60) });
+  };
 })();

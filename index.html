@@ -9,6 +9,7 @@
     <script src="/js/theme-init.js"></script>
     <script src="/js/hit.js" defer></script>
     <script src="/js/app.js" defer></script>
+    <script src="/js/install.js" defer></script>
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="/assets/app/icon-180.png">
     <meta name="apple-mobile-web-app-title" content="linkCS">
@@ -228,6 +229,17 @@
             <div class="tt-body" id="tt-body"></div>
         </section>
 
+        <!-- BUS — next run each way, off js/bus-data.js (same data as /bus) -->
+        <section class="tt-card hb-card" id="hb-card">
+            <div class="tt-head">
+                <span class="tt-title">Bus</span>
+                <div class="tt-tools">
+                    <a href="/pages/bus.html" class="tt-pdf">full schedule</a>
+                </div>
+            </div>
+            <div class="hb-body" id="hb-body"></div>
+        </section>
+
         <!-- COURSES — 2-column grid, compact -->
         <section id="course-grid" class="course-list"></section>
 
@@ -252,6 +264,8 @@
     <script src="/js/gen/data.js"></script>
     <script src="/js/scripts.js"></script>
     <script src="/js/timetable.js" defer></script>
+    <script src="/js/bus-data.js" defer></script>
+    <script src="/js/home-bus.js" defer></script>
     <script src="/js/halloween.js" defer></script>
 </body>
 
