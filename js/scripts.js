@@ -369,6 +369,29 @@ addUpdate("assignments", "ACOL333: AI assignment 1, 12/10/2026", "2026-10-12");
 addUpdate("assignments", "AGRL130: Value proposition (FAB table + personas), 12/10/2026", "2026-10-12");
 addUpdate("assignments", "ACOL333: AI assignment 2 (adversarial search), 09/11/2026", "2026-11-09");
 
+// AHUL261 "Psychology in Everyday Life" portfolio: one entry every Monday,
+// 23:59, uploaded on Blackboard (dates from the course's portfolio brief,
+// 4 Nov). The final revised compilation is due Tue 15 Dec.
+addUpdate("assignments", "AHUL261: Portfolio entry 3 (23:59 on Blackboard), 23/11/2026", "2026-11-23");
+addUpdate("assignments", "AHUL261: Portfolio entry 4 (23:59 on Blackboard), 30/11/2026", "2026-11-30");
+addUpdate("assignments", "AHUL261: Portfolio entry 5 (23:59 on Blackboard), 07/12/2026", "2026-12-07");
+addUpdate("assignments", "AHUL261: Final revised portfolio, 15/12/2026", "2026-12-15");
+
+// Lab exam 3 (the scheduler lab) moved from Thu 19 Nov to "next
+// Wednesday's lab" because of convocation (Blackboard, Abhilash): the Wed
+// ACOL331 lab block. Lab 4 (page replacement) is out on Moodle; its exam
+// date isn't announced yet.
+addUpdate("quizzes", "ACOL331: OS lab exam 3 (scheduler), Wed lab slot, 25/11/2026", "2026-11-25");
+
+// The intelligence quiz set for Tue 17 Nov was postponed, and the next topic
+// is in scope too. Expected in the next lecture (Tue 24 Nov 14:00, M4-0-011);
+// not announced on Blackboard, so it says "expected".
+addUpdate("quizzes", "AHUL261: Intelligence quiz, expected in class 14:00, 24/11/2026", "2026-11-24");
+
+// End-semester exams per the academic calendar. Per-course dates and
+// rooms aren't out yet; replace this with one line per paper when they are.
+addUpdate("quizzes", "ENDSEM: End-semester exams 17-23 Dec, 17/12/2026", "2026-12-17");
+
 // Mid-sem papers from the Year 3 mid-term schedule (24-29 Oct), listed
 // as quizzes so they sit in the same dated list. The time is the start;
 // reporting is 30 min earlier.
@@ -418,9 +441,12 @@ function addNextAlgoTutQuiz() {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     if (!noClass[key]) {
       const dmy = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+      // Weeks where the prof changed the usual one-problem quiz. 25 Nov: the
+      // 20 Nov tutorial was cancelled and folded in (Blackboard), so 2 problems.
+      const NOTE = { "2026-11-25": " (2 problems)" };
       addUpdate(
         "quizzes",
-        `ACOL351: Algorithm tutorial quiz, ${dmy}`,
+        `ACOL351: Algorithm tutorial quiz${NOTE[key] || ""}, ${dmy}`,
         key,
       );
       return;
