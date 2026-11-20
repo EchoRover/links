@@ -52,6 +52,10 @@
     {
       "source": "/stats",
       "destination": "/pages/stats"
+    },
+    {
+      "source": "/admin",
+      "destination": "/pages/stats"
     }
   ],
   "functions": {

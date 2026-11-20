@@ -11,6 +11,7 @@
 
     const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
     const API = LOCAL ? "https://linkcs.vercel.app/api/hit" : "/api/hit";
+    const BCAST = LOCAL ? "https://linkcs.vercel.app/api/push/broadcast" : "/api/push/broadcast";
     const KEY = "linkcs:stats-key";
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
@@ -68,6 +69,8 @@
         $("st-gate").hidden = false;
         $("st-body").hidden = true;
         $("st-range").hidden = true;
+        $("ad-body").hidden = true;
+        $("st-usage-head").hidden = true;
         $("st-err").textContent = msg || "";
         $("st-key").focus();
     }
@@ -105,7 +108,102 @@
         try { localStorage.setItem(KEY, key); } catch (e) { /* ignore */ }
         $("st-gate").hidden = true;
         $("st-range").hidden = false;
+        $("st-usage-head").hidden = false;
         render(data);
+        if (!adminLoaded) loadAdmin();
+    }
+
+    // ---------- admin: notifications ----------
+    let adminLoaded = false;
+    let subsCount = 0;
+    const OPEN_PAGES = [["/", "Home"], ["/pages/bus", "Bus"], ["/pages/mess", "Mess"],
+        ["/pages/week", "Timetable"], ["/pages/rooms", "Free Rooms"], ["/archive/", "Archive"]];
+    const ago = (ms) => {
+        const m = Math.round((Date.now() - ms) / 60000);
+        if (m < 1) return "just now";
+        if (m < 60) return `${m} min ago`;
+        const h = Math.round(m / 60);
+        return h < 24 ? `${h} h ago` : `${Math.round(h / 24)} d ago`;
+    };
+
+    async function loadAdmin() {
+        let data = null;
+        try {
+            const r = await fetch(`${BCAST}?days=30`, { headers: { Authorization: `Bearer ${key}` }, cache: "no-store" });
+            data = await r.json();
+        } catch (e) { /* shown below */ }
+        adminLoaded = true;
+        const box = $("ad-body");
+        box.hidden = false;
+        if (!data || !data.ok) {
+            box.innerHTML = card("Notifications", `<p class="st-empty">Couldn't load: ${esc((data && data.error) || "network")}</p>`, true);
+            return;
+        }
+        subsCount = data.subs;
+        const days = data.perDay.slice().reverse();                 // oldest first
+        const newIn = days.reduce((a, d) => a + d.on, 0);
+        const cols = colsHTML(days.map((d) => ({ v: d.on, tip: `${dayLabel(d.day)}: ${d.on} turned on${d.off ? `, ${d.off} turned off` : ""}` })),
+            days.length ? dayLabel(days[0].day) : "", days.length ? dayLabel(days[days.length - 1].day) : "");
+        const log = data.log.length ? `<ul class="ad-log">${data.log.map((l) => `
+            <li><span>${esc(l.title)}</span><span>${fmt(l.sent)} sent</span>
+            <small>${esc(ago(l.at))}${l.body ? " · " + esc(l.body) : ""}${l.gone ? ` · ${l.gone} expired removed` : ""}${l.failed ? ` · ${l.failed} failed` : ""}</small></li>`).join("")}</ul>`
+            : '<p class="st-empty">Nothing sent yet.</p>';
+        box.innerHTML = `
+            <div class="st-kpis">
+                <div class="st-card st-kpi"><div class="n">${fmt(data.subs)}</div><div class="l">devices with notifications on</div></div>
+                <div class="st-card st-kpi"><div class="n">${fmt(newIn)}</div><div class="l">turned on in the last 30 days</div></div>
+            </div>
+            <div class="ad-grid">
+                <section class="st-card"><h2>Send to everyone</h2>
+                    <form class="ad-form" id="ad-form">
+                        <label>Title <input id="ad-title" maxlength="60" required placeholder="Bus timetable changed"></label>
+                        <label>Message <textarea id="ad-text" maxlength="180" placeholder="Night shift runs every 20 min from tonight."></textarea></label>
+                        <div class="ad-count" id="ad-count">0 / 180</div>
+                        <label>Opens <select id="ad-url">${OPEN_PAGES.map(([u, n]) => `<option value="${u}">${n}</option>`).join("")}</select></label>
+                        <div class="ad-preview" id="ad-preview"><b>Title</b><span>Message</span></div>
+                        <button type="submit" class="ad-send" id="ad-send">Send to ${fmt(data.subs)} device${data.subs === 1 ? "" : "s"}</button>
+                        <p class="ad-msg" id="ad-msg" role="status"></p>
+                    </form>
+                </section>
+                <section class="st-card"><h2>Recently sent</h2>${log}</section>
+                <section class="st-card st-full"><h2>Notifications turned on, per day</h2>${cols}</section>
+            </div>`;
+        const t = $("ad-title"), x = $("ad-text"), btn = $("ad-send"), msg = $("ad-msg");
+        let armed = false, armTimer = null;
+        const disarm = () => { armed = false; btn.classList.remove("arm"); btn.textContent = `Send to ${fmt(subsCount)} device${subsCount === 1 ? "" : "s"}`; };
+        const preview = () => {
+            $("ad-preview").innerHTML = `<b>${esc(t.value || "Title")}</b><span>${esc(x.value || "Message")}</span>`;
+            $("ad-count").textContent = `${x.value.length} / 180`;
+            if (armed) disarm();
+        };
+        t.addEventListener("input", preview); x.addEventListener("input", preview);
+        $("ad-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (!t.value.trim()) return;
+            if (!subsCount) { msg.textContent = "Nobody has notifications on yet."; return; }
+            // two taps: the first arms, the second sends (no pop-up dialogs)
+            if (!armed) {
+                armed = true; btn.classList.add("arm");
+                btn.textContent = `Tap again to send to ${fmt(subsCount)}`;
+                clearTimeout(armTimer); armTimer = setTimeout(disarm, 6000);
+                return;
+            }
+            clearTimeout(armTimer);
+            btn.disabled = true; msg.textContent = "Sending…";
+            try {
+                const r = await fetch(BCAST, { method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ title: t.value, body: x.value, url: $("ad-url").value }) });
+                const j = await r.json();
+                if (!j.ok) throw new Error(j.error || r.status);
+                msg.textContent = `Sent to ${j.sent}.${j.gone ? ` ${j.gone} expired devices removed.` : ""}${j.failed ? ` ${j.failed} failed.` : ""}`;
+                t.value = ""; x.value = "";
+                setTimeout(loadAdmin, 1500);
+            } catch (err) {
+                msg.textContent = "Not sent: " + err.message;
+            } finally {
+                btn.disabled = false; disarm();
+            }
+        });
     }
 
     // ---------- pieces ----------

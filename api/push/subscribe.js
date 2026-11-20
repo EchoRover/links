@@ -8,6 +8,9 @@
 import { storeReady, pushReady, pipeline, redis, body, subIdOf, validSubscription, send } from "../_lib/push.js";
 
 const MAX_SUBS = 5000;
+const TTL = 400 * 86400;
+// Abu Dhabi calendar day, for the per-day sign-up counts on /admin.
+const today = () => new Date(Date.now() + 4 * 3600000).toISOString().slice(0, 10);
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -20,7 +23,11 @@ export default async function handler(req, res) {
       if (!validSubscription(sub)) return res.status(400).json({ ok: false, error: "bad subscription" });
       if ((await redis("HLEN", "push:subs")) >= MAX_SUBS) return res.status(507).json({ ok: false, error: "full" });
       const id = subIdOf(sub.endpoint);
-      await redis("HSET", "push:subs", id, JSON.stringify({ endpoint: sub.endpoint, keys: sub.keys }));
+      const fresh = await redis("HSET", "push:subs", id, JSON.stringify({ endpoint: sub.endpoint, keys: sub.keys, since: Date.now() }));
+      if (fresh === 1) {                                    // a new device, not a re-subscribe
+        const k = `hits:push:${today()}`;
+        await pipeline([["HINCRBY", k, "on", 1], ["EXPIRE", k, TTL]]);
+      }
       const r = await send(sub, { title: "linkCS notifications are on",
         body: "Tap Remind on a bus and you'll get a heads-up 10 minutes before.", url: "/" });
       return res.status(200).json({ ok: true, id, test: r });
@@ -29,7 +36,8 @@ export default async function handler(req, res) {
       const id = String(q.id || "").slice(0, 40);
       if (!id) return res.status(400).json({ ok: false, error: "need id" });
       const mine = (await redis("HGETALL", `push:mine:${id}`)) || [];
-      const cmds = [["HDEL", "push:subs", id], ["DEL", `push:mine:${id}`]];
+      const k = `hits:push:${today()}`;
+      const cmds = [["HDEL", "push:subs", id], ["DEL", `push:mine:${id}`], ["HINCRBY", k, "off", 1], ["EXPIRE", k, TTL]];
       for (let i = 1; i < mine.length; i += 2) cmds.push(["ZREM", "push:due", mine[i]]);
       await pipeline(cmds);
       return res.status(200).json({ ok: true });
