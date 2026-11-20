@@ -392,10 +392,16 @@ addUpdate("assignments", "ACOL331: OS lab 4 (page replacement) on Moodle, 09/12/
 addUpdate("quizzes", "ACOL331: OS lab exam 3 (scheduler), Wed lab 8am, 25/11/2026", "2026-11-25");
 addUpdate("quizzes", "ACOL331: OS lab exam 4 (page replacement), Thu lab 3:30pm, 10/12/2026", "2026-12-10");
 
-// The intelligence quiz set for Tue 17 Nov was postponed, and the next topic
-// is in scope too. Expected in the next lecture (Tue 24 Nov 14:00, M4-0-011);
-// not announced on Blackboard, so it says "expected".
-addUpdate("quizzes", "AHUL261: Intelligence quiz, expected in class 14:00, 24/11/2026", "2026-11-24");
+// The intelligence quiz set for Tue 17 Nov was postponed. In the 17 Nov
+// lecture the prof said a 10-minute quiz next Tuesday on learning, memory and
+// intelligence. Not announced on Blackboard, so it says "expected".
+addUpdate("quizzes", "AHUL261: 10-min quiz on learning, memory, intelligence, expected in class 14:00, 24/11/2026", "2026-11-24");
+
+// Reflection worksheet for the seven-task intelligence battery done in the
+// 16/18 Nov tutorials (slide 18: "complete and submit in the next tutorial").
+// Graded on your own analysis of why you scored what you did, not the scores.
+// Dated at the earliest next tutorial; the deck isn't on Blackboard.
+addUpdate("assignments", "AHUL261: Intelligence reflection worksheet (7 task scores + your analysis), submit at your next tutorial, 23/11/2026", "2026-11-23");
 
 // End-semester exams per the academic calendar. Per-course dates and
 // rooms aren't out yet; replace this with one line per paper when they are.
