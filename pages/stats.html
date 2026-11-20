@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500;1,600&family=Familjen+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
     <style>
+        [hidden] { display: none !important; }   /* the flex/grid rules below must not undo it */
         .st-wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 56px; }
         .st-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 22px 0 18px; }
         .st-title { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--fg); margin: 0; }
@@ -66,6 +67,7 @@
         .st-gate input { font: 500 0.95rem var(--font-mono); padding: 11px 12px; border-radius: 10px; border: 1px solid var(--rule); background: var(--bg-card); color: var(--fg); }
         .st-gate button { font: 700 0.95rem var(--font-sans); padding: 11px; border-radius: 10px; border: 0; background: var(--coral); color: #fff; cursor: pointer; }
         .st-err { color: var(--red); font-size: 0.85rem; min-height: 1.2em; margin: 0; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         .st-hero2 { margin-top: 34px; }
         .st-title2 { font-size: clamp(1.25rem, 2.6vw, 1.6rem); }
         /* admin: notifications */
@@ -109,7 +111,7 @@
                 <span class="brand-name">
                     <span class="brand-part-link">link</span><span class="brand-part-cs">CS</span>
                 </span>
-                <span class="brand-meta">admin · private</span>
+                <span class="brand-meta">private</span>
             </div>
             <div class="topbar-utils">
                 <a href="/" class="pill"><span class="pill-name">← Home</span></a>
@@ -118,7 +120,7 @@
         </header>
 
         <div class="st-wrap">
-            <section class="st-hero">
+            <section class="st-hero" id="st-hero" hidden>
                 <div>
                     <h1 class="st-title">linkCS <em>admin</em></h1>
                     <p class="st-sub">Send notifications, see how linkCS is used.</p>
@@ -126,10 +128,10 @@
             </section>
 
             <section class="st-gate st-card" id="st-gate" hidden>
-                <h2>Password</h2>
+                <h2 class="sr-only">Password</h2>
                 <form id="st-form">
-                    <input type="password" id="st-key" autocomplete="current-password" placeholder="admin password" required>
-                    <button type="submit">Open admin</button>
+                    <input type="password" id="st-key" autocomplete="current-password" placeholder="password" required>
+                    <button type="submit">Open</button>
                     <p class="st-err" id="st-err" role="alert"></p>
                 </form>
             </section>

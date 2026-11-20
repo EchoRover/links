@@ -67,6 +67,7 @@
     // ---------- gate ----------
     function gate(msg) {
         $("st-gate").hidden = false;
+        $("st-hero").hidden = true;
         $("st-body").hidden = true;
         $("st-range").hidden = true;
         $("ad-body").hidden = true;
@@ -107,6 +108,7 @@
         if (!res.ok || !data || !data.ok) return gate(`The endpoint said: ${esc((data && data.error) || res.status)}`);
         try { localStorage.setItem(KEY, key); } catch (e) { /* ignore */ }
         $("st-gate").hidden = true;
+        $("st-hero").hidden = false;
         $("st-range").hidden = false;
         $("st-usage-head").hidden = false;
         render(data);

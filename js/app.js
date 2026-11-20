@@ -31,6 +31,18 @@
     .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class"] });
   document.addEventListener("transitionend", function (e) { if (e.target === document.body) syncBar(); });
 
+  // Hidden door to /admin: 10 quick taps on the "linkCS" wordmark (the text,
+  // not the logo image, which is a link home and would reset the count).
+  // /admin still asks for the password; this only saves typing the address.
+  let taps = 0, tapTimer = null;
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest(".brand-name")) return;
+    taps++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(function () { taps = 0; }, 1500);   // a pause resets it
+    if (taps >= 10) { taps = 0; location.href = "/admin"; }
+  });
+
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("/sw.js").catch(function () { /* the site works without it */ });
