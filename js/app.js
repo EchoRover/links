@@ -63,4 +63,20 @@
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("/sw.js").catch(function () { /* the site works without it */ });
   });
+
+  // Pages come from the phone's copy instantly; sw.js checks /api/version in
+  // the background. Ask for that check whenever the app comes back to the
+  // front, and reload once a new version has been swapped in, unless someone
+  // is typing (the admin form), in which case the next open picks it up.
+  function askForCheck() {
+    if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({ type: "linkcs-check" });
+  }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) askForCheck(); });
+  window.addEventListener("load", askForCheck);
+  navigator.serviceWorker.addEventListener("message", function (e) {
+    if (!e.data || e.data.type !== "linkcs-updated") return;
+    const a = document.activeElement;
+    const typing = a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
+    if (!typing) location.reload();
+  });
 })();
