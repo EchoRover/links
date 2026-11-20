@@ -1,6 +1,6 @@
 // ============================================================
 // POST /api/hit   {t:"view"|"click", p, w, d, r?, l?}  — count one thing
-// GET  /api/hit?days=14                             — the totals, per day
+// GET  /api/hit?days=14   (Authorization: Bearer <STATS_KEY>) — the totals
 //
 // How linkCS is actually used: which pages get opened, on what days and at
 // what hours, on phones or laptops, and which links people tap. Counts only.
@@ -15,14 +15,17 @@
 // Every key carries the day (Abu Dhabi time) and expires after 400 days, so
 // the store holds about a year of counts and never grows past that.
 //
-// The GET returns aggregates only, and they are public on purpose: the
-// numbers are no more private than the page itself, and it lets
-// tools/stats.py read them without anyone handling the store's token.
+// Counting is open (it has to be: every visitor's browser posts here). Reading
+// the totals is not: GET needs the STATS_KEY password, set in Vercel's env and
+// kept in the maintainer's Keychain (service "linkcs-stats-key"). /stats and
+// tools/stats.py send it. No STATS_KEY set = reading is off, never open.
 //
 // Anonymous, so gameable, like the mess flags: a bored script can inflate a
 // count. Page names are a fixed list and link labels are capped, so it cannot
 // fill the store with junk keys.
 // ============================================================
+
+import { timingSafeEqual, createHash } from "node:crypto";
 
 const URL_ = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
@@ -157,8 +160,34 @@ async function report(days) {
   return { ok: true, days: rows, devicesInWindow: Number(total) || 0 };
 }
 
+// Compare hashes so the comparison takes the same time whatever was typed.
+function keyOk(req) {
+  const want = process.env.STATS_KEY || "";
+  const got = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+  if (!want || !got) return false;
+  const h = (x) => createHash("sha256").update(x).digest();
+  return timingSafeEqual(h(want), h(got));
+}
+
+// The /stats page is served by this site, so it never needs CORS. Local
+// previews (localhost, any port) may read too, with the same password.
+function cors(req, res) {
+  const origin = String(req.headers.origin || "");
+  if (/^http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
+  cors(req, res);
+  if (req.method === "OPTIONS") return res.status(204).end();
+  if (req.method === "GET" && !keyOk(req)) {
+    return res.status(401).json({ ok: false, error: "password needed" });
+  }
   if (!URL_ || !TOKEN) {
     return res.status(503).json({ ok: false, error: "no store configured" });
   }

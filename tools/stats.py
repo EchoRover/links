@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """How linkCS is used: page views, devices, hours, phones vs laptops, taps.
 
-Reads the public aggregates from /api/hit (counts only, nothing about anyone),
-so it needs no store token:
+Reads the aggregates from /api/hit (counts only, nothing about anyone). Reading
+needs the stats password: $STATS_KEY if set, else the macOS Keychain item
+"linkcs-stats-key" (the same password the /stats page asks for).
 
     python3 tools/stats.py            last 14 days
     python3 tools/stats.py 30         last 30 days
@@ -13,10 +14,25 @@ on a phone and a laptop is two, and clearing site data makes a new one.
 """
 import collections
 import json
+import os
+import subprocess
 import sys
+import urllib.error
 import urllib.request
 
 BASE = "https://linkcs.vercel.app/api/hit"
+
+
+def stats_key():
+    key = os.environ.get("STATS_KEY", "").strip()
+    if key:
+        return key
+    try:
+        return subprocess.run(
+            ["security", "find-generic-password", "-s", "linkcs-stats-key", "-w"],
+            capture_output=True, text=True, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        sys.exit("no stats password: set STATS_KEY or add the Keychain item 'linkcs-stats-key'")
 
 
 def bar(n, top, width=24):
@@ -35,8 +51,13 @@ def table(title, counter, limit=15):
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     days = int(args[0]) if args else 14
-    with urllib.request.urlopen(f"{BASE}?days={days}", timeout=20) as r:
-        data = json.loads(r.read())
+    req = urllib.request.Request(f"{BASE}?days={days}",
+                                 headers={"Authorization": f"Bearer {stats_key()}"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"endpoint said {e.code}: {e.read().decode(errors='ignore')[:200]}")
     if "--json" in sys.argv:
         print(json.dumps(data, indent=1))
         return
